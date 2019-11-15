@@ -1,0 +1,59 @@
+﻿@{
+    Layout = null;
+    @model Model.Purchase;
+}
+<div class="form-group">
+    <label for="example-input-normal" class="col-sm-4 control-label">分类</label>
+    <div class="col-sm-4" id="cargo_div">
+        <input type="text" class="form-control" id="category" name="category" value="@Model.category" readonly />
+    </div>
+</div>
+
+<div class="form-group">
+    <label for="example-input-normal" class="col-sm-4 control-label">物料名称</label>
+    <div class="col-sm-4">
+        <input type="text" class="form-control" id="material_name" name="material_name" value="@Model.material_name" readonly />
+    </div>
+</div>
+
+<div class="form-group">
+    <label for="example-input-normal" class="col-sm-4 control-label">物料规格</label>
+    <div class="col-sm-4">
+        <input type="text" class="form-control" id="material_spec" name="material_spec" value="@Model.material_spec" readonly />
+    </div>
+</div>
+
+
+<div class="form-group">
+    <label for="example-input-normal" class="col-sm-4 control-label">采购总量</label>
+    <div class="col-sm-4">
+        <input type="text" class="form-control" id="material_num" name="material_num" value="@Model.material_num" readonly />
+    </div>
+</div>
+
+<div class="form-group" style="display:none">
+    <label for="example-input-normal" class="col-sm-4 control-label">已入库数量</label>
+    <div class="col-sm-4">
+        <input type="text" class="form-control" id="material_diff_num" name="material_diff_num" value="@Model.material_inventory_num" readonly />
+    </div>
+</div>
+
+<div class="form-group">
+    <label for="example-input-normal" class="col-sm-4 control-label">本次入库数量</label>
+    <div class="col-sm-4">
+        <input type="text" class="form-control" id="material_inventory_num" name="material_inventory_num" value="" />
+    </div>
+</div>
+
+<div class="form-group">
+    <label for="example-input-normal" class="col-sm-4 control-label">物料单位</label>
+    <div class="col-sm-4">
+        <input type="text" class="form-control" id="material_unit" name="material_unit" value="@Model.material_unit" readonly />
+    </div>
+</div>
+<div class="form-group">
+    <label for="example-input-normal" class="col-sm-4 control-label">单价</label>
+    <div class="col-sm-4">
+        <input type="text" class="form-control" id="material_price" name="material_price" value="@Model.material_price" readonly />
+    </div>
+</div>

@@ -1,0 +1,169 @@
+﻿@{
+    @model IList<Model.User>
+    @using Model;
+    @using BLL;
+
+}
+@using AspNetCoreMvcPager;
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title></title>
+    <link rel="stylesheet" type="text/css" href="~/assets/css/sweetalert.css">
+    <script type="text/javascript" src="~/assets/js/sweetalert-dev.js"></script>
+    <script type="text/javascript" src="~/Scripts/jquery-1.10.2.min.js"></script>
+    <script src="~/assets/js/lib/sweetalert/sweetalert.min.js"></script>
+    <script type="text/javascript">
+        $(function () {
+            $(".sidebar ul li:nth-of-type(7)").addClass("active open")
+            $(".sidebar ul li:nth-of-type(7) ul li:nth-of-type(1)").addClass("active")
+        });
+
+        function deleteTiShi(id) {
+            swal({
+                title: "确定删除 ?",
+                text: "删除后将无法恢复 !",
+                type: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#DD6B55",
+                confirmButtonText: "删除",
+                cancelButtonText: "取消",
+                closeOnConfirm: false,//true表示不需要点击确认,fasle需要点击确认后再关闭对话框
+                closeOnCancel: false //true表示不需要点击确认,fasle需要点击确认后再关闭对话框
+            },
+                function (isConfirm) {                    
+                    if (isConfirm) {
+                        $.ajax({
+                            type: "POST",
+                            url: "/User/Del?id=" + id + "",
+                            beforeSend: function (xhr) {
+                                xhr.setRequestHeader("XSRF-TOKEN",
+                                    $('input:hidden[name="__RequestVerificationToken"]').val());
+                            },
+                            data: {
+                                id: id
+                            },
+                            success: function (msg) {
+                                if (msg == "Success") {
+                                    swal({ title: "已删除 !", text: "该条记录已删除 !", type: "success"},
+                                        function () { window.location.href = '/User/Index'; }); 
+                                }
+                                else {
+                                    swal("执行失败 !", "该记录已保留 !", "error"); 
+                                }
+                            },
+                            error: function (msg) {
+                                swal("数据获取失败 !", "该记录已保留 !", "error"); 
+                            }
+                        });                       
+                    }
+                    else {
+                        swal("已取消 !", "该记录已保留 !", "error");                        
+                    }
+                });     
+        }
+    </script>
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-lg-12 p-0">
+                <div class="page-header">
+                    <div class="page-title">
+                        <ol class="breadcrumb text-left">
+                            <li><a href="/Supplier/Index">主页</a></li>
+                            <li><a href="/User/Index">用户管理</a></li>
+                            <li class="active">用户列表</li>
+                        </ol>
+                    </div>
+                </div>
+            </div><!-- /# column -->
+        </div><!-- /# row -->
+        <div class="main-content">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="card alert">
+                        <div class="card-header">
+                            <form class="form-inline" method="post" id="myfrom">
+                                <div class="form-group">
+                                    @if (UserManager.Current.GetLevel >= UserLevelEnum.Boss)
+                                    {
+                                        <input type="button" value="新增用户" class="btn btn-primary" onclick="window.location.href = '/User/Edit'" />
+
+                                    }
+                                </div>
+                            </form>
+                        </div>
+                        <div class="card-body">
+                            <table class="table table-responsive table-hover ">
+                                <thead>
+                                    <tr>
+                                        <th>编号</th>
+                                        <th>用户名</th>
+                                        <th>用户等级</th>
+                                        @if (UserManager.Current.GetLevel >= UserLevelEnum.Boss)
+                                        {
+                                            <th>编辑</th>
+                                            <th>删除</th>
+                                            <th>重置密码</th>
+                                        }
+
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @{
+                                    int index = 1;
+                                    foreach (var item in Model)
+                                    {
+                                    <tr>
+                                        <td>@index</td>
+                                        <td>@item.user_name</td>
+                                        <td>
+                                            @{
+                                                if (item.level == (int)UserLevelEnum.Operator)
+                                                {
+                                                    <label>普通员工</label>
+                                                }
+                                                else if (item.level == (int)UserLevelEnum.ProductManager)
+                                                {
+                                                    <label>生管</label>
+                                                }
+                                                else if (item.level == (int)UserLevelEnum.Boss)
+                                                {
+                                                    <label>老板</label>
+                                                }
+                                                else if (item.level == (int)UserLevelEnum.Developer)
+                                                {
+                                                    <label>系统后台人员</label>
+                                                }
+
+                                            }
+                                        </td>
+                                        @if (UserManager.Current.GetLevel >= UserLevelEnum.Boss)
+                                        {
+                                            <td>                                      
+                                                <input type="button" class="btn btn-primary" onclick="window.location.href = '/User/Edit?id=@item.id&&user_name=@item.user_name'" value="编辑" />                                            
+                                            </td>
+                                            <td>
+                                                <a href="#" class="btn btn-primary" onclick="deleteTiShi(@item.id)">删除</a>
+                                            </td>
+                                            <td>
+                                                <a href="#" class="btn btn-primary" onclick="deleteTiShi('/User/Reset?user_name=@item.user_name')">密码重置</a>
+                                            </td>
+                                        }                                       
+                                    </tr>
+                                            index++;
+                                        }
+                                    }
+                                </tbody>
+                            </table>
+                            <div class="page-nav" id="pageIndex">@Html.Raw(PagerHtmlString.Pager(ViewBag.model, "User", "Index", true))</div>
+                        </div>
+                    </div><!-- /# card -->
+                </div><!-- /# column -->
+            </div><!-- /# row -->
+        </div>
+    </div><!-- /# container-fluid -->    
+</body>
+</html>

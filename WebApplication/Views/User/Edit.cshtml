@@ -1,0 +1,140 @@
+﻿@{
+    @model Model.User;
+    @using Model;
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title></title>
+    <link rel="stylesheet" type="text/css" href="~/assets/css/sweetalert.css">
+    <script type="text/javascript" src="~/assets/js/sweetalert-dev.js"></script>
+    <script type="text/javascript" src="~/Scripts/jquery-1.10.2.min.js"></script>
+    <script type="text/javascript">
+        $(function () {
+            $(".sidebar ul li:nth-of-type(7)").addClass("active open")
+            $(".sidebar ul li:nth-of-type(7) ul li:nth-of-type(1)").addClass("active")
+            $('#submit').click(function () {
+                var user_name = $('#user_name').val();
+                var level_name = $('#level_name').val();
+                var pass_word = $('#pass_word').val();
+                var id = $('#id').val();
+                if (user_name == "" || level_name == "" || pass_word == "") {
+                    swal("用户名或用户等级不为空!","请将信息补充完整","error");
+
+                }
+                else {
+                    $.ajax({
+                        type: "POST",
+                        url: "/User/EditHandle",
+                        beforeSend: function (xhr) {
+                            xhr.setRequestHeader("XSRF-TOKEN",
+                                $('input:hidden[name="__RequestVerificationToken"]').val());
+                        },
+                        data: { user_name: user_name, level_name: level_name, pass_word: pass_word, id: id },
+                        success: function (msg) {
+                            if (msg == "Success") {
+                                swal({ title: "执行成功!", text: "", type: "success" },
+                                    function () { window.location.href = '/User/Index'; });
+                                
+                            }
+                            else if (msg == "Existence") {
+                                swal("用户名已存在!", "", "error");
+                            }
+                            else {
+                                swal("执行失败!", "", "error");
+                            }
+                        },
+                        error: function (msg) {
+                            swal("数据获取失败!", "", "error");
+                        }
+                    });
+                }
+
+            });
+        });
+    </script>
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="page-header">
+                    <div class="page-title">
+                        <ol class="breadcrumb text-left">
+                            <li><a href="/Supplier/Index">主页</a></li>
+                            <li><a href="/User/Index">用户管理</a></li>
+                            <li class="active">
+                                @{ if (Model == null)
+                                    { <text>添加用户</text>}
+                                else
+                                { <text>编辑用户</text>}}
+                            </li>
+                        </ol>
+                    </div>
+                </div>
+            </div><!-- /# column -->
+        </div><!-- /# row -->
+        <div class="main-content">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="card alert">
+                    <div class="card-header">
+                        <h4>
+                            @{ if (Model == null)
+                                { <text>添加用户</text>}
+                            else
+                            { <text>编辑用户</text>}}
+                        </h4>
+                    </div>
+                        <div class="card-body">
+                            <div class="basic-form">
+                                <div class="form-horizontal">
+                                    <input type="hidden" value="@if(ViewBag.id!=null){@ViewBag.id}" id="id" name="id" />
+                                    <div class="form-group">
+                                        <label for="example-input-normal" class="col-sm-4 control-label">用户名称</label>
+                                        <div class="col-sm-4">
+                                            <input type="text" class="form-control" id="user_name" name="user_name" value="@if (Model != null){@Model.user_name}" />
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="example-input-normal" class="col-sm-4 control-label">用户等级</label>
+                                        <div class="col-sm-4">
+                                            <select class="form-control" id="level_name" name="level_name">
+                                                <option value=""></option>
+                                                <!option value="@UserLevelEnum.Developer" @if (Model != null) { if (Model.level == (int)UserLevelEnum.Developer) { <text> selected </text> } }>系统后台人员</!option>
+                                                <!option value="@UserLevelEnum.Boss" @if (Model != null) { if (Model.level == (int)UserLevelEnum.Boss) { <text> selected </text> } }>老板</!option>
+                                                <!option value="@UserLevelEnum.ProductManager" @if (Model != null) { if (Model.level == (int)UserLevelEnum.ProductManager) { <text> selected </text> } }>生管</!option>
+                                                <!option value="@UserLevelEnum.Operator" @if (Model != null) { if (Model.level == (int)UserLevelEnum.Operator) { <text> selected </text> } }>普通员工</!option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    @if (Model == null)
+                                    {
+                                        <div class="form-group">
+                                            <label for="example-input-normal" class="col-sm-4 control-label">用户密码</label>
+                                            <div class="col-sm-4">
+                                                <input type="text" class="form-control" id="pass_word" name="pass_word" value="" />
+                                            </div>
+                                        </div>
+                                    }
+
+                                    <div class="form-group">
+                                        <div class="col-sm-6 control-label" id="prompt" style="color:red"></div>
+                                    </div>
+                                    <div class="form-group">
+                                        <div class="col-sm-offset-5">
+                                            <input type="button" id="submit" name="submit" class="btn btn-primary" style=" width:12%" value="提交" />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div><!-- /# card -->
+                </div><!-- /# column -->
+            </div><!-- /# row -->
+        </div>
+    </div><!-- /# container-fluid -->         
+</body>
+</html>

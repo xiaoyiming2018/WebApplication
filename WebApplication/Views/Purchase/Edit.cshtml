@@ -1,0 +1,250 @@
+﻿@{
+    @model Model.Purchase;
+    @using Model;
+    @using BLL;
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title></title>
+    <link rel="stylesheet" type="text/css" href="~/assets/css/sweetalert.css">
+    <script type="text/javascript" src="~/assets/js/sweetalert-dev.js"></script>
+    <script type="text/javascript" src="~/My97DatePicker/WdatePicker.js"></script>
+    <script type="text/javascript" src="~/Scripts/jquery-1.10.2.min.js"></script>
+
+    <script type="text/javascript">
+        var TempArr = [];//存储option
+
+        $(function () {
+            $(".sidebar ul li:nth-of-type(2)").addClass("active open")
+            $(".sidebar ul li:nth-of-type(2) ul li:nth-of-type(1)").addClass("active")
+            $(".sidebar ul li:nth-of-type(2) ul li:nth-of-type(4)").removeClass("active open")
+
+            $('#submit').click(function () {
+                var id = $('#id').val();
+                var purchase_index = $('#purchase_index').val();
+                var supplier_id = $('#supplier_id').val();
+                var category = $('#category').val();
+                var material_name = $('#material_name').val();
+                var material_spec = $('#material_spec').val();
+                var material_num = $('#material_num').val();
+                var material_unit = $('#material_unit').val();
+                var material_price = $('#material_price').val();
+                var material_all_price = $('#material_all_price').val();
+                if (purchase_index == "" || supplier_id == "" || category == "" || material_name == "" || material_num <= 0 ||
+                    material_spec == "" || material_unit == "" || material_price == "" || material_all_price == "") {
+
+                    swal("输入信息有误！","请重新提交！","error");
+                }
+                else {
+                    $.ajax({
+                        type: "POST",
+                        url: "/Purchase/EditHandle",
+                        beforeSend: function (xhr) {
+                            xhr.setRequestHeader("XSRF-TOKEN",
+                                $('input:hidden[name="__RequestVerificationToken"]').val());
+                        },
+                        data: {
+                            id: id, purchase_index: purchase_index, supplier_id: supplier_id, category: category, material_name: material_name,
+                            material_num: material_num, material_spec: material_spec, material_unit: material_unit, material_price: material_price,
+                            material_all_price: material_all_price},
+                        success: function (msg) {
+                            if (msg == "Success") {
+                                swal({ title: "执行成功!", text: "", type: "success" },
+                                    function () { window.location.href = '/Purchase/Index';});
+                                
+                            }
+                            else {
+                                swal("执行失败！", "", "error");
+                            }
+                        },
+                        error: function (msg) {
+                            swal("数据获取失败！", "", "error");
+                        }
+                    });
+                }
+
+            });
+        });
+
+        function getProductPrice() {
+            var material_num = $('#material_num').val()
+            var material_price = $('#material_price').val()
+            if (material_num >= 0 && material_price >=0) {
+                $.ajax({
+                    type: "POST",
+                    url: "/Purchase/GetProductPrice",
+                    data: { material_num: material_num, material_price: material_price },
+                    success: function (msg) {
+                        $('#price_div').html(msg);
+                    },
+                    error: function (msg) {
+                        swal("获取规格失败！", "", "error");
+                    }
+                });
+            }
+        }
+    </script>
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="page-header">
+                    <div class="page-title">
+                        <ol class="breadcrumb text-left">
+                            <li><a href="/Supplier/Index">主页</a></li>
+                            <li><a href="/Purchase/Index">采购管理</a></li>
+                            <li class="active">
+                                @{ if (Model == null)
+                                    { <text>新增</text>}
+                                else
+                                { <text>编辑</text>}}
+                            </li>
+                        </ol>
+                    </div>
+                </div>
+            </div><!-- /# column -->
+        </div><!-- /# row -->
+        <div class="main-content">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="card alert">
+                        <div class="card-header">
+                            <h4>
+                                @{ if (Model == null)
+                                    { <text>新增</text>}
+                                else
+                                { <text>编辑</text>}}
+                            </h4>
+                        </div>
+                        <div class="card-body">
+                            <div class="basic-form" name=newform>
+                                <div class="form-horizontal">
+                                    <input type="hidden" class="form-control" id="id" name="id" value="@if (Model != null) {@Model.id}" />
+                                    <div class="form-group">
+                                        <label for="example-input-normal" class="col-sm-4 control-label">采购单号</label>
+                                        <div class="col-sm-4">
+                                            <input type="text" class="form-control" id="purchase_index" name="purchase_index" value="@if (Model !=null) { @Model.purchase_index}else{@ViewBag.purchase_index} " />
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="example-input-normal" class="col-sm-4 control-label">供应商</label>
+                                        <div class="col-sm-4">
+                                            <select class="form-control" id="supplier_id" name="supplier_id" onchange="getCargoList()">
+                                                <option value=""></option>
+                                                @{
+                                                    CompanyManager CM = new CompanyManager();
+                                                    List<Company> objList = CM.SelectAll(type: 1);
+                                                    if (objList.Count > 0)
+                                                    {
+                                                        for (int i = 0; i < objList.Count; i++)
+                                                        {
+                                                            <!option value="@objList[i].id" @if (Model != null) { if (objList[i].id == ViewBag.supplier_id) { <text> selected</text> } }>@objList[i].company_name</!option>
+                                                        }
+                                                    }
+                                                }
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="example-input-normal" class="col-sm-4 control-label">分类</label>
+                                        <div class="col-sm-4">
+                                            <select class="form-control" id="category" name="category">
+                                                <option value=""></option>
+                                                @{
+                                                    SettingManager SM = new SettingManager();
+                                                    List<Setting> sList = SM.SelectConfigList(2);
+                                                    if (sList.Count > 0)
+                                                    {
+                                                        for (int i = 0; i < sList.Count; i++)
+                                                        {
+                                                            <!option value="@sList[i].config_list" @if (Model != null) { if (sList[i].config_list == Model.category) { <text> selected</text> } }>@sList[i].config_list</!option>
+                                                        }
+                                                    }
+                                                }
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="example-input-normal" class="col-sm-4 control-label">物料名称</label>
+                                        <div class="col-sm-4">
+                                            <input type="text" class="form-control" id="material_name" name="material_name" value="@if (Model !=null) { @Model.material_name} " />
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="example-input-normal" class="col-sm-4 control-label">物料规格</label>
+                                        <div class="col-sm-4">
+                                            <input type="text" class="form-control" id="material_spec" name="material_spec" value="@if (Model !=null) { @Model.material_spec}" />
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="example-input-normal" class="col-sm-4 control-label">数量</label>
+                                        <div class="col-sm-4">
+                                            <input type="text" class="form-control" id="material_num" name="material_num" placeholder="0" value="@if (Model !=null) { @Model.material_num}" onchange="getProductPrice()" />
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="example-input-normal" class="col-sm-4 control-label">物料单位</label>
+                                        <div class="col-sm-4">
+                                            <select class="form-control" id="material_unit" name="material_unit">
+                                                <option value=""></option>
+                                                @{
+                                                    SettingManager UM = new SettingManager();
+                                                    List<Setting> uList = UM.SelectConfigList(1);
+                                                    if (uList.Count > 0)
+                                                    {
+                                                        for (int i = 0; i < uList.Count; i++)
+                                                        {
+                                                            <!option value="@uList[i].config_list" @if (Model != null) { if (uList[i].config_list == Model.material_unit) { <text> selected</text> } }>@uList[i].config_list</!option>
+                                                        }
+                                                    }
+                                                }
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="example-input-normal" class="col-sm-4 control-label">单价</label>
+                                        <div class="col-sm-4">
+                                            <input type="text" class="form-control" id="material_price" name="material_price" placeholder="0" onchange="getProductPrice()" value="@if (Model !=null) { @Model.material_price}" />
+                                        </div>
+                                    </div>
+                                    <div class="form-horizontal" id="price_div">
+                                        <div class="form-group">
+                                            <label for="example-input-normal" class="col-sm-4 control-label">总价</label>
+                                            <div class="col-sm-4">
+                                                <input type="text" class="form-control" id="material_all_price" name="material_all_price" placeholder="0" value="@if (Model !=null) { @Model.material_all_price}" readonly/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <div class="col-sm-6 control-label" id="prompt" style="color:red"></div>
+                                    </div>
+                                    <div class="form-group">
+                                        <div class="col-sm-offset-5">
+                                            <input type="button" id="submit" name="submit" class="btn btn-primary" style=" width:10%" value="提交" />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div><!-- /# card -->
+                    </div><!-- /# column -->
+                </div><!-- /# row -->
+            </div>
+        </div>
+    </div><!-- /# container-fluid -->
+
+    <script language="javascript">        
+        
+    </script>
+</body>
+</html>
+
+

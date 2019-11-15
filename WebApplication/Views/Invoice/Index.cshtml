@@ -1,0 +1,219 @@
+﻿@{
+    @model IList<Model.Invoice>
+    @using Model;
+    @using BLL;
+
+}
+@using AspNetCoreMvcPager;
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title></title>
+    <link rel="stylesheet" type="text/css" href="~/assets/css/sweetalert.css">
+    <script type="text/javascript" src="~/assets/js/sweetalert-dev.js"></script>
+    <script type="text/javascript" src="~/Scripts/jquery-1.10.2.min.js"></script>
+    <script type="text/javascript" src="~/My97DatePicker/WdatePicker.js"></script>
+    <script type="text/javascript">
+        $(function () {
+            $(".sidebar ul li:nth-of-type(6)").addClass("active open")
+            $(".sidebar ul li:nth-of-type(6) ul li:nth-of-type(1)").addClass("active")            
+        });
+
+        function deleteTiShi(id) {
+            swal({
+                title: "确定删除 ?",
+                text: "删除后将无法恢复 !",
+                type: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#DD6B55",
+                confirmButtonText: "删除",
+                cancelButtonText: "取消",
+                closeOnConfirm: false,//true表示不需要点击确认,fasle需要点击确认后再关闭对话框
+                closeOnCancel: false //true表示不需要点击确认,fasle需要点击确认后再关闭对话框
+            },
+                function (isConfirm) {
+                    if (isConfirm) {
+                        $.ajax({
+                            type: "POST",
+                            url: "/Invoice/Del?id="+id+"",
+                            beforeSend: function (xhr) {
+                                xhr.setRequestHeader("XSRF-TOKEN",
+                                    $('input:hidden[name="__RequestVerificationToken"]').val());
+                            },
+                            data: {
+                                id: id
+                            },
+                            success: function (msg) {
+                                if (msg == "Success") {
+                                    swal({ title: "已删除 !", text: "该条记录已删除 !", type: "success" },
+                                        function () { window.location.href = '/Invoice/Index'; });
+                                }
+                                else {
+                                    swal("执行失败 !", "该记录已保留 !", "error");
+                                }
+                            },
+                            error: function (msg) {
+                                swal("数据获取失败 !", "该记录已保留 !", "error");
+                            }
+                        });
+                    }
+                    else {
+                        swal("已取消 !", "该记录已保留 !", "error");
+                    }
+                });
+        }
+
+    </script>
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-lg-12 p-0">
+                <div class="page-header">
+                    <div class="page-title">
+                        <ol class="breadcrumb text-left">
+                            <li><a href="/Supplier/Index">主页</a></li>
+                            <li><a href="/Invoice/Index">财务管理</a></li>
+                            <li class="active">开票信息</li>
+                        </ol>
+                    </div>
+                </div>
+            </div><!-- /# column -->
+        </div><!-- /# row -->
+        <div class="main-content">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="card alert">
+                        <div class="card-header">
+                            <form class="form-horizontal" action="/Invoice/Index" method="post" id="myfrom">
+                                <div class="form-inline">
+                                    <div class="form-group">
+                                        <label>客户名称：</label>
+                                        <input id="company_name" name="company_name" type="text" class="form-control" style="height:36px" value="@ViewBag.company_name" />
+                                    </div>
+                                    <div class="form-group">
+                                        <label>发票号：</label>
+                                        <input id="invoice_index" name="invoice_index" type="text" class="form-control" style="height:36px" value="@ViewBag.invoice_index" />
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label>订单号：</label>
+                                        <input id="order_index" name="order_index" type="text" class="form-control" style="height:36px" value="@ViewBag.order_index" />
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label>客户订单号：</label>
+                                        <input id="company_order_index" name="company_order_index" type="text" class="form-control" style="height:36px" value="@ViewBag.company_order_index" />
+                                    </div>
+                                </div>
+                                <br/>
+                                <div class="form-inline">
+                                    <div class="form-group">
+                                        <input type="submit" value="查询" class="btn btn-primary" style="width:80px" />
+                                    </div>
+                                    @if (UserManager.Current.GetLevel >= UserLevelEnum.ProductManager)
+                                    {
+                                        <div class="form-group">
+                                            <input type="button" value="新增" class="btn btn-primary" style="width:80px" onclick="window.location.href = '/Invoice/Edit'" />
+                                        </div>
+                                    }
+
+                                </div>
+                                
+                            </form>
+                            
+                        </div>
+                    <br/>
+                        <div class="card-body">
+                            <table class="table table-responsive table-hover ">
+                                <thead>
+                                    <tr>
+                                        <th>编号</th>
+                                        <th>客户公司</th>
+                                        <th>发票号</th>
+                                        <th>发票类型</th>
+                                        <th>开票日期</th>
+                                        <th>金额</th>
+                                        <th>税额</th>
+                                        <th>价税合计</th>
+                                        <th>付款方式</th>
+                                        <th>订单号</th>
+                                        <th>客户订单号</th>
+                                        @if (UserManager.Current.GetLevel >= UserLevelEnum.ProductManager)
+                                        {
+                                            <th>编辑</th>
+
+                                        }
+                                        else
+                                        {
+                                            <th>查看</th>
+                                        }
+
+                                        @if (UserManager.Current.GetLevel >= UserLevelEnum.Boss)
+                                        {
+                                            <th>删除</th>
+                                        }
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @{
+                                        int index = 1;
+                                        foreach (var item in Model)
+                                        {
+                                    <tr>
+                                        <td>@index</td>
+                                        <td>@item.company_name</td>
+
+                                        <td>@item.invoice_index</td>
+                                        @if (item.invoice_type == 0)
+                                        {
+                                            <td>普通发票</td>
+                                        }
+                                        else
+                                        {
+                                            <td>增值税专用发票</td>
+                                        }
+                                        <td>@item.invoice_time.ToString("yyyy-MM-dd")</td>
+
+                                        <td>@item.invoice_price</td>
+                                        <td>@item.invoice_ratio</td>
+                                        <td>@item.invoice_all_price</td>
+                                        @if (item.pay_type == 0)
+                                        {
+                                            <td>转账</td>
+                                        }
+                                        else
+                                        {
+                                            <td>现金</td>
+                                        }
+                                        <td>@item.order_index</td>
+                                        <td>@item.company_order_index</td>
+                                        <td>
+                                            <input type="button" class="btn btn-primary" onclick="window.location.href = '/Invoice/Edit?id=@item.id'" value="@if (UserManager.Current.GetLevel >= UserLevelEnum.ProductManager) { <text>编辑</text>} else {<text>查看</text> } " />
+                                        </td>
+
+                                        @if (UserManager.Current.GetLevel >= UserLevelEnum.Boss)
+                                        {
+                                            <td>
+                                                <input type="button" class="btn btn-primary" onclick="deleteTiShi(@item.id)" value="删除" />
+                                            </td>
+
+                                        }
+                                    </tr>
+                                            index++;
+                                        }
+                                    }
+                                </tbody>
+                            </table>
+                            <div class="page-nav" id="pageIndex">@Html.Raw(PagerHtmlString.Pager(ViewBag.model, "Invoice", "Index", true))</div>
+                        </div>
+                    </div><!-- /# card -->
+                </div><!-- /# column -->
+            </div><!-- /# row -->
+        </div>
+    </div><!-- /# container-fluid -->
+</body>
+</html>
+
+

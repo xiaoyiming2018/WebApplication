@@ -1,0 +1,28 @@
+﻿
+@{
+    Layout = null;
+
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="stylesheet" type="text/css" href="~/assets/css/sweetalert.css">
+    <script type="text/javascript" src="~/assets/js/sweetalert-dev.js"></script>
+    <script type="text/javascript" src="~/Scripts/jquery-1.10.2.min.js"></script>
+    <script src="~/assets/js/lib/sweetalert/sweetalert.min.js"></script>
+    <script>
+        $(function () {
+        swal({
+            title: "YES",
+            text: '@Html.Raw(@ViewBag.Message)',
+		type : "success",
+	}, function() {
+        window.location.href = '/User/Index';
+	});
+    });
+
+    </script>
+</head>
+<body>
+</body>
+</html>

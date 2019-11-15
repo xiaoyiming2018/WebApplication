@@ -1,0 +1,294 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using AspNetCoreMvcPager;
+using BLL;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Model;
+
+namespace WebApplication.Controllers
+{
+    public class OrderSeqController : BaseController
+    {
+        OrderManager OMM = new OrderManager();
+        SaleManager SM = new SaleManager();
+        SaleReturnManager SRM = new SaleReturnManager();
+        /// <summary>
+        /// 用户列表首页
+        /// </summary>
+        /// <param name="page">分页页码</param>
+        /// <param name="size">每页显示数量</param>
+        /// <returns></returns>
+        public IActionResult Index(string start_time, string end_time, string order_name, string unit,string activation, int pageindex = 1, int pagesize = 8)
+        {
+            
+            int order_id = Convert.ToInt32(Request.Query["order_id"]);
+            Order order = OMM.SelectById(order_id);
+            ViewBag.order_index = order.order_index;
+            ViewBag.company_order_index = order.company_order_index;
+            ViewBag.company_name = order.company_name;
+            if (activation == null)
+            {
+                ViewBag.activation = "off";
+            }
+            else
+            {
+                ViewBag.activation = activation;
+            }
+
+
+            ViewBag.start_time = start_time;
+            ViewBag.end_time = end_time;
+            ViewBag.order_id = order_id;
+            ViewBag.unit = unit;
+            ViewBag.order_name = order_name;
+
+            if (start_time == null)
+            {
+                start_time = "2001-01-01";
+            }
+            if (end_time == null)
+            {
+                end_time = "2222-01-01";
+            }
+
+            var objList = OMM.SelectSeqByOrderId(order_id, start_time,end_time, order_name, unit);
+            return View(objList);
+            
+        }
+
+        /// <summary>
+        /// 插入更新页面
+        /// </summary>
+        /// <returns></returns>
+        public IActionResult Edit()
+        {
+            try
+            {
+                int order_id = Convert.ToInt32(Request.Query["order_id"]);
+                ViewBag.order_id = order_id;
+                Order order = OMM.SelectById(order_id);
+                ViewBag.order_index = order.order_index;
+                ViewBag.company_name = order.company_name;
+                ViewBag.company_order_index = order.company_order_index;
+                ViewBag.order_time = DateTime.Now.ToLocalTime().ToString("yyyy-MM-dd");
+
+                int seq_id = Convert.ToInt32(Request.Query["seq_id"]);
+                if (seq_id > 0)
+                {
+                    var obj = OMM.SelectByOrderSeqId(order_id, seq_id);
+                    return View(obj);
+                }
+                else
+                {
+                    return View();
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        /// <summary>
+        /// 编辑处理页面
+        /// </summary>
+        /// <returns></returns>
+        public IActionResult EditHandle(Order order)
+        {
+
+            //验证账户是否存在
+            int seq_id = 0;
+
+            string order_index = order.order_index;
+            string company_order_index = order.company_order_index;
+            int customer_id = order.customer_id;
+            int order_id = order.order_id;
+            ViewBag.order_id = order_id;
+
+            DateTime order_time = order.order_time;
+            DateTime deliver_time = order.deliver_time;
+            string order_name = order.order_name;
+            string purchase_person = order.purchase_person;
+            string unit = order.unit;
+
+            Int64 order_num = order.order_num;
+            double order_price = order.order_price;
+            double order_all_price = order.order_all_price;
+            string order_picture = order.order_picture;
+            
+            if (order.seq_id >0)
+            {
+                seq_id = order.seq_id;
+            }
+
+            int count = 0;
+            Order objOrder = new Order();
+            objOrder.order_index = order_index;
+            objOrder.company_order_index = company_order_index;
+            objOrder.customer_id = customer_id;
+
+            objOrder.order_id = order_id;
+            objOrder.order_time = order_time;
+            objOrder.deliver_time = deliver_time;
+            objOrder.order_name = order_name;
+            objOrder.order_num = order_num;
+            objOrder.purchase_person = purchase_person;
+            objOrder.unit = unit;
+            objOrder.order_price = order_price;
+            objOrder.order_all_price = order_all_price;
+            objOrder.order_picture = order_picture;
+
+            if (seq_id > 0)
+            {
+                objOrder.seq_id = seq_id;
+                count = OMM.UpdateOrderSeq(objOrder);
+                OMM.UpdateOrder(objOrder);
+            }
+            else
+            {
+                count = OMM.InsertOrderSeq(objOrder);
+            }
+            if (count > 0)
+            {
+                return Json("Success");
+            }
+            else
+            {
+                return Json("Fail");
+            }
+
+        }
+
+        /// <summary>
+        /// 删除数据
+        /// </summary>
+        /// <returns></returns>
+        public IActionResult Del()
+        {
+            try
+            {
+                int count = 0;
+                int order_id = Convert.ToInt32(Request.Query["order_id"]);
+                Order order = new Order();
+                ViewBag.order_id = order_id;
+
+                int seq_id = Convert.ToInt32(Request.Query["seq_id"]);
+                List<Order> orderList = OMM.SelectOrderSeqList(order_id);
+                if (orderList.Count > 1)
+                {
+                    count = OMM.DelOrderSeq(seq_id);
+                    ViewBag.key = "OrderSeq";
+
+                }
+                else
+                {
+                    count = OMM.DelOrderSeq(seq_id);
+                    OMM.DelOrder(order_id);
+                    ViewBag.key = "Order";
+                }
+
+                if (count > 0)
+                {
+                    return Json("Success");
+                }
+                else
+                {
+                    return Json("Fail");
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        /// <summary>
+        /// 获取材料规格
+        /// </summary>
+        /// <returns></returns>
+        public IActionResult GetProductPrice(int order_num, double order_price)
+        {
+            ViewBag.order_all_price = order_num * order_price;
+            return View();
+        }
+
+        public IActionResult HistoryIndex(string start_time, string end_time, string order_name, string unit, string activation)
+        {
+            
+            int order_id = Convert.ToInt32(Request.Query["order_id"]);
+            //从order_info中获取相关信息
+            Order order = OMM.SelectById(order_id);
+            ViewBag.order_index = order.order_index;
+            ViewBag.company_order_index = order.company_order_index;
+            ViewBag.company_name = order.company_name;
+
+            //从orderseq_info中获取订单信息
+            List<Order> orderseqList = OMM.SelectOrderSeqList(order_id);
+            ViewBag.orderseqList = orderseqList;
+
+            Int64 order_num = 0;
+            double order_all_price = 0;
+            for (int i=0;i< orderseqList.Count;i++)
+            {
+                order_num += orderseqList[i].order_num;
+                order_all_price += orderseqList[i].order_all_price;
+            }
+            ViewBag.order_num = order_num;
+            ViewBag.order_all_price = order_all_price;
+
+            //从sale_info中获取订单的出货详情
+            List<Sale> saleList = SM.SelectByOrderId(order_id);
+            ViewBag.saleList = saleList;
+            double deliver_all_price = 0;
+            for (int i = 0; i < saleList.Count; i++)
+            {
+                deliver_all_price += saleList[i].deliver_all_price;
+            }
+            ViewBag.deliver_all_price = deliver_all_price;
+
+            //从salereturn_info中获取订单的退货详情
+            List<SaleReturn> saleReturnList = SRM.SelectByOrderIdForHistory(order_id);
+            ViewBag.saleReturnList = saleReturnList;
+            Int64 return_num = 0;
+            double return_all_price = 0;
+            for (int i = 0; i < saleReturnList.Count; i++)
+            {
+                return_num += saleReturnList[i].return_num;
+                return_all_price += saleReturnList[i].return_all_price;
+            }
+            ViewBag.return_num = return_num;
+            ViewBag.return_all_price = return_all_price;
+
+            if (activation == null)
+            {
+                ViewBag.activation = "off";
+            }
+            else
+            {
+                ViewBag.activation = activation;
+            }
+
+            ViewBag.start_time = start_time;
+            ViewBag.end_time = end_time;
+            ViewBag.order_id = order_id;
+            ViewBag.unit = unit;
+            ViewBag.order_name = order_name;
+
+            if (start_time == null)
+            {
+                start_time = "2001-01-01";
+            }
+            if (end_time == null)
+            {
+                end_time = "2222-01-01";
+            }
+
+            var objList = OMM.SelectSeqByOrderId(order_id, start_time, end_time,  order_name, unit);
+            return View(objList);
+        }
+        
+    }
+}

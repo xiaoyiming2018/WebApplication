@@ -1,0 +1,72 @@
+﻿@{
+    Layout = null;
+    @model IList<Model.Order>
+    @using Model;
+    @using BLL;
+}
+    <div class="col-lg-12">
+        <div class="card alert">
+            <div class="card-header">
+                <h4>
+                    订单详情
+                </h4>
+            </div>
+                <br />
+                <div class="card-body">
+                    <div class="basic-form">
+                        <div class="form-horizontal">
+                            <div class="form-group">
+                                <label for="example-input-normal" class="col-sm-2 control-label">客户公司</label>
+                                <div class="col-sm-3">
+                                    <input type="text" class="form-control" id="company_name" name="company_name" value="@ViewBag.company_name" readonly />
+                                </div>
+                                <label for="example-input-normal" class="col-sm-2 control-label">客户订单号</label>
+                                <div class="col-sm-3">
+                                    <input type="text" class="form-control" id="company_order_index" name="company_order_index" value="@ViewBag.company_order_index" readonly />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <table class="table table-responsive table-hover ">
+                        <thead>
+                            <tr>
+                                <th>序号</th>
+                                <th>下单明细</th>
+                                <th>下单时间</th>
+                                <th>下单数量</th>
+                                <th>退单数量</th>
+                                <th>订单单价</th>
+                                <th>订单总价</th>
+                                <th>出货总价</th>
+                                <th>客户采购员</th>
+                                <th>需求单位</th>
+
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @{
+                                int index = 1;
+                                foreach (var item in Model)
+                                {
+                                    <tr>
+                                        <td>@index</td>
+                                        <td>@item.order_name</td>
+                                        <td>@item.order_time.ToString("yyyy-MM-dd")</td>
+                                        <td>@item.order_num</td>
+                                        <td>@item.tui_num</td>
+
+                                        <td>@item.order_price</td>
+                                        <td>@item.order_all_price</td>
+                                        <td>@item.deliver_all_price</td>
+                                        <td>@item.purchase_person</td>
+                                        <td>@item.unit</td>
+
+                                    </tr>
+                                    index++;
+                                }
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div><!-- /# card -->
+    </div><!-- /# column -->

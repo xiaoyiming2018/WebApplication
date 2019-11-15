@@ -1,0 +1,289 @@
+﻿
+@{
+    @model IList<Model.Sale>
+    @using Model;
+    @using BLL;
+
+}
+@using AspNetCoreMvcPager;
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title></title>
+    <link rel="stylesheet" type="text/css" href="~/assets/css/sweetalert.css">
+    <script type="text/javascript" src="~/assets/js/sweetalert-dev.js"></script>
+    <script type="text/javascript" src="~/Scripts/jquery-1.10.2.min.js"></script>
+    <script type="text/javascript" src="~/My97DatePicker/WdatePicker.js"></script>
+    <script type="text/javascript">
+        $(function () {
+            $(".sidebar ul li:nth-of-type(5)").addClass("active open")
+            $(".sidebar ul li:nth-of-type(5) ul li").removeClass()
+            $(".sidebar ul li:nth-of-type(5) ul li:nth-of-type(1)").addClass("active")
+        });
+
+        function doPrint() {
+            window.print();
+            return false;
+        };
+
+        window.onbeforeprint = function () {
+
+            //$('#company_name1').text($('#company_name').val());
+            //$('#deliver_index1').text($('#deliver_index').val());
+            //$('#deliver_time1').text($('#deliver_time').val());
+            //$('#order_index1').text($('#order_index').val());
+            //$('#order_name1').text($('#order_name').val());
+            //$('#action_num1').text($('#action_num').val());
+            //$('#order_price1').text($('#order_price').val());
+            //$('#action_price1').text($('#action_price').val());
+
+            $(".sidebar").hide()
+            $(".header").hide()
+            $("#Data1").show()
+            $("#wrap").hide()
+            $(".sidebar.sidebar-shrink ~ .content-wrap").css("margin-left", 0)
+        }
+        window.onafterprint = function () {
+            $("#Data1").hide()
+            $("#wrap").show()
+            $(".sidebar").show()
+            $(".header").show()
+            $(".sidebar.sidebar-shrink ~ .content-wrap").css("margin-left", "250px")
+        }
+
+    </script>
+</head>
+<body>
+    <div class="container-fluid" id="wrap">
+        <div class="row">
+            <div class="col-lg-12 p-0">
+                <div class="page-header">
+                    <div class="page-title">
+                        <ol class="breadcrumb text-left">
+                            <li><a href="/Supplier/Index">主页</a></li>
+                            <li><a href="/Sale/Index">销售管理</a></li>
+                            <li class="active">销售出货开单</li>
+                        </ol>
+                    </div>
+                </div>
+            </div><!-- /# column -->
+        </div><!-- /# row -->
+        <div class="main-content">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="card alert">
+                        <div class="card-header">
+                            <h4>销售出货单</h4>
+                        </div>
+                        <br />
+                        <div class="card-body">
+                            <div class="form-horizontal">
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label">出货单号：</label>
+                                    <div class="col-sm-2">
+                                        <input type="text" class="form-control" value="@ViewBag.deliver_index" disabled="disabled" />
+                                    </div>
+                                    <label class="col-sm-2 control-label">出货公司抬头：</label>
+                                    <div class="col-sm-2">
+                                        <input type="text" class="form-control" value="@ViewBag.deliver_company_head" disabled="disabled" />
+                                    </div>
+                                    <label class="col-sm-2 control-label">订单号：</label>
+                                    <div class="col-sm-2">
+                                        <input type="text" class="form-control" value="@ViewBag.order_index" disabled="disabled" />
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label">公司名称：</label>
+                                    <div class="col-sm-2">
+                                        <input type="text" class="form-control" value="@ViewBag.company_name" disabled="disabled" />
+                                    </div>
+                                    <label class="col-sm-2 control-label">客户订单号：</label>
+                                    <div class="col-sm-2">
+                                        <input type="text" class="form-control" value="@ViewBag.company_order_index" disabled="disabled" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div><!-- /# card -->
+                </div><!-- /# column -->
+                <div class="col-lg-12">
+                    <div class="card alert">
+                        <div class="card-header">
+                            <input type="hidden" value="@ViewBag.deliver_index" id="deliver_index" name="deliver_index" />
+                            <div class="form-inline">
+                                <div class="card-header-right-icon">
+                                    @if (UserManager.Current.GetLevel >= UserLevelEnum.ProductManager)
+                                    {
+                                        <div class="form-group">
+                                            <input type="button" value="修改" class="btn btn-primary" style="width:80px" onclick="window.location.href='/SaleSeq/Edit?deliver_index=@ViewBag.deliver_index'" />
+                                        </div>
+                                        <div class="form-group">
+                                            <input type="button" value="出货单打印" class="btn btn-primary" onclick="doPrint()" style="width:100px" />
+                                        </div>
+                                    }
+
+
+                                </div>
+                            </div>
+                            <br />
+                            
+                            
+                        </div>
+                        <div class="card-body">
+                            <table class="table table-responsive table-hover ">
+                                <thead>
+                                    <tr>
+                                        <th>序号</th>
+                                        <th>下单明细</th>
+                                        <th>下单数量</th>
+                                        <th>下单时间</th>
+                                        <th>需求出货时间</th>
+                                        <th>实际出货数量</th>
+                                        <th>实际出货时间</th>
+                                        @if (UserManager.Current.GetLevel >= UserLevelEnum.ProductManager)
+                                        {
+                                            <th>出货单价</th>
+                                            <th>出货总价</th>
+                                            <th>采购人员</th>
+                                            <th>需求单位</th>
+                                        }
+
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @{
+                                        int index = 1;
+                                        foreach (var item in Model)
+                                        {
+                                    <tr>
+                                        <td>@index</td>
+                                        <td>@item.order_name</td>
+                                        <td>@item.order_num</td>
+                                        <td>@item.order_time.ToString("yyyy-MM-dd")</td>
+                                        <td>@item.deliver_time.ToString("yyyy-MM-dd")</td>
+
+                                        <td>@item.real_num</td>
+                                        <td>@item.real_time.ToString("yyyy-MM-dd")</td>
+                                        @if (UserManager.Current.GetLevel >= UserLevelEnum.ProductManager)
+                                        {
+                                            <td>@item.deliver_price</td>
+                                            <td>@item.deliver_all_price</td>
+                                            <td>@item.purchase_person</td>
+                                            <td>@item.unit</td>
+                                        }
+
+                                    </tr>
+                                            index++;
+                                        }
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div><!-- /# card -->
+                </div><!-- /# column -->
+            </div><!-- /# row -->
+        </div>
+    </div><!-- /# container-fluid -->
+
+    <div class="card alert" id="Data1" style="margin: 30px;display: none">
+
+        <div class="card-body">
+            <table class="table" border="0" cellspacing="0" cellpadding="0">
+                <tbody>
+                    <tr style="font-weight:bold">
+                        <td style="font-size:20px;text-align:center;padding:2px;border:0;" colspan="6">出货单</td>
+                    </tr>
+                    <tr>
+                        <td style="padding:2px;border:0;text-align:left"></td>
+                        <td style="padding:2px;border:0;text-align:left"></td>
+                        <td style="padding:2px;border:0;"></td>
+                        <td style="padding:2px;border:0;"></td>
+                        <td style="padding:2px;border:0;text-align:right"></td>
+                        <td style="padding:2px;border:0;text-align:right"></td>
+                    </tr>
+                    <tr>
+                        <td style="padding:2px;border:0;text-align:left">出货单号：</td>
+                        <td style="padding:2px;border:0;text-align:left">@ViewBag.deliver_index</td>
+                        <td style="padding:2px;border:0;"></td>
+                        <td style="padding:2px;border:0;"></td>
+                        <td style="padding:2px;border:0;text-align:right">订单号：</td>
+                        <td style="padding:2px;border:0;text-align:right">@ViewBag.order_index</td>
+                    </tr>
+                    <tr>
+                        <td style="padding:2px;border:0;text-align:left" >出货公司抬头：</td>
+                        <td style="padding:2px;border:0;text-align:left" >@ViewBag.deliver_company_head</td>
+                        <td style="padding:2px;border:0;"></td>
+                        <td style="padding:2px;border:0;"></td>
+                        <td style="padding:2px;border:0;text-align:right">制单人员：</td>
+                        <td style="padding:2px;border:0;text-align:right">@UserManager.Current.GetLoginName</td>
+                    </tr>
+                    <tr>
+                        <td style="padding:2px;border:0;text-align:left">客户名称：</td>
+                        <td style="padding:2px;border:0;text-align:left">@ViewBag.company_name</td>
+                        <td style="padding:2px;border:0;">客户订单号：</td>
+                        <td style="padding:2px;border:0;">@ViewBag.company_order_index</td>
+                        <td style="padding:2px;border:0;text-align:right">制单日期：</td>
+                        <td style="padding:2px;border:0;text-align:right">@(DateTime.Now.ToLocalTime().ToString("yyyy-MM-dd HH:ss:mm"))</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <table class="table table-responsive table-hover " >
+                <thead>
+                    <tr>
+                        <th>序号</th>
+                        <th>下单明细</th>
+                        <th>下单数量</th>
+                        <th>下单时间</th>
+                        <th>需求出货时间</th>
+                        <th>实际出货数量</th>
+                        <th>实际出货时间</th>
+                        <th>出货单价</th>
+                        <th>出货总价</th>
+                        <th>采购人员</th>
+                        <th>需求单位</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @{
+                        int index1 = 1;
+                        foreach (var item in Model)
+                        {
+                            <tr>
+                                <td>@index1</td>
+                                <td>@item.order_name</td>
+                                <td>@item.order_num</td>
+                                <td>@item.order_time.ToString("yyyy-MM-dd")</td>
+                                <td>@item.deliver_time.ToString("yyyy-MM-dd")</td>
+
+                                <td>@item.real_num</td>
+                                <td>@item.real_time.ToString("yyyy-MM-dd")</td>
+                                <td>@item.deliver_price</td>
+                                <td>@item.deliver_all_price</td>
+                                <td>@item.purchase_person</td>
+                                <td>@item.unit</td>
+                            </tr>
+                            index1++;
+                        }
+                    }
+                </tbody>
+            </table>
+            <label for="example-input-normal">注：以上货品请校对数量，如有质量问题，请在收货后3天内通知本公司，逾期数不负责。</label>
+            <br />
+            <table class="table" border="0" cellspacing="0" cellpadding="0">
+                <tbody>
+                    <tr>
+                        <td style="padding:2px;border:0;">送货单位及经手人（盖章）：</td>
+                        <td style="padding:2px;border:0;">收货单位及经手人（盖章）：</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</body>
+</html>
+
+
+
+

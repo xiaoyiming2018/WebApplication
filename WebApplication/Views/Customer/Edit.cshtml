@@ -1,0 +1,465 @@
+﻿@{
+    @model Model.Company;    
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title></title>
+    <link rel="stylesheet" type="text/css" href="~/assets/css/sweetalert.css">
+    <script type="text/javascript" src="~/assets/js/sweetalert-dev.js"></script>
+    <script type="text/javascript" src="~/Scripts/jquery-1.10.2.min.js"></script>
+    <script src="~/js/xlsx.core.min.js"></script>
+    <script src="~/assets/js/lib/jquery.min.js"></script>
+    <script type="text/javascript">
+        var TempArr = [];//存储option
+        $(function () {
+            $(".sidebar ul li:nth-of-type(3)").addClass("active open")
+            $(".sidebar ul li:nth-of-type(3) ul li:nth-of-type(1)").addClass("active")
+
+            document.getElementById('file').addEventListener('change', function (e) {
+                var files = e.target.files;
+                if (files.length == 0) return;
+                var f = files[0];
+                if (!/\.xlsx$/g.test(f.name)) {
+                    swal("仅支持读取xlsx格式！","请重新上传文件！","error");
+                    return;
+                }
+                readWorkbookFromLocalFile(f, function (workbook) {
+                    readWorkbook(workbook);
+                });
+            });
+
+            $('#submit').click(function () {
+                var id = $('#id').val();
+                var company_name = $('#company_name').val();
+                var tax_num = $('#tax_num').val();
+                var address = $('#address').val();
+                var account = $('#account').val();
+                var bank = $('#bank').val();
+                var name = $('#name').val();
+                var position = $('#position').val();
+                var telephone = $('#telephone').val();
+                var email = $('#email').val();
+                if (company_name == "" || tax_num == "" || account == "" || bank == "" || address == "" || name == "" || position == "" || telephone == "" || email == "") {
+
+                    swal("信息不能为空！", "请将信息填充完整！", "error");
+                }
+                else {
+                    $.ajax({
+                        type: "POST",
+                        url: "/Customer/EditHandle",
+                        beforeSend: function (xhr) {
+                            xhr.setRequestHeader("XSRF-TOKEN",
+                                $('input:hidden[name="__RequestVerificationToken"]').val());
+                        },
+                        data: {
+                            id: id, company_name: company_name, tax_num: tax_num, account: account, bank: bank, address: address,
+                            name: name, position: position, telephone: telephone, email: email},
+                        success: function (msg) {
+                            if (msg == "Success") {
+                                swal({ title: "执行成功!", text: "", type: "success" },
+                                    function () { window.location.href = '/Customer/Index'; });  
+                            }
+                            else if (msg == "Fail") {
+                                swal("执行失败！", "", "error");
+                            }
+                            else {
+                                document.getElementById("company_name1").value = msg.company_name;
+                                document.getElementById("account1").value = msg.account;
+                                document.getElementById("tax_num1").value = msg.tax_num;
+                                document.getElementById("bank1").value = msg.bank;
+                                document.getElementById("address1").value = msg.address;
+                                swal("客户名称已存在！", "请重新填写客户名称！", "error");
+                            }
+                        },
+                        error: function (msg) {
+                            swal("数据获取失败！", "请重新提交！", "error");
+                        }
+                    });
+                }
+
+            });
+        });
+
+        function inputList() {
+            var num = document.getElementById('inputNum').value;
+            var allList = new Array();
+            for (var i = 0; i < num;i++)
+            {
+                var indexList = document.getElementsByName("index" + i + "");
+                for (var j = 0; j < indexList.length; j++) {
+                    
+                    allList.push(indexList[j].value);
+                }                
+            }
+            var AllList = allList.join(',');
+
+            $.ajax({
+                type: "POST",
+                url: "/Customer/EditHandleList",
+                beforeSend: function (xhr) {
+                    xhr.setRequestHeader("XSRF-TOKEN",
+                        $('input:hidden[name="__RequestVerificationToken"]').val());
+                },
+                data: {
+                    AllList: AllList, num: num
+                },
+                success: function (msg) {
+                    if (msg == "Success") {
+                        $("#prompt").hide();
+                        window.location.href = '/Customer/Index';
+                    }
+                    else {
+                        swal("执行失败！", "", "error");
+                    }
+                },
+                error: function (msg) {
+                    swal("数据获取失败！", "请检查提交！", "error");
+                }
+            });
+        }
+
+        function selectFile() {
+            document.getElementById('file').click();
+               
+            document.getElementById("company_name").value = "";
+            document.getElementById("tax_num").value = "";
+            document.getElementById("address").value = "";
+            document.getElementById("account").value = "";
+            document.getElementById("bank").value = "";
+            $("#prompt").hide();
+
+        }
+
+        // 读取本地excel文件
+        function readWorkbookFromLocalFile(file, callback) {
+            var reader = new FileReader();
+            reader.onload = function (e) {
+                var data = e.target.result;
+                var workbook = XLSX.read(data, { type: 'binary' });
+                if (callback) callback(workbook);
+            };
+            reader.readAsBinaryString(file);
+        }
+
+        // 读取 excel文件
+        function outputWorkbook(workbook) {
+            var sheetNames = workbook.SheetNames; // 工作表名称集合
+            sheetNames.forEach(name => {
+                var worksheet = workbook.Sheets[name]; // 只能通过工作表名称来获取指定工作表
+                for (var key in worksheet) {
+                    // v是读取单元格的原始值
+                    console.log(key, key[0] === '!' ? worksheet[key] : worksheet[key].v);
+                }
+            });
+        }
+
+        function readWorkbook(workbook) {
+            var sheetNames = workbook.SheetNames; // 工作表名称集合
+            var worksheet = workbook.Sheets[sheetNames[0]]; // 这里我们只读取第一张sheet
+            var csv = XLSX.utils.sheet_to_csv(worksheet);
+            document.getElementById('result').innerHTML = csv2table(csv);
+            document.getElementById('result').style.display = "block";
+        }
+
+        // 将csv转换成表格
+        function csv2table(csv) {
+            var html = '<div class="card alert"> <div class=\"card-header\"><h4>已导入信息</h4><div class=\"card-header-right-icon\"><button class=\"btn btn-primary\" onclick=\"inputList()\">提交导入信息</button></div></div>';
+            html +=  '<div class=\"card-body\"><table class=\"table table-responsive\">';
+            var rows = csv.split('\n');
+            rows.pop(); // 最后一行没用的
+            rows.forEach(function (row, idx) {
+                var columns = row.split(',');
+                columns.unshift(idx); // 添加行索引
+                if (idx == 0) { // 添加列索引
+                    html += '<thead> <tr><th>编号</th><th>客户名称</th><th>税号</th><th>地址</th><th>银行账号</th><th>开户行</th><th>联系人</th><th>职务</th><th>手机号</th><th>邮箱</th>';
+                    html += '</tr> </thead>';
+                }
+                html += '<tr>';
+                columns.forEach(function (column) {
+                    if (idx >= 1)
+                    {
+                        html += '<td ><input type=\"text\" style=\"border:none;width:50px\" name=\"index' + idx + '\" value=\"' + column + '\" readonly/></td>';
+                    }
+                     
+                });
+                html += '</tr>';
+            });
+            html += '</table></div ><input type=\"hidden\" id=\"inputNum\" value=\"' + rows.length+'\"/> </div > ';
+            return html;
+        }
+
+        function table2csv(table) {
+            var csv = [];
+            $(table).find('tr').each(function () {
+                var temp = [];
+                $(this).find('td').each(function () {
+                    temp.push($(this).html());
+                })
+                temp.shift(); // 移除第一个
+                csv.push(temp.join(','));
+            });
+            csv.shift();
+            return csv.join('\n');
+        }
+
+        // csv转sheet对象
+        function csv2sheet(csv) {
+            var sheet = {}; // 将要生成的sheet
+            csv = csv.split('\n');
+            csv.forEach(function (row, i) {
+                row = row.split(',');
+                if (i == 0) sheet['!ref'] = 'A1:' + String.fromCharCode(65 + row.length - 1) + (csv.length - 1);
+                row.forEach(function (col, j) {
+                    sheet[String.fromCharCode(65 + j) + (i + 1)] = { v: col };
+                });
+            });
+            return sheet;
+        }
+
+        // 将一个sheet转成最终的excel文件的blob对象，然后利用URL.createObjectURL下载
+        function sheet2blob(sheet, sheetName) {
+            sheetName = sheetName || 'sheet1';
+            var workbook = {
+                SheetNames: [sheetName],
+                Sheets: {}
+            };
+            workbook.Sheets[sheetName] = sheet;
+            // 生成excel的配置项
+            var wopts = {
+                bookType: 'xlsx', // 要生成的文件类型
+                bookSST: false, // 是否生成Shared String Table，官方解释是，如果开启生成速度会下降，但在低版本IOS设备上有更好的兼容性
+                type: 'binary'
+            };
+            var wbout = XLSX.write(workbook, wopts);
+            var blob = new Blob([s2ab(wbout)], { type: "application/octet-stream" });
+            // 字符串转ArrayBuffer
+            function s2ab(s) {
+                var buf = new ArrayBuffer(s.length);
+                var view = new Uint8Array(buf);
+                for (var i = 0; i != s.length; ++i) view[i] = s.charCodeAt(i) & 0xFF;
+                return buf;
+            }
+            return blob;
+        }
+
+        //url 下载地址，也可以是一个blob对象，必选
+        //saveName 保存文件名，可选
+        function openDownloadDialog(url, saveName) {
+            if (typeof url == 'object' && url instanceof Blob) {
+                url = URL.createObjectURL(url); // 创建blob地址
+            }
+            var aLink = document.createElement('a');
+            aLink.href = url;
+            aLink.download = saveName || ''; // HTML5新增的属性，指定保存文件名，可以不要后缀，注意，file:///模式下不会生效
+            var event;
+            if (window.MouseEvent) event = new MouseEvent('click');
+            else {
+                event = document.createEvent('MouseEvents');
+                event.initMouseEvent('click', true, false, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null);
+            }
+            aLink.dispatchEvent(event);
+        }
+
+        function exportSpecialExcel() {
+            var aoa = [
+                ['客户名称', '税号', '地址', '银行账号', '开户行','联系人','职务','手机号','邮箱']
+            ];
+            var sheet = XLSX.utils.aoa_to_sheet(aoa);
+            openDownloadDialog(sheet2blob(sheet), '客户列表.xlsx');
+        }
+
+        function SelectTip(flag) {
+            var TxtObj = document.getElementById("company_name");
+            var SelectObj = document.getElementById("company_id")
+            var Arr = []
+            with (SelectObj) {
+                var SelectHTML = innerHTML.match(/<[^>]*>/)[0]
+                for (i = 0; i < TempArr.length; i++)
+                    if (TempArr[i][0].indexOf(TxtObj.value, 0) >= 0 || flag)//若找到以txt的内容开头的，添加option。若flag为true，对下拉框初始化
+                        Arr[Arr.length] = "<option value='" + TempArr[i][1] + "'>" + TempArr[i][0] + "</option>"
+                innerHTML = SelectHTML + Arr.join() + "</SELECT>"
+            }
+        }
+
+        function Init() {
+            var SelectObj = document.getElementById("company_id");
+            /*先将数据存入数组*/
+            with (SelectObj)
+            for (i = 0; i < length; i++)
+                TempArr[i] = [options[i].text, options[i].value]
+
+        }
+    </script>
+</head>
+<body onload="Init()">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="page-header">
+                    <div class="page-title">
+                        <ol class="breadcrumb text-left">
+                            <li><a href="/Supplier/Index">主页</a></li>
+                            <li><a href="/Customer/Index">客户管理</a></li>
+                            <li class="active">
+                                @{ if (Model == null)
+                                    { <text>新增客户</text>}
+                                else
+                                { <text>编辑客户</text>}}
+                            </li>
+                        </ol>
+                    </div>
+                </div>
+            </div><!-- /# column -->
+        </div><!-- /# row -->
+        <div class="main-content">
+            <div class="row">
+                <div id="current" class="@if (Model != null) {<text> col-lg-12</text> } else {<text> col-lg-8</text> }">
+                    <div class="card alert">
+                        <div class="card-header">
+                            <h4>
+                                @{ if (Model == null)
+                                    { <text>新增客户</text>}
+                                else
+                                { <text>编辑客户</text>}}
+                            </h4>
+                            <div class="card-header-right-icon">
+                                <input type="file" id="file" style="display:none;" accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet">
+                                @if (Model == null)
+                                {
+                                    <button class="btn btn-primary" onclick="selectFile()"><i class="ti-download"></i>Excel导入</button>
+                                    <button class="btn btn-primary" onclick="exportSpecialExcel()"><i class="ti-upload"></i>模板导出</button>
+                                }
+
+                            </div>
+                        </div>
+                        <br />
+                        <div class="card-body">
+                            <div class="basic-form">
+                                <div class="form-horizontal">
+                                    <input type="hidden" value="@if (Model != null){@Model.id}" id="id" name="id" />
+                                    <div class="form-group">
+                                        <label for="example-input-normal" class="col-sm-4 control-label">客户名称</label>
+                                        <div class="col-sm-4">
+                                            <input type="text" class="form-control" id="company_name" name="company_name" value="@if (Model != null){@Model.company_name}" onkeyup="SelectTip(0)" @if (Model != null) { <text> readonly</text>} />
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="example-input-normal" class="col-sm-4 control-label">税号</label>
+                                        <div class="col-sm-4">
+                                            <input type="text" class="form-control" id="tax_num" name="tax_num" value="@if (Model != null){@Model.tax_num}" />
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="example-input-normal" class="col-sm-4 control-label">地址</label>
+                                        <div class="col-sm-4">
+                                            <input type="text" class="form-control" id="address" name="address" value="@if (Model != null){@Model.address}" />
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="example-input-normal" class="col-sm-4 control-label">银行账号</label>
+                                        <div class="col-sm-4">
+                                            <input type="text" class="form-control" id="account" name="account" value="@if (Model != null){@Model.account}" />
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="example-input-normal" class="col-sm-4 control-label">开户行</label>
+                                        <div class="col-sm-4">
+                                            <input type="text" class="form-control" id="bank" name="bank" value="@if (Model != null){@Model.bank}" />
+                                        </div>
+                                    </div>
+                                    @if (Model == null)
+                                    {
+                                        <div class="form-group">
+                                            <label for="example-input-normal" class="col-sm-4 control-label">联系人</label>
+                                            <div class="col-sm-4">
+                                                <input type="text" class="form-control" id="name" name="name" value="@if (Model != null){<text>test</text>}" />
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label for="example-input-normal" class="col-sm-4 control-label">职务</label>
+                                            <div class="col-sm-4">
+                                                <input type="text" class="form-control" id="position" name="position" value="@if (Model != null){<text>test</text>}" />
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label for="example-input-normal" class="col-sm-4 control-label">手机号</label>
+                                            <div class="col-sm-4">
+                                                <input type="text" class="form-control" id="telephone" name="telephone" value="@if (Model != null){<text>test</text>}" />
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label for="example-input-normal" class="col-sm-4 control-label">邮箱</label>
+                                            <div class="col-sm-4">
+                                                <input type="text" class="form-control" id="email" name="email" value="@if (Model != null){<text>test</text>}" />
+                                            </div>
+                                        </div>
+                                    }
+
+                                    <div class="form-group">
+                                        <div class="col-sm-offset-5">
+                                            <input type="button" id="submit" name="submit" class="btn btn-primary" style=" width:12%" value="提交" />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div><!-- /# card -->
+                </div><!-- /# column -->
+
+                <div id="existence" style="display:@if (Model!=null) {<text>none</text> } ">
+                    <div class="col-lg-4">
+                        <div class="card alert">
+                            <div class="card-header">
+                                <h4 style="color:#ED7F7E">
+                                    客户名称列表
+                                </h4>
+                            </div>
+                            <hr />
+                            <div class="card-body">
+                                <div class="basic-form">
+                                    <div class="form-horizontal">
+
+                                        <select class="form-control" id="company_id" name="company_id" onchange="company_name.value=options[selectedIndex].text;" size=25>
+                                            <option value=""></option>
+                                            @{
+                                                CompanyManager CM = new CompanyManager();
+                                                List<Company> objList = CM.SelectAll(type: 0);
+                                                if (objList.Count > 0)
+                                                {
+                                                    for (int i = 0; i < objList.Count; i++)
+                                                    {
+                                                        <!option value="@objList[i].id">@objList[i].company_name</!option>
+                                                    }
+                                                }
+                                            }
+                                        </select>
+
+                                        <hr />
+                                        <br />
+                                    </div>
+                                </div>
+                            </div>
+                        </div><!-- /# card -->
+                    </div><!-- /# column -->
+                </div>
+
+                <div id="result" class="col-lg-12" style="display:none">
+                </div>
+
+            </div><!-- /# row -->
+        </div>
+    </div><!-- /# container-fluid -->
+</body>
+</html>
+
+

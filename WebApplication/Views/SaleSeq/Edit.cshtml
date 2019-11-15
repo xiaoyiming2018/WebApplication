@@ -1,0 +1,448 @@
+﻿@{
+    @model IList<Model.Sale>;
+    @using Model;
+    @using BLL;
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+
+    <title></title>
+    <link rel="stylesheet" type="text/css" href="~/assets/css/sweetalert.css" />
+    <link href="~/assets/fontAwesome/css/fontawesome-all.min.css" rel="stylesheet">
+    <script type="text/javascript" src="~/assets/js/sweetalert-dev.js"></script>
+    <script type="text/javascript" src="~/My97DatePicker/WdatePicker.js"></script>
+    <script type="text/javascript" src="~/Scripts/jquery-1.10.2.min.js"></script>
+
+    <script type="text/javascript">
+        var TempArr = [];//存储option
+        $(function () {
+            $(".sidebar ul li:nth-of-type(5)").addClass("active open")
+            $(".sidebar ul li:nth-of-type(5) ul li").removeClass()
+            $(".sidebar ul li:nth-of-type(5) ul li:nth-of-type(1)").addClass("active")
+            $('#submit').click(function () {
+                var flag = 0;
+
+                var inputNum = document.getElementById('inputNum').value;
+                var deliver_index = document.getElementById('deliver_index').value;
+                var deliver_company_head = document.getElementById('deliver_company_head').value;
+                var order_id = document.getElementById('order_id').value;
+
+                var seq_idList = document.getElementsByName("seq_id");
+                var remain_numList = document.getElementsByName("remain_num");
+                var real_numList = document.getElementsByName("real_num");
+                var real_timeList = document.getElementsByName("real_time");
+                var deliver_priceList = document.getElementsByName("deliver_price");
+                var deliver_all_priceList = document.getElementsByName("deliver_all_price");
+
+                var seq_id = new Array();
+                var real_num = new Array();
+                var real_time = new Array();
+                var deliver_price = new Array();
+                var deliver_all_price = new Array();
+                for (var i = 0; i < real_numList.length; i++) {
+                    seq_id.push(seq_idList[i].value);
+                    real_num.push(real_numList[i].value);
+                    real_time.push(real_timeList[i].value);
+                    deliver_price.push(deliver_priceList[i].value);
+                    deliver_all_price.push(deliver_all_priceList[i].value);
+                    if (parseInt(real_numList[i].value) > parseInt(remain_numList[i].value))
+                    {
+                        flag = 1;
+                    }
+                }
+
+                var Seq_Id = seq_id.join(',');
+                var Real_Num = real_num.join(',');
+                var Real_Time = real_time.join(',');
+                var Deliver_Price = deliver_price.join(',');
+                var Deliver_All_Price = deliver_all_price.join(',');
+
+                if (deliver_index == "" || deliver_company_head == "" || order_id <= 0) {
+                    swal("信息不能为空！","","error");
+                }
+                else if (flag==1)
+                {
+                    swal("出货数量超过剩余数量！", "", "error");
+                }
+                else {
+                    $.ajax({
+                        type: "POST",
+                        url: "/SaleSeq/EditHandle",
+                        beforeSend: function (xhr) {
+                            xhr.setRequestHeader("XSRF-TOKEN",
+                                $('input:hidden[name="__RequestVerificationToken"]').val());
+                        },
+                        data: {
+                            inputNum: inputNum,deliver_index: deliver_index, deliver_company_head: deliver_company_head, order_id: order_id,
+                            Seq_Id: Seq_Id, Real_Num: Real_Num, Real_Time: Real_Time, Deliver_Price: Deliver_Price, Deliver_All_Price: Deliver_All_Price
+                        },
+                        success: function (msg) {
+                            if (msg == "Success") {
+                                swal({ title: "执行成功!", text: "", type: "success" },
+                                    function () { window.location.href = '/Sale/Index';});
+                                
+                            }
+                            else {
+                                swal("执行失败，请检查提交文件内容！", "", "error");
+                            }
+                        },
+                        error: function (msg) {
+                            swal("数据获取失败！", "", "error");
+                        }
+                    });
+                }
+
+            });
+        });
+
+        function inputList() {
+
+        }
+
+        function doPrint() {
+            window.print();
+            return false;
+        };
+        
+        window.onbeforeprint = function () {
+            
+            $('#company_name1').text($('#company_name').val());
+            $('#deliver_index1').text($('#deliver_index').val());
+            $('#deliver_time1').text($('#deliver_time').val());
+            $('#order_index1').text($('#order_index').val());
+            $('#order_name1').text($('#order_name').val());
+            $('#action_num1').text($('#action_num').val());
+            $('#order_price1').text($('#order_price').val());
+            $('#action_price1').text($('#action_price').val());
+            
+            $(".sidebar").hide()
+            $(".header").hide()
+            $("#Data1").show()
+            $("#wrap").hide()
+            $(".sidebar.sidebar-shrink ~ .content-wrap").css("margin-left", 0)
+        }
+        window.onafterprint = function () {
+            $("#Data1").hide()
+            $("#wrap").show()
+            $(".sidebar").show()
+            $(".header").show()
+            $(".sidebar.sidebar-shrink ~ .content-wrap").css("margin-left", "250px")
+        }
+
+        function getOrderList() {
+            var order_id = $('#order_id').val()
+            if (order_id > 0) {
+                $.ajax({
+                    type: "POST",
+                    url: "/Sale/GetOrderList",
+                    data: { order_id: order_id },
+                    success: function (msg) {
+                        $('#order_div').html(msg);
+                    },
+                    error: function (msg) {
+                        swal("获取订单失败！","请重新操作！","error");
+                    }
+                });
+            }
+        }
+
+        function SelectTip(flag) {
+            var TxtObj = document.getElementById("txtPlace");
+            var SelectObj = document.getElementById("order_id")
+            var Arr = []
+            with (SelectObj) {
+                var SelectHTML = innerHTML.match(/<[^>]*>/)[0]
+                for (i = 0; i < TempArr.length; i++)
+                    if (TempArr[i][0].indexOf(TxtObj.value, 0) >= 0 || flag)//若找到以txt的内容开头的，添加option。若flag为true，对下拉框初始化
+                        Arr[Arr.length] = "<option value='" + TempArr[i][1] + "'>" + TempArr[i][0] + "</option>"
+                innerHTML = SelectHTML + Arr.join() + "</SELECT>"
+            }
+        }
+
+        function Init() {
+            var SelectObj = document.getElementById("order_id");
+            /*先将数据存入数组*/
+            with (SelectObj)
+            for (i = 0; i < length; i++)
+                TempArr[i] = [options[i].text, options[i].value];
+        }
+       
+    </script>
+</head>
+<body onload="Init()">
+    <div class="container-fluid" id="wrap">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="page-header">
+                    <div class="page-title">
+                        <ol class="breadcrumb text-left">
+                            <li><a href="/Supplier/Index">主页</a></li>
+                            <li><a href="/Sale/Index">销售开单</a></li>
+                            <li class="active">
+                                开单
+                            </li>
+                        </ol>
+                    </div>
+                </div>
+            </div><!-- /# column -->
+        </div><!-- /# row -->
+        <div class="main-content">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="card alert">
+                        <div class="card-header">
+                            <h4>
+                                出货开单
+                            </h4>
+                            <div class="card-header-right-icon">
+                                <button class="btn btn-primary" id="js_print_receipt" onclick="doPrint()"> 打印预览</button>
+                            </div>
+                        </div>
+
+                        <div class="card-body">
+
+                            <div class="basic-form">
+                                <div class="form-horizontal">
+
+                                    <div class="form-group">
+                                        <label for="example-input-normal" class="col-sm-4 control-label">出货单号</label>
+                                        <div class="col-sm-4">
+                                            <input type="text" class="form-control" id="deliver_index" name="deliver_index" value="@ViewBag.deliver_index" readonly />
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="example-input-normal" class="col-sm-4 control-label">出货公司抬头</label>
+                                        <div class="col-sm-4">
+
+                                            <select class="form-control" id="deliver_company_head" name="deliver_company_head">
+                                                <option value=""></option>
+                                                @{
+                                                    SettingManager SM = new SettingManager();
+                                                    List<Setting> sList = SM.SelectConfigList(6);
+                                                    if (sList.Count > 0)
+                                                    {
+                                                        for (int i = 0; i < sList.Count; i++)
+                                                        {
+                                                            <!option value="@sList[i].config_list" @if (Model != null) { if (sList[i].config_list == ViewBag.deliver_company_head) { <text> selected</text>} }>@sList[i].config_list</!option>
+                                                        }
+                                                    }
+                                                }
+                                            </select>
+
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="example-input-normal" class="col-sm-4 control-label">订单号</label>
+                                        <div class="col-sm-4">
+                                            @if (Model == null)
+                                            {
+                                                <input id="txtPlace" name="txtPlace" class="form-control" onkeyup="SelectTip(0)">
+                                                <select class="form-control" id="order_id" name="order_id" onchange="getOrderList();txtPlace.value=options[selectedIndex].text;" size=5>
+                                                    <option value=""></option>
+                                                    @{
+                                                        OrderManager OM = new OrderManager();
+                                                        List<Order> objList = OM.SelectForSaleAll(0);
+                                                        if (objList.Count > 0)
+                                                        {
+                                                            for (int i = 0; i < objList.Count; i++)
+                                                            {
+                                                                <!option value="@objList[i].id">@objList[i].order_index</!option>
+                                                            }
+                                                        }
+                                                    }
+                                                </select>
+                                            }
+                                            else
+                                            {
+                                                <input type="text" class="form-control" id="order_index" name="order_index" value="@ViewBag.order_index" readonly />
+                                                <input type="hidden" class="form-control" id="order_id" name="order_id" value="@ViewBag.order_id" readonly />
+                                            }
+
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="example-input-normal" class="col-sm-4 control-label">客户名称</label>
+                                        <div class="col-sm-4">
+                                            <input type="text" class="form-control" id="company_name" name="company_name" value="@ViewBag.company_name" readonly/>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="example-input-normal" class="col-sm-4 control-label">客户订单号</label>
+                                        <div class="col-sm-4">
+                                            <input type="text" class="form-control" id="company_order_index" name="company_order_index" value="@ViewBag.company_order_index" readonly/>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-horizontal" id="order_div">
+                                        <table class="table table-responsive table-hover ">
+                                            <thead>
+                                                <tr>
+                                                    <th>序号</th>
+                                                    <th hidden>实际序号</th>
+                                                    <th>下单明细</th>
+                                                    <th>下单数量</th>
+                                                    <th hidden>剩余数量</th>
+                                                    <th>剩余数量</th>
+                                                    <th>下单时间</th>
+                                                    <th>需求出货时间</th>
+                                                    <th>客户采购员</th>
+                                                    <th>需求单位</th>
+                                                    <th>实际出货数量</th>
+                                                    <th>实际出货时间</th>
+                                                    <th>出货单价</th>
+                                                    <th>出货总价</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @{
+                                                    int index = 1;
+                                                    foreach (var item in Model)
+                                                    {
+                                                        <tr>
+                                                            <td>@index</td>
+                                                            <td hidden><input type="text" name="seq_id" style="width:100px" value="@item.seq_id" /></td>
+                                                            <td>@item.order_name</td>
+                                                            <td>@item.order_num</td>
+                                                            <td hidden><input type="text" name="remain_num" style="width:100px" value="@(item.remain_num+item.real_num)" /></td>
+                                                            <td>@(item.remain_num + item.real_num)</td>
+                                                            <td>@item.order_time.ToString("yyyy-MM-dd")</td>
+                                                            <td>@item.deliver_time.ToString("yyyy-MM-dd")</td>
+                                                            <td>@item.purchase_person</td>
+                                                            <td>@item.unit</td>
+                                                            <td>
+                                                                @if ((item.remain_num+ item.real_num) == 0)
+                                                                {
+                                                                    <input type="text" name="real_num" style="width:100px" value="出货已完成" readonly />
+                                                                }
+                                                                else
+                                                                {
+                                                                    <input type="text" name="real_num" style="width:100px" value="@item.real_num" />
+                                                                }
+
+                                                            </td>
+                                                            <td>
+                                                                @if ((item.remain_num + item.real_num) == 0)
+                                                                {
+                                                                    <input type="text" name="real_time" style="width:100px" value="出货已完成" readonly />
+                                                                }
+                                                                else
+                                                                {
+                                                                    <input type="text" name="real_time" style="width:100px" onclick="WdatePicker({ skin: 'whyGreen',dateFmt:'yyyy-MM-dd' })" value="@item.real_time.ToString("yyyy-MM-dd")" />
+                                                                }
+
+                                                            </td>
+                                                            <td>
+                                                                @if ((item.remain_num + item.real_num) == 0)
+                                                                {
+                                                                    <input type="text" name="deliver_price" style="width:100px" value="出货已完成" readonly />
+                                                                }
+                                                                else
+                                                                {
+                                                                    <input type="text" name="deliver_price" style="width:100px" value="@item.deliver_price" />
+                                                                }
+
+                                                            </td>
+                                                            <td>
+                                                                @if ((item.remain_num + item.real_num) == 0)
+                                                                {
+                                                                    <input type="text" name="deliver_all_price" style="width:100px" value="出货已完成" readonly />
+                                                                }
+                                                                else
+                                                                {
+                                                                    <input type="text" name="deliver_all_price" style="width:100px" value="@item.deliver_all_price" />
+                                                                }
+
+                                                            </td>
+                                                        </tr>
+                                                        index++;
+                                                    }
+                                                    <tr><td><input id="inputNum" name="inputNum" value="@(index-1)" hidden /></td></tr>
+                                                }
+                                            </tbody>
+                                        </table>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <div class="col-sm-offset-5">
+                                            <input type="button" id="submit" name="submit" class="btn btn-primary" style=" width:12%" value="提交" />
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div><!-- /# card -->
+                </div><!-- /# column -->
+            </div><!-- /# row -->
+        </div>
+    </div><!-- /# container-fluid -->
+
+    <div class="card alert" id="Data1" style="margin: 30px;display: none">
+        
+        <div class="card-body">
+            <table class="table" border="0" cellspacing="0" cellpadding="0">
+                <tbody>
+                    <tr style="font-weight:bold">
+                        <td style="padding:2px;border:0;"></td>
+                        <td style="font-size:20px;text-align:right;padding:2px;border:0;">送货单</td>
+                        <td style="padding:2px;border:0;"></td>
+                    </tr>
+                    <tr>
+                        <td style="padding:2px;border:0;"></td>
+                        <td style="padding:2px;border:0;"></td>
+                        <td style="padding:2px;border:0;text-align:right">送货单号：<span id="deliver_index1"></span></td>
+                    </tr>
+                    <tr>
+                        <td style="padding:2px;border:0;"></td>
+                        <td style="padding:2px;border:0;"></td>
+                        <td style="padding:2px;border:0;text-align:right">制单人员：@UserManager.Current.GetLoginName</td>
+                    </tr>
+                    <tr>
+                        <td style="padding:2px;border:0;">客户名称：<span id="company_name1"></span></td>
+                        <td style="padding:2px;border:0;"></td>
+                        <td style="padding:2px;border:0;text-align:right">送货日期：<span id="deliver_time1"></span></td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <table class="table table-responsive table-bordered">
+                <thead>
+                    <tr>
+                        <th>编号</th>
+                        <th>订单号</th>
+                        <th>订单名称</th>
+                        <th>数量</th>
+                        <th>单价</th>
+                        <th>金额</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>1</td>
+                        <td><span id="order_index1"></span></td>
+                        <td><span id="order_name1"></span></td>
+                        <td><span id="action_num1"></span></td>
+                        <td><span id="order_price1"></span></td>
+                        <td><span id="action_price1"></span></td>
+                    </tr>
+                </tbody>
+            </table>
+            <label for="example-input-normal">注：以上货品请校对数量，如有质量问题，请在收货后3天内通知本公司，逾期数不负责。</label>
+            <br />
+            <table class="table" border="0" cellspacing="0" cellpadding="0">
+                <tbody>
+                    <tr>
+                        <td style="padding:2px;border:0;">送货单位及经手人（盖章）：</td>
+                        <td style="padding:2px;border:0;">收货单位及经手人（盖章）：</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</body>
+</html >
+
+

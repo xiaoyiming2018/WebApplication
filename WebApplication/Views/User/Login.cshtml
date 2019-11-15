@@ -1,0 +1,97 @@
+﻿@{
+    Layout = null;
+}
+@Html.AntiForgeryToken()
+@{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>登录</title>
+
+    <!-- ================= Favicon ================== -->
+    <!-- Standard -->
+    @*<link rel="shortcut icon" href="http://placehold.it/64.png/000/fff">*@
+
+    <!-- Styles -->
+    <link href="~/assets/fontAwesome/css/fontawesome-all.min.css" rel="stylesheet">
+    <link href="~/assets/css/lib/themify-icons.css" rel="stylesheet">
+    <link href="~/assets/css/lib/bootstrap.min.css" rel="stylesheet">
+    <link href="~/assets/css/lib/nixon.css" rel="stylesheet">
+    <link href="~/assets/css/style.css" rel="stylesheet">
+    <script type="text/javascript" src="~/Scripts/jquery-1.10.2.min.js"></script>
+    <script type="text/javascript">
+        $(function () {
+            $('#button').click(function () {
+                var userName = $("#userName").val();
+                var passWord = $("#passWord").val();
+                var remember = $("input[type='checkbox']").is(':checked');
+                if (userName != "" && passWord != "") {
+                    $.ajax({
+                        type: "POST",
+                        url: "/User/LoginHandle?userName=" + userName + "&passWord=" + passWord + "&remember=" + remember,
+                        beforeSend: function (xhr) {
+                            xhr.setRequestHeader("XSRF-TOKEN",
+                                $('input:hidden[name="__RequestVerificationToken"]').val());
+                        },
+                        data: { userName: userName, passWord: passWord, remember: remember },
+                        success: function (msg) {
+                            if (msg == "Success") {
+                                window.location.href = "/Supplier/Index";
+                            }
+                            else {                                
+                                $("#login_FalseHints").text("UserName or password error");
+                            }
+                        },
+                        error: function (msg) {
+                            $("#login_FalseHints").text("UserName or password error");
+                        }
+                    });
+                }
+                else {
+                    if (userName == "") {
+                        $("#login_FalseHints").text("The UserName cannot be empty");
+                    }
+                    else if (passWord == "") {
+                        $("#login_FalseHints").text("The password can not be empty");
+                    }
+                }
+            });
+        });
+    </script>
+</head>
+<body class="bg-primary">
+    <div class="Nixon-login">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-6 col-lg-offset-3">
+                    <div class="login-content">
+                        <div class="login-form">
+                            <h4 id="login">麦买卖进销存管理系统&nbsp;&nbsp;1.0</h4>
+                            <div class="login_FalseHints">麦买卖进销存管理系统1.0</div>
+                            <div class="form-group">
+                                <label>用户名</label>
+                                <input type="text" class="form-control" name="userName" id="userName" placeholder="User Name">
+                            </div>
+                            <div class="form-group">
+                                <label>密码</label>
+                                <input type="password" class="form-control" name="passWord" id="passWord" placeholder="Password">
+                            </div>
+                            <div class="checkbox">
+                                <label>
+                                    <input type="checkbox" id="remember" name="remember"> 记住密码
+                                </label>
+                            </div>
+                            <h5 id="login_FalseHints" style="color:red"></h5>
+                            <input type="submit" id="button" class="btn btn-primary btn-flat m-b-30 m-t-30" value="登录" />
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

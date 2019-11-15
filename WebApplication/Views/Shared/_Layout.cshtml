@@ -1,0 +1,192 @@
+﻿
+@{
+    @using Model;
+    @using BLL;
+}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>麦买卖进销存管理系统1.0</title>
+
+    <!-- ================= Favicon ================== -->
+    <!-- Standard -->
+    <!-- Styles -->
+    <link href="~/assets/fontAwesome/css/fontawesome-all.min.css" rel="stylesheet">
+    <link href="~/assets/css/lib/themify-icons.css" rel="stylesheet">
+    <link href="~/assets/css/lib/mmc-chat.css" rel="stylesheet" />
+    <link href="~/assets/css/lib/sidebar.css" rel="stylesheet">
+    <link href="~/assets/css/lib/bootstrap.min.css" rel="stylesheet">
+    <link href="~/assets/css/lib/nixon.css" rel="stylesheet">
+    <link href="~/assets/css/style.css" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="~/assets/css/sweetalert.css">
+    <script type="text/javascript" src="~/assets/js/sweetalert-dev.js"></script>
+    <script src="~/assets/js/lib/sweetalert/sweetalert.min.js"></script>
+    <script type="text/javascript" src="~/Scripts/jquery-1.10.2.min.js"></script>
+
+    <script language="JavaScript">
+        $(document).ready(function () {
+
+            //load grafana and set default option
+            $('#grafanaDashboard').attr('src', '/Supplier/Index');
+
+            $('#grafanaDashboard').on('load', function () {
+                interactDash.main('defaultOption', undefined);
+            });
+
+        });
+    </script>
+
+</head>
+
+<body>
+
+    <div class="sidebar sidebar-hide-to-small sidebar-shrink sidebar-gestures">
+        <div class="nano">
+            <div class="nano-content">
+                <ul>
+
+                    <li>
+                        <a class="sidebar-sub-toggle"><i class="ti-truck"></i> 供应商管理 <span class="sidebar-collapse-icon ti-angle-down"></span></a>
+                        <ul>
+                            <li><a href="/Supplier/Index">供应商信息</a></li>
+                        </ul>
+                    </li>
+
+                    <li>
+                        <a class="sidebar-sub-toggle"><i class="ti-shopping-cart"></i>物料购入管理 <span class="sidebar-collapse-icon ti-angle-down"></span></a>
+                        <ul>
+                            <li><a href="/Deliver/Index">物料购入流水账</a></li>
+                            <li><a href="/Deliver/SupplierIndex">供应商结款</a></li>
+                            <li><a href="/Deliver/HistoryIndex">历史购入清单</a></li>
+                        </ul>
+                    </li>
+
+                    <li>
+                        <a class="sidebar-sub-toggle"><i class="ti-id-badge"></i> 客户管理 <span class="sidebar-collapse-icon ti-angle-down"></span></a>
+                        <ul>
+                            <li><a href="/Customer/Index">客户信息</a></li>
+
+                        </ul>
+                    </li>
+
+
+                    <li>
+                        <a class="sidebar-sub-toggle"><i class="ti-receipt"></i> 客户订单管理 <span class="sidebar-collapse-icon ti-angle-down"></span></a>
+                        <ul>
+                            <li><a href="/Order/Index">订单列表</a></li>
+                            <li><a href="/Order/HistoryIndex">历史客户订单</a></li>
+                        </ul>
+                    </li>
+
+
+
+                    <li>
+                        <a class="sidebar-sub-toggle"><i class="ti-clipboard"></i> 销售管理 <span class="sidebar-collapse-icon ti-angle-down"></span></a>
+                        <ul>
+                            <li><a href="/Sale/Index">销售出货开单</a></li>
+                            <li><a href="/SaleReturn/Index">销售退货开单</a></li>
+                            <li><a href="/SaleReturn/ReturnHistoryIndex">历史退货记录</a></li>
+                            <li><a href="/SaleReturn/MoneyIndex">销售结款</a></li>
+                            <li><a href="/SaleReturn/MoneyHistoryIndex">历史结款记录</a></li>
+                        </ul>
+                    </li>
+
+                    <li>
+                        <a class="sidebar-sub-toggle"><i class="ti-money"></i> 财务管理 <span class="sidebar-collapse-icon ti-angle-down"></span></a>
+                        <ul>
+                            <li><a href="/Invoice/Index">发票管理</a></li>
+                        </ul>
+                    </li>
+
+                    <li>
+                        <a class="sidebar-sub-toggle"><i class="ti-user"></i> 用户管理 <span class="sidebar-collapse-icon ti-angle-down"></span></a>
+                        <ul>
+                            <li><a href="/User/Index">用户列表</a></li>
+                            @if (UserManager.Current.GetLevel >= UserLevelEnum.Boss)
+                            {
+                                <li><a href="/User/EditPassWord">修改密码</a></li>
+                            }
+                            <li><a href="/User/Logout">退出登录</a></li>
+                        </ul>
+                    </li>
+
+                    @if (UserManager.Current.GetLevel >= UserLevelEnum.Developer)
+                    {
+                        <li>
+                            <a class="sidebar-sub-toggle"><i class="ti-settings"></i> 后台配置 <span class="sidebar-collapse-icon ti-angle-down"></span></a>
+                            <ul>
+                                <li><a href="/Setting/Index">常用参数配置</a></li>
+                            </ul>
+                        </li>
+                    }
+
+
+                </ul>
+            </div>
+        </div>
+    </div><!-- /# sidebar -->
+
+    <div class="header">
+        <div class="pull-left">
+            <div class="hamburger sidebar-toggle">
+                <span class="ti-menu"></span>
+            </div>
+        </div>
+        <div class="pull-left p-l-10"><h4 style="color:white;padding:4px 15px">麦买卖进销存管理系统</h4></div>
+        
+        <div class="pull-right p-r-15">
+            <ul>
+                <li class="header-icon dib">
+                    <img class="avatar-img" src="~/assets/images/avatar/1.jpg" alt="" /> <span class="user-avatar">@UserManager.Current.GetLoginName <i class="ti-angle-down f-s-10"></i></span>
+                    <div class="drop-down dropdown-profile" style="width:127.86px">
+                        <div class="dropdown-content-heading">
+                            <span class="text-left">用户权限</span>
+                            <p class="trial-day">
+                                @{
+                                    if (UserManager.Current.GetLevel == UserLevelEnum.Operator)
+                                    {
+                                        <text>普通员工</text>
+                                    }
+                                    else if (UserManager.Current.GetLevel == UserLevelEnum.ProductManager)
+                                    {
+                                        <text>生管</text>
+                                    }
+                                    else if (UserManager.Current.GetLevel == UserLevelEnum.Boss)
+                                    {
+                                        <text>老板</text>
+                                    }
+                                    else if (UserManager.Current.GetLevel == UserLevelEnum.Developer)
+                                    {
+                                        <text>系统后台人员</text>
+                                    }
+                                }
+                            </p>
+                        </div>
+
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <!--主体部分-->
+    <div class="content-wrap">
+        <div class="main">
+            @RenderBody()
+        </div><!-- /# main -->
+    </div><!-- /# content wrap -->
+    <script src="~/assets/js/lib/jquery.min.js"></script><!-- jquery vendor -->
+    <script src="~/assets/js/lib/jquery.nanoscroller.min.js"></script><!-- nano scroller -->
+    <script src="~/assets/js/lib/sidebar.js"></script><!-- sidebar -->
+    <script src="~/assets/js/lib/bootstrap.min.js"></script><!-- bootstrap -->
+    <script src="~/assets/js/lib/mmc-common.js"></script>
+    @*<script src="~/assets/js/lib/mmc-chat.js"></script>*@
+    <script src="~/assets/js/scripts.js"></script><!-- scripit init-->
+
+</body>
+
+</html>
