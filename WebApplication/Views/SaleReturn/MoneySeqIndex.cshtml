@@ -80,7 +80,7 @@
                                 <li><a href="/SaleReturn/MoneyHistoryIndex">历史结款记录</a></li>
                             }
 
-                            <li class="active">销售出货开单</li>
+                            <li class="active">出货详情</li>
                         </ol>
                     </div>
                 </div>
@@ -300,11 +300,11 @@
                                         <td>@item.order_num</td>
 
                                         <td>@item.return_num</td>
-                                        <td>@item.return_time.ToString("yyyy-MM-dd")</td>
+                                        <td>@if (item.return_num !=0) {@item.return_time.ToString("yyyy-MM-dd")} else { <text>-</text>}</td>
                                         @if (UserManager.Current.GetLevel >= UserLevelEnum.ProductManager)
                                         {
-                                            <td>@item.return_price</td>
-                                            <td>@item.return_all_price</td>
+                                            <td>@if (item.return_num != 0) {@item.return_price}else{<text>-</text>}</td>
+                                            <td>@if (item.return_num != 0) {@item.return_all_price}else {<text>-</text>}</td>
                                         }
 
                                     </tr>

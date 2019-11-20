@@ -261,7 +261,7 @@ namespace DAL
                 string sql = null;
                 sql = sql = "select * " +
                     "from jinchen.salereturn_info a,jinchen.orderseq_info b " +
-                    "where deliver_index='{0}' and a.seq_id=b.seq_id ";
+                    "where deliver_index='{0}' and a.seq_id=b.seq_id order by a.return_index";
                 sql = string.Format(sql, deliver_index);
 
                 objList = PostgreHelper.GetEntityList<SaleReturn>(sql);

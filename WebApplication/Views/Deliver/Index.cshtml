@@ -17,8 +17,9 @@
     <script type="text/javascript">
         $(function () {
             $(".sidebar ul li:nth-of-type(2)").addClass("active open")
+            $(".sidebar ul li:nth-of-type(2) ul li").removeClass()
             $(".sidebar ul li:nth-of-type(2) ul li:nth-of-type(1)").addClass("active")
-            $(".sidebar ul li:nth-of-type(2) ul li:nth-of-type(2)").removeClass("active open")
+            
         });
 
         function deleteTiShi(id) {
@@ -75,7 +76,8 @@
                     <div class="page-title">
                         <ol class="breadcrumb text-left">
                             <li><a href="/Supplier/Index">主页</a></li>
-                            <li><a href="/Deliver/Index">物料购入流水账</a></li>
+                            <li><a href="/Deliver/Index">物料购入管理</a></li>
+                            <li class="active">物料购入流水账</li>
                         </ol>
                     </div>
                 </div>

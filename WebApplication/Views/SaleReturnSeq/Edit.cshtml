@@ -138,7 +138,8 @@
                             <li><a href="/Supplier/Index">主页</a></li>
                             <li><a href="/Sale/Index">销售开单</a></li>
                             <li><a href="/SaleReturn/Index">销售退货开单</a></li>
-                            <li class="active">退货编辑</li>                            
+                            <li><a href="/SaleReturnSeq/Index?return_index=@ViewBag.return_index">退货详情</a></li>
+                            <li class="active">编辑退货单</li>
                         </ol>
                     </div>
                 </div>
@@ -150,7 +151,7 @@
                     <div class="card alert">
                         <div class="card-header">
                             <h4>
-                                出货开单
+                                编辑退货单
                             </h4>
                         </div>
 
@@ -234,17 +235,17 @@
                                                     <td>@item.deliver_all_price</td>
                                                     <td>@item.purchase_person</td>
                                                     <td>@item.unit</td>
-                                                    <td><input type="text" name="return_num" style="width:70px" value="@item.return_num" /></td>
-                                                    <td><input type="text" name="return_time" style="width:80px" onclick="WdatePicker({ skin: 'whyGreen',dateFmt:'yyyy-MM-dd' })" value="@if (item.return_time.ToString("yyyy-MM-dd")!="0001-01-01") { @item.return_time.ToString("yyyy-MM-dd")} " /></td>
+                                                    <td><input type="text" name="return_num" style="width:70px;border-left-style:none;border-top-style:none;border-right-style:none;" value="@item.return_num" /></td>
+                                                    <td><input type="text" name="return_time" style="width:80px;border-left-style:none;border-top-style:none;border-right-style:none;" onclick="WdatePicker({ skin: 'whyGreen',dateFmt:'yyyy-MM-dd' })" value="@if (item.return_time.ToString("yyyy-MM-dd")!="0001-01-01") { @item.return_time.ToString("yyyy-MM-dd")} " /></td>
                                                     <td>
 
-                                                    <input type="text" name="return_price" style="width:70px" value="@item.return_price" />
+                                                    <input type="text" name="return_price" style="width:70px;border-left-style:none;border-top-style:none;border-right-style:none;" value="@item.return_price" />
 
                                                     </td>
 
                                                     <td>
 
-                                                    <input type="text" name="return_all_price" style="width:70px" value="@item.return_all_price" />
+                                                    <input type="text" name="return_all_price" style="width:70px;border-left-style:none;border-top-style:none;border-right-style:none;" value="@item.return_all_price" />
 
                                                     </td>
 

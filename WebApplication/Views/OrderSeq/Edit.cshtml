@@ -137,7 +137,8 @@
                         <ol class="breadcrumb text-left">
                             <li><a href="/Supplier/Index">主页</a></li>
                             <li><a href="/Order/Index">订单管理</a></li>
-                            <li><a href="/OrderSeq/Index?order_id=@ViewBag.order_id">订单详情</a></li>
+                            <li><a href="/Order/Index">订单列表</a></li>
+                            <li><a href="/OrderSeq/Index?order_id=@ViewBag.order_id">下单详情</a></li>
                             <li class="active">
                                 @{ if (Model == null)
                                     { <text>新增订单</text>}
@@ -258,7 +259,7 @@
                                     <div class="form-group">
                                         <label for="example-input-normal" class="col-sm-4 control-label">图纸上传</label>
                                         <div class="col-sm-4">
-                                            <input type="file" id="files" name="files" placeholder="file" />
+                                            <input type="file" id="files" name="files" placeholder="file" class="form-control" style="border:none;outline:none" />
                                             <input type="hidden" id="order_picture" name="order_picture" value="@if (Model != null) {@Model.order_picture}" />
                                         </div>
                                         <div class="col-sm-4">

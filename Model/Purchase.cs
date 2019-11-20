@@ -46,8 +46,6 @@ namespace Model
         //确认时间
         public DateTime confirm_time { get; set; }
 
-        //物料数量
-        public int material_inventory_num { get; set; }
 
     }
 }

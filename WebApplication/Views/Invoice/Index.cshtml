@@ -75,7 +75,7 @@
                         <ol class="breadcrumb text-left">
                             <li><a href="/Supplier/Index">主页</a></li>
                             <li><a href="/Invoice/Index">财务管理</a></li>
-                            <li class="active">开票信息</li>
+                            <li class="active">发票管理</li>
                         </ol>
                     </div>
                 </div>
@@ -140,6 +140,7 @@
                                         <th>付款方式</th>
                                         <th>订单号</th>
                                         <th>客户订单号</th>
+                                        <th>备注</th>
                                         @if (UserManager.Current.GetLevel >= UserLevelEnum.ProductManager)
                                         {
                                             <th>编辑</th>
@@ -189,6 +190,7 @@
                                         }
                                         <td>@item.order_index</td>
                                         <td>@item.company_order_index</td>
+                                        <td>@item.remark</td>
                                         <td>
                                             <input type="button" class="btn btn-primary" onclick="window.location.href = '/Invoice/Edit?id=@item.id'" value="@if (UserManager.Current.GetLevel >= UserLevelEnum.ProductManager) { <text>编辑</text>} else {<text>查看</text> } " />
                                         </td>

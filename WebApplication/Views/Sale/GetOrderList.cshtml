@@ -63,22 +63,22 @@
             <td>
                 @if (item.remain_num == 0)
                 {
-                    <input type="text" name="real_num" style="width:100px" value="出货已完成" readonly />
+                    <input type="text" name="real_num" style="width:100px;border:none;outline:none;" value="出货已完成" readonly />
                 }
                 else
                 {
-                    <input type="text" name="real_num" style="width:100px" />
+                    <input type="text" name="real_num" style="width:100px;border-right-style: none;border-left-style: none;border-top-style: none;" />
                 }
 
             </td>
             <td>
                 @if (item.remain_num == 0)
                 {
-                    <input type="text" name="real_time" style="width:100px" value="出货已完成" readonly />
+                    <input type="text" name="real_time" style="width:100px;border:none;outline:none;" value="出货已完成" readonly />
                 }
                 else
                 {
-                    <input type="text" name="real_time" style="width:100px" onclick="WdatePicker({ skin: 'whyGreen',dateFmt:'yyyy-MM-dd' })" />
+                    <input type="text" name="real_time" style="width:100px;border-right-style: none;border-left-style: none;border-top-style: none;" onclick="WdatePicker({ skin: 'whyGreen',dateFmt:'yyyy-MM-dd' })" />
                 }
 
             </td>
@@ -87,22 +87,22 @@
                 <td>
                     @if (item.remain_num == 0)
                     {
-                        <input type="text" name="deliver_price" style="width:100px" value="出货已完成" readonly />
+                        <input type="text" name="deliver_price" style="width:100px;border:none;outline:none;" value="出货已完成" readonly />
                     }
                     else
                     {
-                        <input type="text" name="deliver_price" style="width:100px" />
+                        <input type="text" name="deliver_price" style="width:100px;border-right-style: none;border-left-style: none;border-top-style: none;" />
                     }
 
                 </td>
                 <td>
                     @if (item.remain_num == 0)
                     {
-                        <input type="text" name="deliver_all_price" style="width:100px" value="出货已完成" readonly />
+                        <input type="text" name="deliver_all_price" style="width:100px;border:none;outline:none;" value="出货已完成" readonly />
                     }
                     else
                     {
-                        <input type="text" name="deliver_all_price" style="width:100px" />
+                        <input type="text" name="deliver_all_price" style="width:100px;border-right-style: none;border-left-style: none;border-top-style: none;" />
                     }
 
                 </td>

@@ -11,18 +11,7 @@ namespace BLL
         public PurchaseService PS = new PurchaseService();
 
         /// <summary>
-        /// 模糊查询结果为一笔或多笔数据
-        /// </summary>
-        /// <param name="name"></param>
-        /// <returns></returns>
-        public List<Purchase> SelectAll( string company_name, string purchase_index, string material_name)
-        {
-            List<Purchase> objList = PS.SelectAll(company_name, purchase_index, material_name);
-            return objList;
-        }
-
-        /// <summary>
-        /// 模糊查询结果为一笔或多笔数据
+        /// 用于生成唯一的采购单号
         /// </summary>
         /// <param name="name"></param>
         /// <returns></returns>
@@ -43,28 +32,9 @@ namespace BLL
             return objList;
         }
 
-        public List<Purchase> SelectDeliverAllForSupplier(int money_onoff, string start_time, string end_time, string company_name, string purchase_index, 
-            string material_name, string deliver_index)
-        {
-            List<Purchase> objList = PS.SelectDeliverAllForSupplier(money_onoff,start_time, end_time, company_name, purchase_index, material_name, deliver_index);
-            return objList;
-        }
-
-        
 
         /// <summary>
-        /// 查询没有送货的订单
-        /// </summary>
-        /// <param name="name"></param>
-        /// <returns></returns>
-        public List<Purchase> SelectForDeliver()
-        {
-            List<Purchase> objList = PS.SelectForDeliver();
-            return objList;
-        }
-
-        /// <summary>
-        /// 查询没有送货的订单
+        /// 历史购入清单：已确认结款的
         /// </summary>
         /// <param name="name"></param>
         /// <returns></returns>
@@ -78,7 +48,7 @@ namespace BLL
         
 
         /// <summary>
-        /// 根据id查询
+        /// 根据id单笔查询
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
@@ -100,18 +70,7 @@ namespace BLL
         }
 
         /// <summary>
-        /// 更新
-        /// </summary>
-        /// <param name="obj"></param>
-        /// <returns></returns>
-        public int Update(Purchase obj)
-        {
-            int count = PS.Update(obj);
-            return count;
-        }
-
-        /// <summary>
-        /// 更新
+        /// 更新，用于修改入库单中的信息
         /// </summary>
         /// <param name="obj"></param>
         /// <returns></returns>
@@ -122,7 +81,7 @@ namespace BLL
         }
 
         /// <summary>
-        /// 更新
+        /// 更新，用于确认和取消确认
         /// </summary>
         /// <param name="obj"></param>
         /// <returns></returns>

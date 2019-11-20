@@ -8,36 +8,9 @@ namespace DAL
 {
     public class PurchaseService
     {
-        /// <summary>
-        /// 根据联系人名模糊查询，查询结果为一笔或多笔数据
-        /// </summary>
-        /// <param name="name"></param>
-        /// <returns></returns>
-        public List<Purchase> SelectAll(string company_name, string purchase_index, string material_name)
-        {
-            try
-            {
-                List<Purchase> objList = new List<Purchase>();
-                string sql = null;
-                sql = "SELECT a.id, b.company_name, a.purchase_index, a.category, a.material_name, a.material_spec, "+
-                "a.material_num, a.material_unit, a.material_price, a.material_all_price "+
-                 "FROM jinchen.purchase_info a, jinchen.company_info b " +
-                   " where a.supplier_id = b.id and a.purchase_index ~* '{0}' and b.company_name ~* '{1}' and a.material_name ~* '{2}' "+
-                   "order by a.purchase_index,deliver_time,money_onoff desc ";
-                sql = string.Format(sql, purchase_index, company_name, material_name);
-
-                objList = PostgreHelper.GetEntityList<Purchase>(sql);
-
-                return objList;
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
-        }
 
         /// <summary>
-        /// 查询当天的采购数量，用于自动生成采购单号
+        /// 用于自动生成采购单号
         /// </summary>
         /// <param name="name"></param>
         /// <returns></returns>
@@ -63,7 +36,7 @@ namespace DAL
         }
 
         /// <summary>
-        /// 查询单笔数
+        /// 根据id查询单笔数据
         /// </summary>
         /// <param name="id">用户id</param>
         /// <returns></returns>
@@ -73,7 +46,7 @@ namespace DAL
             {
                 Purchase obj = new Purchase();
                 string sql = "SELECT a.id,a.supplier_id, b.company_name, a.purchase_index, a.category, a.material_name, a.material_spec, " +
-                "a.material_num, a.material_inventory_num,a.material_unit, a.material_price, a.material_all_price,deliver_index,deliver_time,money_onoff,money_way,confirm_time,status " +
+                "a.material_num, a.material_unit, a.material_price, a.material_all_price,deliver_index,deliver_time,money_onoff,money_way,confirm_time,status " +
                  "FROM jinchen.purchase_info a, jinchen.company_info b " +
                    " where a.supplier_id = b.id and a.id={0} ";
                 sql = string.Format(sql, id);
@@ -87,7 +60,7 @@ namespace DAL
         }
 
         /// <summary>
-        /// 用于入库单：模糊查询，查询结果为一笔或多笔数据
+        /// 查询入库单中尚未确认结款的单子（物料购入流水账和供应商结款共用一个）
         /// </summary>
         /// <param name="name"></param>
         /// <returns></returns>
@@ -98,7 +71,7 @@ namespace DAL
                 List<Purchase> objList = new List<Purchase>();
                 string sql = null;
                 sql = "SELECT a.id, b.company_name, a.purchase_index, a.category,a.deliver_index,a.deliver_time, a.material_name, a.material_spec, " +
-                "a.material_num,a.material_inventory_num, a.material_unit, a.material_price, a.material_all_price,money_onoff,money_way,status,confirm_time " +
+                "a.material_num, a.material_unit, a.material_price, a.material_all_price,money_onoff,money_way,status,confirm_time " +
                  "FROM jinchen.purchase_info a, jinchen.company_info b " +
                    " where a.supplier_id = b.id and a.purchase_index ~* '{0}' and b.company_name ~* '{1}' and a.material_name ~* '{2}' and " +
                    "a.deliver_index ~* '{3}' and a.status =0 and to_char(a.deliver_time,'yyyy-MM-dd')>='{4}' and to_char(a.deliver_time,'yyyy-MM-dd')<='{5}' " +
@@ -115,60 +88,8 @@ namespace DAL
             }
         }
 
-        public List<Purchase> SelectDeliverAllForSupplier(int money_onoff,string start_time, string end_time, string company_name, string purchase_index,
-            string material_name, string deliver_index)
-        {
-            try
-            {
-                List<Purchase> objList = new List<Purchase>();
-                string sql = null;
-                sql = "SELECT a.id, b.company_name, a.purchase_index, a.category,a.deliver_index,a.deliver_time, a.material_name, a.material_spec, " +
-                "a.material_num,a.material_inventoy_num, a.material_unit, a.material_price, a.material_all_price,money_onoff,money_way,confirm_time " +
-                 "FROM jinchen.purchase_info a, jinchen.company_info b " +
-                   " where a.supplier_id = b.id and a.purchase_index ~* '{0}' and b.company_name ~* '{1}' and a.material_name ~* '{2}' and " +
-                   "a.deliver_index ~* '{3}' and a.deliver_index !='no' and to_char(a.deliver_time,'yyyy-MM-dd')>='{4}' and to_char(a.deliver_time,'yyyy-MM-dd')<='{5}' " +
-                   "order by a.purchase_index ";
-                sql = string.Format(sql, company_name, purchase_index, material_name, deliver_index, start_time, end_time, money_onoff);
-
-                objList = PostgreHelper.GetEntityList<Purchase>(sql);
-
-                return objList;
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
-        }
-
         /// <summary>
-        /// 用于入库单：模糊查询，查询结果为一笔或多笔数据
-        /// </summary>
-        /// <param name="name"></param>
-        /// <returns></returns>
-        public List<Purchase> SelectForDeliver()
-        {
-            try
-            {
-                List<Purchase> objList = new List<Purchase>();
-                string sql = null;
-                sql = "SELECT a.id, b.company_name, a.purchase_index, a.category,a.deliver_index,a.deliver_time, a.material_name, a.material_spec, " +
-                "a.material_num, a.material_unit, a.material_price, a.material_all_price,money_onoff,money_way,confirm_time " +
-                 "FROM jinchen.purchase_info a, jinchen.company_info b " +
-                   " where a.supplier_id = b.id and a.deliver_index ='no' ";
-                sql = string.Format(sql);
-
-                objList = PostgreHelper.GetEntityList<Purchase>(sql);
-
-                return objList;
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
-        }
-
-        /// <summary>
-        /// 用于入库单：模糊查询，查询结果为一笔或多笔数据
+        /// 历史购入清单：已确认结款的
         /// </summary>
         /// <param name="name"></param>
         /// <returns></returns>
@@ -183,7 +104,7 @@ namespace DAL
                 "a.material_num, a.material_unit, a.material_price, a.material_all_price,money_onoff,money_way,confirm_time " +
                  "FROM jinchen.purchase_info a, jinchen.company_info b " +
                    " where a.supplier_id = b.id and a.purchase_index ~* '{0}' and b.company_name ~* '{1}' and a.material_name ~* '{2}' and " +
-                   "a.deliver_index ~* '{3}' and a.deliver_index !='no' and to_char(a.deliver_time,'yyyy-MM-dd')>='{4}' and to_char(a.deliver_time,'yyyy-MM-dd')<='{5}' and a.status=1 " +
+                   "a.deliver_index ~* '{3}' and to_char(a.deliver_time,'yyyy-MM-dd')>='{4}' and to_char(a.deliver_time,'yyyy-MM-dd')<='{5}' and a.status=1 " +
                    "order by a.purchase_index ";
                 sql = string.Format(sql, purchase_index, company_name, material_name, deliver_index, start_time, end_time);
 
@@ -225,29 +146,6 @@ namespace DAL
         }
 
         /// <summary>
-        /// 更新
-        /// </summary>
-        /// <param name="obj"></param>
-        /// <returns></returns>
-        public int Update(Purchase obj)
-        {
-            try
-            {
-                int count = 0;
-                string sql = "update jinchen.purchase_info set category='{0}',material_name='{1}', material_spec='{2}',material_num={3}," +
-                    "material_unit='{4}',material_price={5},material_all_price={6},supplier_id={7} where id={8}";
-                sql = string.Format(sql, obj.category, obj.material_name, obj.material_spec, obj.material_num,obj.material_unit,obj.material_price,obj.material_all_price, obj.supplier_id, obj.id);
-                count = PostgreHelper.ExecuteNonQuery(sql);
-                return count;
-
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
-        }
-
-        /// <summary>
         /// 更新入库信息
         /// </summary>
         /// <param name="obj"></param>
@@ -273,7 +171,7 @@ namespace DAL
         }
 
         /// <summary>
-        /// 更新deliver_time/inventory_status/deliver_status
+        /// 更新入库单的状态（用于区分是否结款）
         /// </summary>
         /// <param name="obj"></param>
         /// <returns></returns>

@@ -46,11 +46,11 @@ namespace DAL
                 string sql = null;
                 if (string.IsNullOrEmpty(user_name))
                 {
-                    sql = "select * from jinchen.user_info order by level_name,level desc";
+                    sql = "select * from jinchen.user_info order by user_name";
                 }
                 else
                 {
-                    sql = "select * jinchen.user_info where user_name ~* '{0}' order by user_name,level desc";
+                    sql = "select * jinchen.user_info where user_name ~* '{0}' order by user_name";
                     sql = string.Format(sql, user_name);
                 }
                 objList = PostgreHelper.GetEntityList<User>(sql);

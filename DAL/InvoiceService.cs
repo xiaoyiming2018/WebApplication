@@ -20,7 +20,8 @@ namespace DAL
             {
                 List<Invoice> objList = new List<Invoice>();
                 string sql = null;
-                sql = "select a.id,b.company_name,c.order_index,c.company_order_index,a.invoice_type,a.invoice_index,a.invoice_time,a.invoice_price,a.invoice_ratio,a.invoice_all_price,a.pay_type " +
+                sql = "select a.id,b.company_name,c.order_index,c.company_order_index,a.invoice_type,a.invoice_index," +
+                    "a.invoice_time,a.invoice_price,a.invoice_ratio,a.invoice_all_price,a.pay_type,a.remark " +
                     "from jinchen.invoice_info a,jinchen.company_info b,jinchen.order_info c " +
                     "where c.customer_id=b.id and a.order_id=c.id and a.invoice_index ~* '{0}' and b.company_name ~* '{1}' and c.order_index ~*'{2}' and c.company_order_index ~* '{3}'" +
                     "order by a.invoice_time desc";

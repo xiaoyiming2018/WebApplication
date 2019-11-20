@@ -17,7 +17,7 @@
     <script type="text/javascript">
         $(function () {
             $(".sidebar ul li:nth-of-type(2)").addClass("active open")
-            $(".sidebar ul li:nth-of-type(2) ul li:nth-of-type(2)").removeClass()
+            $(".sidebar ul li:nth-of-type(2) ul li").removeClass()
             $(".sidebar ul li:nth-of-type(2) ul li:nth-of-type(3)").addClass("active")
             
         });
@@ -76,7 +76,8 @@
                     <div class="page-title">
                         <ol class="breadcrumb text-left">
                             <li><a href="/Supplier/Index">主页</a></li>
-                            <li><a href="/Deliver/HistoryIndex">历史购入清单</a></li>
+                            <li><a href="/Deliver/Index">物料购入管理</a></li>
+                            <li class="active">历史购入清单</li>
 
                         </ol>
                     </div>

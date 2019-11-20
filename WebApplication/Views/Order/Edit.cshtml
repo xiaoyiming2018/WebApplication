@@ -261,6 +261,7 @@
                         <ol class="breadcrumb text-left">
                             <li><a href="/Supplier/Index">主页</a></li>
                             <li><a href="/Order/Index">客户订单管理</a></li>
+                            <li><a href="/Order/Index">订单列表</a></li>
                             <li class="active">
                                 @{ if (Model == null)
                                     { <text>新增订单</text>}
@@ -313,7 +314,7 @@
                                     <div class="form-group">
                                         <label for="example-input-normal" class="col-sm-6 control-label">订单号</label>
                                         <div class="col-sm-4">
-                                            <input type="text" class="form-control" id="order_index" name="order_index" value="@if (Model != null) {@Model.order_index} else { @ViewBag.order_index} " />
+                                            <input type="text" class="form-control" id="order_index" name="order_index" value="@if (Model != null) {@Model.order_index} else { @ViewBag.order_index} " readonly/>
                                         </div>
                                     </div>
 
