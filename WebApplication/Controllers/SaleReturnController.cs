@@ -317,7 +317,7 @@ namespace WebApplication.Controllers
         public IActionResult GetDeliverList(string deliver_index)
         {
             List<Sale> sale = SaleM.SelectSeqByDeliverIndex(deliver_index);
-            Sale saleView = SaleM.SelectByDeliverIndex(deliver_index);
+            Sale saleView = SaleM.SelectDeliverByDeliverIndex(deliver_index);
             ViewBag.order_id = saleView.order_id;
             ViewBag.order_index = saleView.order_index;
             ViewBag.company_name = saleView.company_name;
@@ -504,7 +504,7 @@ namespace WebApplication.Controllers
                 }
             }
 
-            Sale sale = SaleM.SelectByDeliverIndex(deliver_index);
+            Sale sale = SaleM.SelectDeliverByDeliverIndex(deliver_index);
             ViewBag.money_onoff = sale.money_onoff;
             ViewBag.money_way = sale.money_way;
 

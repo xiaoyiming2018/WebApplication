@@ -21,8 +21,7 @@ namespace WebApplication.Controllers
         /// <param name="page">分页页码</param>
         /// <param name="size">每页显示数量</param>
         /// <returns></returns>
-        public IActionResult Index(string start_time, string end_time, string deliver_index, string deliver_company_head, 
-            string order_index, string company_name, string company_order_index,int pageindex = 1, int pagesize = 8)
+        public IActionResult Index(string start_time, string end_time, string deliver_index, string deliver_company_head,int pageindex = 1, int pagesize = 8)
         {
 
             ViewBag.start_time = start_time;
@@ -30,9 +29,6 @@ namespace WebApplication.Controllers
 
             ViewBag.deliver_index = deliver_index;
             ViewBag.deliver_company_head = deliver_company_head;
-            ViewBag.order_index = order_index;
-            ViewBag.company_name = company_name;
-            ViewBag.company_order_index = company_order_index;
 
             if (start_time == null)
             {
@@ -43,7 +39,7 @@ namespace WebApplication.Controllers
                 end_time = "2222-01-01";
             }
 
-            var objList = SM.SelectAll(start_time, end_time, deliver_index, deliver_company_head, order_index, company_name, company_order_index);
+            var objList = SM.SelectAll(start_time, end_time, deliver_index, deliver_company_head);
             var pagedList = PagedList<Sale>.PageList(pageindex, pagesize, objList);
             ViewBag.model = pagedList.Item2;
             return View(pagedList.Item1);
@@ -57,15 +53,17 @@ namespace WebApplication.Controllers
         public IActionResult Edit()
         {
             try
-            {
-                int id = Convert.ToInt32(Request.Query["id"]);
-                if (id > 0)
+            {        
+                if (!string.IsNullOrEmpty(HttpContext.Request.Form["deliver_index"]))
                 {
-                    //此处可忽略，修改动作在出货详情中
-                    Sale sale = new Sale();
-                    //sale = SM.SelectById(id);
+                    string deliver_index = Convert.ToString(HttpContext.Request.Form["deliver_index"]);
+                    Sale sale=SM.SelectDeliverByDeliverIndex(deliver_index);
+                    ViewBag.deliver_index = deliver_index;
+                    ViewBag.deliver_company_head = sale.deliver_company_head;
 
-                    return View(sale);
+                    List<Sale> saleList = SM.SelectSeqByDeliverIndex(deliver_index);
+
+                    return View(saleList);
 
                 }
                 else
@@ -111,6 +109,7 @@ namespace WebApplication.Controllers
             string[] real_time = Convert.ToString(HttpContext.Request.Form["Real_Time"]).Split(',');
             string[] deliver_price = Convert.ToString(HttpContext.Request.Form["Deliver_Price"]).Split(',');
             string[] deliver_all_price = Convert.ToString(HttpContext.Request.Form["Deliver_All_Price"]).Split(',');
+            string[] remark = Convert.ToString(HttpContext.Request.Form["Remark"]).Split(',');
 
 
             bool flag = true;
@@ -124,6 +123,7 @@ namespace WebApplication.Controllers
             for (int i = 0; i < inputNum; i++)
             {
                 objSale.seq_id = Convert.ToInt32(seq_id[i]);
+                objSale.remark = Convert.ToString(remark[i]);
 
                 if (real_num[i] == "" || real_num[i] == "出货已完成")
                 {

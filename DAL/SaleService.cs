@@ -13,35 +13,46 @@ namespace DAL
         /// </summary>
         /// <param name="name"></param>
         /// <returns></returns>
-        public List<Sale> SelectAll(string start_time, string end_time, string deliver_index, string deliver_company_head, 
-            string order_index, string company_name, string company_order_index)
+        public List<Sale> SelectAll(string start_time, string end_time, string deliver_index, string deliver_company_head)
         {
             try
             {
                 List<Sale> objList = new List<Sale>();
                 string sql = null;
-                sql = "select res1.deliver_index,res1.deliver_company_head,res1.order_index,res1.company_name,res1.company_order_index,"+
-                       " res1.real_num,res1.deliver_all_price,res1.insert_time,res2.order_num " +
-                        "from " +
-                       " (select a.deliver_index, a.deliver_company_head, b.order_index, d.company_name, b.company_order_index, " +
-                       " sum(real_num) as real_num, sum(deliver_all_price) as deliver_all_price, a.insert_time " +
-                       " from jinchen.sale_info a, jinchen.order_info b, jinchen.orderseq_info c, jinchen.company_info d " +
-                       " where a.order_id = b.id and b.id = c.order_id and a.seq_id = c.seq_id and b.customer_id = d.id " +
-                       " and a.deliver_index ~*'{0}' and a.deliver_company_head ~*'{1}' and b.order_index ~*'{2}' and d.company_name ~*'{3}' " +
-                       " and b.company_order_index ~*'{4}' and to_char(a.insert_time,'yyyy-MM-dd')>='{5}' and to_char(a.insert_time,'yyyy-MM-dd')<='{6}' " +
-                       "group by a.deliver_index, a.deliver_company_head, b.order_index, b.company_order_index, " +
-                       " d.company_name, a.insert_time order by a.insert_time desc, a.deliver_index) res1 " +
-                        " left join " +
-                        " (select b.order_index, d.company_name, b.company_order_index, sum(c.order_num) as order_num " +
-                        " from(select a.order_id from jinchen.sale_info a group by a.order_id) a, jinchen.order_info b, jinchen.orderseq_info c, jinchen.company_info d " +
-                        " where a.order_id = b.id and b.id = c.order_id and b.customer_id = d.id and b.order_index ~*'{2}' and d.company_name ~*'{3}' and " +
-                        " b.company_order_index ~*'{4}' " +
-                        " group by b.order_index, d.company_name, b.company_order_index " +
-                        " order by b.order_index) res2 " +
-                        " on res1.order_index = res2.order_index and res1.company_name = res2.company_name and res1.company_order_index = res2.company_order_index";
-                sql = string.Format(sql, deliver_index, deliver_company_head, order_index, company_name, company_order_index,start_time,end_time);
+                sql = "select deliver_index,deliver_company_head,sum(real_num) as real_num,sum(deliver_all_price) as deliver_all_price,max(insert_time) as insert_time "+
+                      "  from jinchen.sale_info a "+
+                      "  where deliver_index ~*'{0}' and company_order_index ~*'{1}' and to_char(insert_time,'yyyy-MM-dd')>='{2}' and to_char(insert_time,'yyyy-MM-dd')<='{3}' " +
+                      "  group by deliver_index,deliver_company_head";
+                sql = string.Format(sql, deliver_index, deliver_company_head,start_time,end_time);
 
                 objList = PostgreHelper.GetEntityList<Sale>(sql);
+
+                return objList;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        /// <summary>
+        /// 查询出货单对应的出货抬头、结款与否、结款方式
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
+        public Sale SelectDeliverByDeliverIndex(string deliver_index)
+        {
+            try
+            {
+                Sale objList = new Sale();
+                string sql = null;
+                sql = "select a.deliver_index,a.deliver_company_head,max(money_onoff) as money_onoff,max(money_way) as money_way " +
+                        "from jinchen.sale_info a" +
+                        "where a.deliver_index='{0}' " +
+                        "group by a.deliver_index,a.deliver_company_head";
+                sql = string.Format(sql, deliver_index);
+
+                objList = PostgreHelper.GetSingleEntity<Sale>(sql);
 
                 return objList;
             }
@@ -131,33 +142,6 @@ namespace DAL
         }
 
         /// <summary>
-        /// 用于销售管理：模糊查询，查询结果为一笔或多笔数据
-        /// </summary>
-        /// <param name="name"></param>
-        /// <returns></returns>
-        public Sale SelectByDeliverIndex(string deliver_index)
-        {
-            try
-            {
-                Sale objList = new Sale();
-                string sql = null;
-                sql = "select a.deliver_index,a.deliver_company_head,b.order_index,a.order_id,d.company_name,b.company_order_index,max(money_onoff) as money_onoff,max(money_way) as money_way " +
-                        "from jinchen.sale_info a,jinchen.order_info b, jinchen.orderseq_info c, jinchen.company_info d " +
-                        "where a.order_id = b.id and b.id = c.order_id and a.seq_id = c.seq_id and b.customer_id = d.id and a.deliver_index='{0}' " +
-                        "group by a.deliver_index,a.deliver_company_head,b.order_index,a.order_id,b.company_order_index,d.company_name";
-                sql = string.Format(sql, deliver_index);
-
-                objList = PostgreHelper.GetSingleEntity<Sale>(sql);
-
-                return objList;
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
-        }
-
-        /// <summary>
         /// 查询订单下的序号
         /// </summary>
         /// <param name="id">用户id</param>
@@ -222,9 +206,9 @@ namespace DAL
             try
             {
                 string sql = "insert into jinchen.sale_info(order_id,seq_id,deliver_index,deliver_company_head,real_num," +
-                    "real_time,deliver_price,deliver_all_price,insert_time) values({0},{1},'{2}','{3}',{4},'{5}',{6},{7},'{8}')";
+                    "real_time,deliver_price,deliver_all_price,insert_time,remark) values({0},{1},'{2}','{3}',{4},'{5}',{6},{7},'{8}','{9}')";
                 sql = string.Format(sql, obj.order_id, obj.seq_id, obj.deliver_index,
-                    obj.deliver_company_head, obj.real_num, obj.real_time,obj.deliver_price,obj.deliver_all_price,obj.insert_time);
+                    obj.deliver_company_head, obj.real_num, obj.real_time,obj.deliver_price,obj.deliver_all_price,obj.insert_time,obj.remark);
                 int count = PostgreHelper.ExecuteNonQuery(sql);
                 return count;
             }

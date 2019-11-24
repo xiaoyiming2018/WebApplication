@@ -77,5 +77,8 @@ namespace Model
         public int return_status { get; set; }
         //实际退货时间
         public DateTime confirm_time { get; set; }
+
+        //备注
+        public string remark { get; set; }
     }
 }

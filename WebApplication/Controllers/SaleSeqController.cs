@@ -23,7 +23,7 @@ namespace WebApplication.Controllers
         {
             
             string deliver_index = Convert.ToString(Request.Query["deliver_index"]);
-            Sale sale = SM.SelectByDeliverIndex(deliver_index);
+            Sale sale = SM.SelectDeliverByDeliverIndex(deliver_index);
             ViewBag.deliver_index = deliver_index;
             ViewBag.deliver_company_head = sale.deliver_company_head;
             ViewBag.order_index = sale.order_index;
@@ -57,7 +57,7 @@ namespace WebApplication.Controllers
             {
                 string deliver_index = Convert.ToString(Request.Query["deliver_index"]);
                 ViewBag.deliver_index = deliver_index;
-                Sale sale=SM.SelectByDeliverIndex(deliver_index);
+                Sale sale=SM.SelectDeliverByDeliverIndex(deliver_index);
                 ViewBag.deliver_company_head = sale.deliver_company_head;
                 ViewBag.order_index = sale.order_index;
                 ViewBag.order_id = sale.order_id;

@@ -685,15 +685,17 @@ a.dt-button.active:not(.disabled) {
 Buttons
 -------------------------------------------------*/
 .btn-default {
-  background: #878787;
-  border-color: #878787;
-  color: #fff; }
-  .btn-default:hover, .btn-default:focus, .btn-default.active {
-    background: #6e6e6e;
-    border-color: #878787;
-    color: #fff;
-    -webkit-box-shadow: none;
-            box-shadow: none; }
+    background: #FFFFFF;
+    border-color: #e7e7e7;
+    /*color: #fff;*/
+}
+    .btn-default:hover, .btn-default:focus, .btn-default.active {
+        background: #FFFFFF;
+        border-color: #e7e7e7;
+        /*color: #fff;*/
+        -webkit-box-shadow: none;
+        box-shadow: none;
+    }
 
 .btn-primary {
   background: #00838F;

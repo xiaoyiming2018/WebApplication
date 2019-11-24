@@ -14,10 +14,9 @@ namespace BLL
         /// </summary>
         /// <param name="name"></param>
         /// <returns></returns>
-        public List<Sale> SelectAll(string start_time, string end_time, string deliver_index, string deliver_company_head, string order_index, 
-            string company_name, string company_order_index)
+        public List<Sale> SelectAll(string start_time, string end_time, string deliver_index, string deliver_company_head)
         {
-            List<Sale> objList = SS.SelectAll(start_time,end_time,deliver_index, deliver_company_head, order_index, company_name, company_order_index);
+            List<Sale> objList = SS.SelectAll(start_time,end_time,deliver_index, deliver_company_head);
             return objList;
         }
 
@@ -59,9 +58,9 @@ namespace BLL
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public Sale SelectByDeliverIndex(string deliver_index)
+        public Sale SelectDeliverByDeliverIndex(string deliver_index)
         {
-            Sale obj = SS.SelectByDeliverIndex(deliver_index);
+            Sale obj = SS.SelectDeliverByDeliverIndex(deliver_index);
             return obj;
         }
 

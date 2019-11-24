@@ -23,7 +23,7 @@ namespace Model
         public string order_name { get; set; }
         //下单数量
         public Int64 order_num { get; set; }
-        //下单时间
+        //下单时间(登记时间)
         public DateTime order_time { get; set; }
         //需求出货时间
         public DateTime deliver_time { get; set; }
@@ -35,7 +35,7 @@ namespace Model
         public double deliver_all_price { get; set; }
         //采购人员
         public string purchase_person { get; set; }
-        //需求单位
+        //单位
         public string unit { get; set; }
         //开单数量
         public Int64 open_num { get; set; }

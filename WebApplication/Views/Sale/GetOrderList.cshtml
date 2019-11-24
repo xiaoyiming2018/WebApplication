@@ -7,31 +7,23 @@
         <tr>
             <th>序号</th>
             <th hidden>实际序号</th>
-            <th>下单明细</th>
-            <th>下单数量</th>
+            <th>名称规格</th>
+            <th>订单数量</th>
+            <th>单位</th>
             @if (UserManager.Current.GetLevel >= UserLevelEnum.ProductManager)
             {
                 <th>单价</th>
+                <th>金额</th>
             }
-
             <th hidden>剩余数量</th>
             <th>剩余数量</th>
-            <th>下单时间</th>
-            <th>需求出货时间</th>
-            @if (UserManager.Current.GetLevel >= UserLevelEnum.ProductManager)
-            {
-                <th>客户采购员</th>
-                <th>需求单位</th>
-            }
-
-            <th>实际出货数量</th>
-            <th>实际出货时间</th>
+            <th>出货数量</th>
             @if (UserManager.Current.GetLevel >= UserLevelEnum.ProductManager)
             {
                 <th>出货单价</th>
                 <th>出货总价</th>
             }
-
+            <th>备注</th>
 
         </tr>
     </thead>
@@ -45,20 +37,15 @@
             <td hidden><input type="text" name="seq_id" style="width:100px" value="@item.seq_id" /></td>
             <td>@item.order_name</td>
             <td>@item.order_num</td>
+            <td>@item.unit</td>
             @if (UserManager.Current.GetLevel >= UserLevelEnum.ProductManager)
             {
                 <td>@item.order_price</td>
+                <td>@item.order_all_price</td>
             }
 
             <td hidden><input type="text" name="remain_num" style="width:100px" value="@item.remain_num" /></td>
             <td>@item.remain_num</td>
-            <td>@item.order_time.ToString("yyyy-MM-dd")</td>
-            <td>@item.deliver_time.ToString("yyyy-MM-dd")</td>
-            @if (UserManager.Current.GetLevel >= UserLevelEnum.ProductManager)
-            {
-                <td>@item.purchase_person</td>
-                <td>@item.unit</td>
-            }
 
             <td>
                 @if (item.remain_num == 0)
@@ -68,17 +55,6 @@
                 else
                 {
                     <input type="text" name="real_num" style="width:100px;border-right-style: none;border-left-style: none;border-top-style: none;" />
-                }
-
-            </td>
-            <td>
-                @if (item.remain_num == 0)
-                {
-                    <input type="text" name="real_time" style="width:100px;border:none;outline:none;" value="出货已完成" readonly />
-                }
-                else
-                {
-                    <input type="text" name="real_time" style="width:100px;border-right-style: none;border-left-style: none;border-top-style: none;" onclick="WdatePicker({ skin: 'whyGreen',dateFmt:'yyyy-MM-dd' })" />
                 }
 
             </td>
@@ -107,7 +83,7 @@
 
                 </td>
             }
-
+            <td><input type="text" name="remark" style="width:100px;border-right-style: none;border-left-style: none;border-top-style: none;" /></td>
         </tr>
                 index++;
             }

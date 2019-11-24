@@ -16,9 +16,9 @@ namespace BLL
         /// <param name="name"></param>
         /// <returns></returns>
         public List<Order> SelectAll(int order_status, string start_time, string end_time,string deliver_start_time, string deliver_end_time, 
-             string company_name, string order_index, string company_order_index)
+             string company_name, string order_index, string company_order_index,string purchase_person)
         {
-            List<Order> objList = OS.SelectAll(order_status, start_time, end_time, deliver_start_time, deliver_end_time,  company_name, order_index, company_order_index);
+            List<Order> objList = OS.SelectAll(order_status, start_time, end_time, deliver_start_time, deliver_end_time,  company_name, order_index, company_order_index, purchase_person);
             return objList;
         }
 

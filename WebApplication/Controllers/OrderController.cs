@@ -20,12 +20,14 @@ namespace WebApplication.Controllers
         /// <param name="page">分页页码</param>
         /// <param name="size">每页显示数量</param>
         /// <returns></returns>
-        public IActionResult Index(string start_time, string end_time,string deliver_start_time, string deliver_end_time, string company_name, string order_index,string company_order_index, int pageindex = 1, int pagesize = 8)
+        public IActionResult Index(string start_time, string end_time,string deliver_start_time, string deliver_end_time, string company_name, 
+            string order_index,string company_order_index,string purchase_person, int pageindex = 1, int pagesize = 8)
         {            
                           
             ViewBag.company_name = company_name;
             ViewBag.order_index = order_index;
             ViewBag.company_order_index = company_order_index;
+            ViewBag.purchase_person = purchase_person;
 
             ViewBag.start_time = start_time;
             ViewBag.end_time = end_time;
@@ -50,7 +52,7 @@ namespace WebApplication.Controllers
             }
 
 
-            var objList = OM.SelectAll(0, start_time, end_time, deliver_start_time, deliver_end_time, company_name, order_index, company_order_index);
+            var objList = OM.SelectAll(0, start_time, end_time, deliver_start_time, deliver_end_time, company_name, order_index, company_order_index, purchase_person);
             var pagedList = PagedList<Order>.PageList(pageindex, pagesize, objList);
             ViewBag.model = pagedList.Item2;
             return View(pagedList.Item1);
@@ -251,11 +253,13 @@ namespace WebApplication.Controllers
             return View();
         }
 
-        public IActionResult HistoryIndex(string start_time, string end_time, string deliver_start_time, string deliver_end_time, string company_name, string order_index, string company_order_index, int pageindex = 1, int pagesize = 8)
+        public IActionResult HistoryIndex(string start_time, string end_time, string deliver_start_time, string deliver_end_time, 
+            string company_name, string order_index, string company_order_index,string purchase_person, int pageindex = 1, int pagesize = 8)
         {
             ViewBag.company_name = company_name;
             ViewBag.order_index = order_index;
             ViewBag.company_order_index = company_order_index;
+            ViewBag.purchase_person = purchase_person;
             ViewBag.start_time = start_time;
             ViewBag.end_time = end_time;
             ViewBag.deliver_start_time = deliver_start_time;
@@ -279,7 +283,7 @@ namespace WebApplication.Controllers
                 deliver_end_time = "2222-01-01";
             }
 
-            var objList = OM.SelectAll(1, start_time, end_time, deliver_start_time, deliver_end_time,  company_name, order_index, company_order_index);
+            var objList = OM.SelectAll(1, start_time, end_time, deliver_start_time, deliver_end_time,  company_name, order_index, company_order_index, purchase_person);
             var pagedList = PagedList<Order>.PageList(pageindex, pagesize, objList);
             ViewBag.model = pagedList.Item2;
             return View(pagedList.Item1);

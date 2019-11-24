@@ -20,6 +20,49 @@
             $(".sidebar ul li:nth-of-type(4) ul li:nth-of-type(1)").addClass("active")
         });
 
+        function deleteTiShi(order_id, seq_id) {
+            swal({
+                title: "确定删除 ?",
+                text: "删除后将无法恢复 !",
+                type: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#DD6B55",
+                confirmButtonText: "删除",
+                cancelButtonText: "取消",
+                closeOnConfirm: false,//true表示不需要点击确认,fasle需要点击确认后再关闭对话框
+                closeOnCancel: false //true表示不需要点击确认,fasle需要点击确认后再关闭对话框
+            },
+                function (isConfirm) {
+                    if (isConfirm) {
+                        $.ajax({
+                            type: "POST",
+                            url: "/OrderSeq/Del?order_id="+order_id+"&seq_id="+seq_id+"",
+                            beforeSend: function (xhr) {
+                                xhr.setRequestHeader("XSRF-TOKEN",
+                                    $('input:hidden[name="__RequestVerificationToken"]').val());
+                            },
+                            data: {
+                                order_id: order_id, seq_id: seq_id
+                            },
+                            success: function (msg) {
+                                if (msg == "Success") {
+                                    swal({ title: "已删除 !", text: "该条记录已删除 !", type: "success" },
+                                        function () { window.location.href = '/Order/Index'; });
+                                }
+                                else {
+                                    swal("执行失败 !", "该记录已保留 !", "error");
+                                }
+                            },
+                            error: function (msg) {
+                                swal("数据获取失败 !", "该记录已保留 !", "error");
+                            }
+                        });
+                    }
+                    else {
+                        swal("已取消 !", "该记录已保留 !", "error");
+                    }
+                });
+        }
     </script>
 </head>
 <body>
@@ -43,6 +86,26 @@
                     <div class="card alert">
                         <div class="card-header">
                             <form class="form-horizontal" action="/Order/Index" method="post" id="myfrom">
+
+                                <div class="form-inline">
+                                    <div class="form-group">
+                                        <label>订&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;单&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;号：</label>
+                                        <input id="order_index" name="order_index" type="text" class="form-control" style="height:36px;width:180px" value="@ViewBag.order_index" />
+                                    </div>
+                                    <div class="form-group">
+                                        <label>客&nbsp;&nbsp;户&nbsp;&nbsp;单&nbsp;&nbsp;&nbsp;号：</label>
+                                        <input id="company_order_index" name="company_order_index" type="text" class="form-control" style="height:36px;width:180px" value="@ViewBag.company_order_index" />
+                                    </div>
+                                    <div class="form-group">
+                                        <label>公&nbsp;&nbsp;&nbsp;司&nbsp;&nbsp;&nbsp;名&nbsp;&nbsp;&nbsp;称：</label>
+                                        <input id="company_name" name="company_name" type="text" class="form-control" style="height:36px;width:180px" value="@ViewBag.company_name" />
+                                    </div>
+                                    <div class="form-group">
+                                        <label>采&nbsp;&nbsp;&nbsp;购&nbsp;&nbsp;&nbsp;人&nbsp;&nbsp;&nbsp;员：</label>
+                                        <input id="purchase_person" name="purchase_person" type="text" class="form-control" style="height:36px;width:180px" value="@ViewBag.purchase_person" />
+                                    </div>
+                                </div>
+                                <br />
                                 <div class="form-inline">
                                     <div class="form-group">
                                         <label>下单开始时间：</label>
@@ -64,19 +127,6 @@
                                 <br />
                                 <div class="form-inline">
                                     <div class="form-group">
-                                        <label>订&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;单&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;号：</label>
-                                        <input id="order_index" name="order_index" type="text" class="form-control" style="height:36px;width:180px" value="@ViewBag.order_index" />
-                                    </div>
-                                    <div class="form-group">
-                                        <label>客&nbsp;&nbsp;户&nbsp;&nbsp;单&nbsp;&nbsp;&nbsp;号：</label>
-                                        <input id="company_order_index" name="company_order_index" type="text" class="form-control" style="height:36px;width:180px" value="@ViewBag.company_order_index" />
-                                    </div>
-                                    <div class="form-group">
-                                        <label>公&nbsp;&nbsp;&nbsp;司&nbsp;&nbsp;&nbsp;名&nbsp;&nbsp;&nbsp;称：</label>
-                                        <input id="company_name" name="company_name" type="text" class="form-control" style="height:36px;width:180px" value="@ViewBag.company_name" />
-                                    </div>
-
-                                    <div class="form-group">
                                         <input type="submit" value="查询" class="btn btn-primary" style="width:80px" />
                                     </div>
                                     <div class="form-group">
@@ -87,8 +137,6 @@
 
                                     </div>
                                 </div>
-                                <br />                              
-
 
                             </form>
                         </div>
@@ -98,19 +146,27 @@
                                     <tr>
                                         <th>编号</th>
                                         <th>订单号</th>
+                                        <th>登记时间</th>
+                                        <th>客户名称</th>
                                         <th>客户订单号</th>
-                                        <th>公司名称</th>
-                                        <th>下单时间</th>
-                                        <th>需求出货时间</th>
-                                        <th>下单总数</th>
+                                        <th>名称规格</th>
+
                                         @if (UserManager.Current.GetLevel >= UserLevelEnum.ProductManager)
                                         {
-                                            <th>下单总价</th>
+                                            <th>单价</th>
+                                            <th>金额</th>
                                         }
-                                        <th>开单总量</th>
-                                        <th>退单总量</th>
-                                        <th>剩余总量</th>
-                                        <th>下单详情</th>
+                                        <th>数量</th>
+                                        <th>开单数</th>
+                                        <th>退单数</th>
+                                        <th>交货日期</th>
+                                        @if (UserManager.Current.GetLevel >= UserLevelEnum.ProductManager)
+                                        {
+                                            <th>采购员</th>
+                                        }
+                                        <th>图纸</th>
+                                        <th>编辑</th>
+                                        <th>删除</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -118,36 +174,52 @@
                                     int index = 1;
                                     foreach (var item in Model)
                                     {
-                                    <tr>
-                                        <td>@index</td>
-                                        <td>@item.order_index</td>
-                                        <td>@item.company_order_index</td>
-                                        <td>@item.company_name</td>
-                                        <td>@item.order_time.ToString("yyyy-MM-dd")</td>
-                                        <td>
-                                            @if (item.deliver_time != item.insert_time)
+                                        <tr>
+                                            <td>@index</td>
+                                            <td>@item.order_index</td>
+                                            <td>@item.order_time.ToString("yyyy-MM-dd")</td>
+                                            <td>@item.company_name</td>
+                                            <td>@item.company_order_index</td>
+                                            <td>@item.order_name</td>
+                                            
+                                            @if (UserManager.Current.GetLevel >= UserLevelEnum.ProductManager)
                                             {
-                                                <text>@(item.deliver_time.ToString("yyyy-MM-dd") + "*")</text>
+                                                <td>@item.order_price</td>
+                                                <td>@item.order_all_price</td>
+                                            }
+                                            <td>@item.order_num</td>
+                                            <td style="color:darkseagreen">@item.open_num</td>
+                                            <td style="color:red">@item.tui_num</td>
+                                            <td>@item.deliver_time.ToString("yyyy-MM-dd")</td>
+                                            @if (UserManager.Current.GetLevel >= UserLevelEnum.ProductManager)
+                                            {
+                                                <td>@item.purchase_person</td>
+                                            }
+                                        <td>
+                                            @if (!string.IsNullOrEmpty(item.order_picture))
+                                            {
+                                                <a href="/src/Files/@item.order_picture" target="_blank">查看</a>
                                             }
                                             else
                                             {
-                                                <text>@(item.deliver_time.ToString("yyyy-MM-dd"))</text>
+                                                <a href="javascript:return false;" target="_blank">暂无图纸</a>
                                             }
-
                                         </td>
-                                        <td>@item.order_num</td>
-                                        @if (UserManager.Current.GetLevel >= UserLevelEnum.ProductManager)
-                                        {
-                                            <td>@item.order_all_price</td>
-                                        }
-                                        <td style="color:darkseagreen">@item.open_num</td>
-                                        <td style="color:red">@item.tui_num</td>
-                                        <td style="color:orange">@item.remain_num</td>
-                                        <td>
-                                            <input type="button" class="btn btn-primary" onclick="window.location.href = '/OrderSeq/Index?order_id=@item.id'" value="下单详情" />
-                                        </td>
+                                            
+                                            @if (UserManager.Current.GetLevel >= UserLevelEnum.ProductManager)
+                                            {
+                                                <td>
+                                                    <input type="button" class="btn btn-primary" onclick="window.location.href = '/OrderSeq/Edit?order_id=@item.id&seq_id=@item.seq_id'" value="编辑" />
+                                                </td>
+                                            }
+                                            @if (UserManager.Current.GetLevel >= UserLevelEnum.Boss)
+                                            {
+                                                <td>
+                                                    <input type="button" class="btn btn-primary" onclick="deleteTiShi(@item.id,@item.seq_id)" value="删除" />
+                                                </td>
+                                            }           
 
-                                    </tr>
+                                        </tr>
                                             index++;
                                         }
                                     }
