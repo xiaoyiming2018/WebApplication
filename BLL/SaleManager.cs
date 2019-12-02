@@ -14,7 +14,7 @@ namespace BLL
         /// </summary>
         /// <param name="name"></param>
         /// <returns></returns>
-        public List<Sale> SelectAll(string start_time, string end_time, string deliver_index, string deliver_company_head)
+        public List<Sale> SelectAll(string start_time, string end_time, string deliver_index="", string deliver_company_head="")
         {
             List<Sale> objList = SS.SelectAll(start_time,end_time,deliver_index, deliver_company_head);
             return objList;
@@ -25,9 +25,9 @@ namespace BLL
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public Sale SelectById(int seq_id, string deliver_index)
+        public Sale SelectSingleBySeqIndex(int seq_id, string deliver_index)
         {
-            Sale obj = SS.SelectById(seq_id, deliver_index);
+            Sale obj = SS.SelectSingleBySeqIndex(seq_id, deliver_index);
             return obj;
         }
 
@@ -36,11 +36,23 @@ namespace BLL
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public List<Sale> SelectSeqByDeliverIndex(string deliver_index)
+        public List<Sale> SelectSeqByDeliverIndex(string deliver_index, string order_index="", string order_name="")
         {
-            List<Sale> objList = SS.SelectSeqByDeliverIndex(deliver_index);
+            List<Sale> objList = SS.SelectSeqByDeliverIndex(deliver_index, order_index, order_name);
             return objList;
         }
+
+        /// <summary>
+        /// 根据id查询
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public List<Sale> SelectSaleForReturn(string deliver_index,string order_index)
+        {
+            List<Sale> objList = SS.SelectSaleForReturn(deliver_index, order_index);
+            return objList;
+        }
+        
 
         /// <summary>
         /// 根据id查询
@@ -86,6 +98,12 @@ namespace BLL
             return objList;
         }
 
+        public List<Sale> SelectMoneyAll(int deliver_status,string start_time, string end_time, string deliver_index="", string deliver_company_head="")
+        {
+            List<Sale> objList = SS.SelectMoneyAll(deliver_status,start_time, end_time, deliver_index, deliver_company_head);
+            return objList;
+        }
+
         /// <summary>
         /// 插入
         /// </summary>
@@ -102,9 +120,20 @@ namespace BLL
         /// </summary>
         /// <param name="obj"></param>
         /// <returns></returns>
-        public int Update(Sale obj)
+        public int UpdateDeliverDetails(Sale obj)
         {
-            int count = SS.Update(obj);
+            int count = SS.UpdateDeliverDetails(obj);
+            return count;
+        }
+
+        /// <summary>
+        /// 更新
+        /// </summary>
+        /// <param name="obj"></param>
+        /// <returns></returns>
+        public int UpdateDeliverHead(string deliver_company_head, string deliver_index)
+        {
+            int count = SS.UpdateDeliverHead(deliver_company_head, deliver_index);
             return count;
         }
 

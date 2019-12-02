@@ -10,8 +10,10 @@
 <head>
     <meta name="viewport" content="width=device-width" />
     <title></title>
-    <link rel="stylesheet" type="text/css" href="~/assets/css/sweetalert.css">
-    <script type="text/javascript" src="~/assets/js/sweetalert-dev.js"></script>
+    <link href="~/js/dist/css/bootstrap-select.min.css" rel="stylesheet" />
+
+    <script src="~/assets/js/lib/bootstrap.min.js"></script>
+    <script src="~/js/dist/js/bootstrap-select.min.js"></script>
     <script type="text/javascript" src="~/Scripts/jquery-1.10.2.min.js"></script>
     <script type="text/javascript" src="~/My97DatePicker/WdatePicker.js"></script>
     <script type="text/javascript">
@@ -19,7 +21,7 @@
             $(".sidebar ul li:nth-of-type(2)").addClass("active open")
             $(".sidebar ul li:nth-of-type(2) ul li").removeClass()
             $(".sidebar ul li:nth-of-type(2) ul li:nth-of-type(3)").addClass("active")
-            
+
         });
 
         function confirmTiShi(id) {
@@ -38,7 +40,7 @@
                     if (isConfirm) {
                         $.ajax({
                             type: "POST",
-                            url: "/Deliver/SupplierConfirm?id="+id+"",
+                            url: "/Deliver/SupplierConfirm?id=" + id + "",
                             beforeSend: function (xhr) {
                                 xhr.setRequestHeader("XSRF-TOKEN",
                                     $('input:hidden[name="__RequestVerificationToken"]').val());
@@ -64,6 +66,35 @@
                         swal("操作已终止 !", "该记录已保留 !", "error");
                     }
                 });
+        }
+
+        function CheckOrCancleAll(obj)
+        {
+            if (obj.is(":checked")) {
+                $('input.form-control').prop('checked', false);
+                obj.prop('checked', true);
+                if (obj.attr('name') == "day") {
+                    document.getElementById("day").value = "1";
+                    document.getElementById("month").value = "0";
+                    document.getElementById("year").value = "0";
+                }
+                else if (obj.attr('name') == "month") {
+                    document.getElementById("day").value = "0";
+                    document.getElementById("month").value = "1";
+                    document.getElementById("year").value = "0";
+                }
+                else if (obj.attr('name') == "year") {
+                    document.getElementById("day").value = "0";
+                    document.getElementById("month").value = "0";
+                    document.getElementById("year").value = "1";
+                }
+            }
+            else {
+                document.getElementById("day").value = "0";
+                document.getElementById("month").value = "0";
+                document.getElementById("year").value = "0";
+            }
+
         }
 
     </script>
@@ -93,20 +124,46 @@
                                 <div class="form-inline">
                                     <div class="form-group">
                                         <label>购入单号：</label>
-                                        <input id="purchase_index" name="purchase_index" type="text" class="form-control" style="height:36px" value="@ViewBag.purchase_index" />
+                                        <select class="selectpicker" data-live-search="true" data-live-search-placeholder="搜索" id="purchase_index" name="purchase_index" style="padding:6px 50px">
+                                            <option value=""></option>
+                                            @{
+                                                PurchaseManager PM = new PurchaseManager();
+                                                List<Purchase> deliverList = PM.SelectHistory("2001-01-01", "2222-01-01", "0001-01-01", "2222-01-01");
+                                                if (deliverList.Count > 0)
+                                                {
+                                                    for (int i = 0; i < deliverList.Count; i++)
+                                                    {
+                                                        <!option value="@deliverList[i].purchase_index" @if (Model != null) { if (deliverList[i].purchase_index == ViewBag.purchase_index) { <text> selected</text>}}>@deliverList[i].purchase_index</!option>
+                                                    }
+                                                }
+                                            }
+                                        </select>
                                     </div>
                                     <div class="form-group">
                                         <label>供应商名称：</label>
-                                        <input id="company_name" name="company_name" type="text" class="form-control" style="height:36px" value="@ViewBag.company_name" />
+                                        <select class="selectpicker" data-live-search="true" data-live-search-placeholder="搜索" id="company_name" name="company_name" style="padding:6px 50px">
+                                            <option value=""></option>
+                                            @{
+                                                CompanyManager CM = new CompanyManager();
+                                                List<Company> objList = CM.SelectAll(type: 1);
+                                                if (objList.Count > 0)
+                                                {
+                                                    for (int i = 0; i < objList.Count; i++)
+                                                    {
+                                                        <!option value="@objList[i].company_name" @if (Model != null) { if (objList[i].company_name == ViewBag.company_name) { <text> selected</text>}}>@objList[i].company_name</!option>
+                                                    }
+                                                }
+                                            }
+                                        </select>
                                     </div>
 
                                     <div class="form-group">
                                         <label>送货单号：</label>
-                                        <input id="deliver_index" name="deliver_index" type="text" class="form-control" style="height:36px" value="@ViewBag.deliver_index" />
+                                        <input id="deliver_index" name="deliver_index" type="text" class="form-control" value="@ViewBag.deliver_index" />
                                     </div>
                                     <div class="form-group">
                                         <label>物料名称：</label>
-                                        <input id="material_name" name="material_name" type="text" class="form-control" style="height:36px" value="@ViewBag.material_name" />
+                                        <input id="material_name" name="material_name" type="text" class="form-control" value="@ViewBag.material_name" />
                                     </div>
 
 
@@ -114,12 +171,37 @@
                                 <br />
                                 <div class="form-inline">
                                     <div class="form-group">
-                                        <label>开始时间：</label>
-                                        <input id="start_time" name="start_time" type="text" class="form-control" style="height:36px" onclick="WdatePicker({ skin: 'whyGreen',dateFmt:'yyyy-MM-dd' })" value="@ViewBag.start_time" />
+                                        <label>送货开始时间：</label>
+                                        <input id="start_time" name="start_time" type="text" class="form-control" style="width:190px" onclick="WdatePicker({ skin: 'whyGreen',dateFmt:'yyyy-MM-dd' })" value="@ViewBag.start_time" />
                                     </div>
                                     <div class="form-group">
-                                        <label>结&nbsp;&nbsp;束&nbsp;时&nbsp;间：</label>
-                                        <input id="end_time" name="end_time" type="text" class="form-control" style="height:36px" onclick="WdatePicker({ skin: 'whyGreen',dateFmt:'yyyy-MM-dd' })" value="@ViewBag.end_time" />
+                                        <label>送货结束时间：</label>
+                                        <input id="end_time" name="end_time" type="text" class="form-control" style="width:190px" onclick="WdatePicker({ skin: 'whyGreen',dateFmt:'yyyy-MM-dd' })" value="@ViewBag.end_time" />
+                                    </div>
+                                    <div class="form-group">
+                                        <label>确认开始时间：</label>
+                                        <input id="confirm_start_time" name="confirm_start_time" type="text" class="form-control" style="width:190px" onclick="WdatePicker({ skin: 'whyGreen',dateFmt:'yyyy-MM-dd' })" value="@ViewBag.confirm_start_time" />
+                                    </div>
+                                    <div class="form-group">
+                                        <label>确认结束时间：</label>
+                                        <input id="confirm_end_time" name="confirm_end_time" type="text" class="form-control" style="width:180px" onclick="WdatePicker({ skin: 'whyGreen',dateFmt:'yyyy-MM-dd' })" value="@ViewBag.confirm_end_time" />
+                                    </div>
+                                </div>
+                                <br />
+                                <div class="form-inline">
+
+                                    <div class="form-group">
+                                        <label>本日</label>
+                                        <input id="day" name="day" type="checkbox" class="form-control" onclick="CheckOrCancleAll($(this))" style="width:16px" value="0" @if (ViewBag.day == "1") { <text> checked</text> } />
+                                    </div>
+                                    <div class="form-group">
+                                        <label>本月</label>
+                                        <input id="month" name="month" type="checkbox" class="form-control" onclick="CheckOrCancleAll($(this))" style="width:16px" value="0" @if (ViewBag.month == "1") { <text> checked</text> } />
+                                    </div>
+                                    <div class="form-group">
+                                        <label>本年</label>
+                                        <input id="year" name="year" type="checkbox" class="form-control" onclick="CheckOrCancleAll($(this))" style="width:16px" value="0" @if (ViewBag.year == "1") { <text> checked</text> } />
+                                        <label>（确认结款时间）</label>
                                     </div>
                                     <div class="form-group">
                                         <input type="submit" value="查询" class="btn btn-primary" style="width:80px" />
@@ -151,7 +233,7 @@
                                             <th>总价</th>
                                             <th>结款与否</th>
                                             <th>结款方式</th>
-                                            <th>确认时间</th>
+                                            <th>确认结款时间</th>
                                         }
                                         @if (UserManager.Current.GetLevel >= UserLevelEnum.Developer)
                                         {

@@ -16,22 +16,35 @@ namespace BLL
         /// <param name="name"></param>
         /// <returns></returns>
         public List<Order> SelectAll(int order_status, string start_time, string end_time,string deliver_start_time, string deliver_end_time, 
-             string company_name, string order_index, string company_order_index,string purchase_person)
+             string company_name="", string order_index = "", string company_order_index = "", string purchase_person = "")
         {
             List<Order> objList = OS.SelectAll(order_status, start_time, end_time, deliver_start_time, deliver_end_time,  company_name, order_index, company_order_index, purchase_person);
             return objList;
         }
 
         /// <summary>
-        /// 查询出可以开单的订单
+        /// 查询出可以开退货单的订单
         /// </summary>
         /// <param name="name"></param>
         /// <returns></returns>
-        public List<Order> SelectForSaleAll(int order_status)
+        public List<Order> SelectOrderForDropDown(int order_status)
         {
-            List<Order> objList = OS.SelectForSaleAll(order_status);
+            List<Order> objList = OS.SelectOrderForDropDown(order_status);
             return objList;
         }
+
+        /// <summary>
+        /// 查询出可以开退货单的订单
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
+        public List<Order> SelectOrderForSaleReturnAll()
+        {
+            List<Order> objList = OS.SelectOrderForSaleReturnAll();
+            return objList;
+        }
+
+
 
         /// <summary>
         /// 根据id查询
@@ -60,9 +73,9 @@ namespace BLL
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public Order SelectByOrderSeqId(int order_id,int seq_id)
+        public Order SelectByOrderSeqId(int seq_id)
         {
-            Order obj = OS.SelectByOrderSeqId(order_id, seq_id);
+            Order obj = OS.SelectByOrderSeqId( seq_id);
             return obj;
         }
 
@@ -95,39 +108,6 @@ namespace BLL
         public List<Order> SelectTodayForOrderIndex(string start_time)
         {
             List<Order> objList = OS.SelectTodayForOrderIndex(start_time);
-            return objList;
-        }
-
-        /// <summary>
-        /// 根据order_id查询orderseq_info
-        /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
-        public Order SelectForHistoryOrder(int order_id)
-        {
-            Order objList = OS.SelectForHistoryOrder(order_id);
-            return objList;
-        }
-
-        /// <summary>
-        /// 根据order_id查询orderseq_info
-        /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
-        public List<Order> SelectByInvoiceStatus(int invoice_status)
-        {
-            List<Order> objList = OS.SelectByInvoiceStatus(invoice_status);
-            return objList;
-        }
-
-        /// <summary>
-        /// 根据order_id查询orderseq_info
-        /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
-        public List<Order> SelectForInvoiceOrderList(int order_id)
-        {
-            List<Order> objList = OS.SelectForInvoiceOrderList(order_id);
             return objList;
         }
 
@@ -194,17 +174,6 @@ namespace BLL
         public int UpdateOrderStatus(Order obj)
         {
             int count = OS.UpdateOrderStatus(obj);
-            return count;
-        }
-
-        /// <summary>
-        /// 更新
-        /// </summary>
-        /// <param name="obj"></param>
-        /// <returns></returns>
-        public int UpdateInvoiceStatus(Order obj)
-        {
-            int count = OS.UpdateInvoiceStatus(obj);
             return count;
         }
 

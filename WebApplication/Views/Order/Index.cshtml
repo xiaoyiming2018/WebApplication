@@ -10,8 +10,10 @@
 <head>
     <meta name="viewport" content="width=device-width" />
     <title></title>
-    <link rel="stylesheet" type="text/css" href="~/assets/css/sweetalert.css">
-    <script type="text/javascript" src="~/assets/js/sweetalert-dev.js"></script>
+    <link href="~/js/dist/css/bootstrap-select.min.css" rel="stylesheet" />
+
+    <script src="~/assets/js/lib/bootstrap.min.js"></script>
+    <script src="~/js/dist/js/bootstrap-select.min.js"></script>
     <script type="text/javascript" src="~/Scripts/jquery-1.10.2.min.js"></script>
     <script type="text/javascript" src="~/My97DatePicker/WdatePicker.js"></script>
     <script type="text/javascript">
@@ -36,7 +38,7 @@
                     if (isConfirm) {
                         $.ajax({
                             type: "POST",
-                            url: "/OrderSeq/Del?order_id="+order_id+"&seq_id="+seq_id+"",
+                            url: "/OrderSeq/Del?order_id=" + order_id + "&seq_id=" + seq_id + "",
                             beforeSend: function (xhr) {
                                 xhr.setRequestHeader("XSRF-TOKEN",
                                     $('input:hidden[name="__RequestVerificationToken"]').val());
@@ -86,42 +88,54 @@
                     <div class="card alert">
                         <div class="card-header">
                             <form class="form-horizontal" action="/Order/Index" method="post" id="myfrom">
-
                                 <div class="form-inline">
                                     <div class="form-group">
-                                        <label>订&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;单&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;号：</label>
-                                        <input id="order_index" name="order_index" type="text" class="form-control" style="height:36px;width:180px" value="@ViewBag.order_index" />
+                                        <label>&emsp;&emsp;&emsp;订单号：</label>
+                                        <input id="order_index" name="order_index" type="text" class="form-control" style="width:160px" value="@ViewBag.order_index" />
                                     </div>
                                     <div class="form-group">
-                                        <label>客&nbsp;&nbsp;户&nbsp;&nbsp;单&nbsp;&nbsp;&nbsp;号：</label>
-                                        <input id="company_order_index" name="company_order_index" type="text" class="form-control" style="height:36px;width:180px" value="@ViewBag.company_order_index" />
+                                        <label>&emsp;&emsp;客户单号：</label>
+                                        <input id="company_order_index" name="company_order_index" type="text" class="form-control" style="width:160px" value="@ViewBag.company_order_index" />
                                     </div>
                                     <div class="form-group">
-                                        <label>公&nbsp;&nbsp;&nbsp;司&nbsp;&nbsp;&nbsp;名&nbsp;&nbsp;&nbsp;称：</label>
-                                        <input id="company_name" name="company_name" type="text" class="form-control" style="height:36px;width:180px" value="@ViewBag.company_name" />
+                                        <label>&emsp;&emsp;客户名称：</label>
+                                        <select class="selectpicker" data-live-search="true" data-live-search-placeholder="搜索" id="company_name" name="company_name" style="padding:6px 50px">
+                                            <option value=""></option>
+                                            @{
+                                                CompanyManager CM = new CompanyManager();
+                                                List<Company> objList = CM.SelectAll(type: 0);
+                                                if (objList.Count > 0)
+                                                {
+                                                    for (int i = 0; i < objList.Count; i++)
+                                                    {
+                                                        <!option value="@objList[i].company_name" @if (Model != null) { if (objList[i].company_name == ViewBag.company_name) { <text> selected</text>}}>@objList[i].company_name</!option>
+                                                    }
+                                                }
+                                            }
+                                        </select>
                                     </div>
                                     <div class="form-group">
-                                        <label>采&nbsp;&nbsp;&nbsp;购&nbsp;&nbsp;&nbsp;人&nbsp;&nbsp;&nbsp;员：</label>
-                                        <input id="purchase_person" name="purchase_person" type="text" class="form-control" style="height:36px;width:180px" value="@ViewBag.purchase_person" />
+                                        <label>&emsp;&emsp;采购人员：</label>
+                                        <input id="purchase_person" name="purchase_person" type="text" class="form-control" style="width:160px" value="@ViewBag.purchase_person" />
                                     </div>
                                 </div>
                                 <br />
                                 <div class="form-inline">
                                     <div class="form-group">
-                                        <label>下单开始时间：</label>
-                                        <input id="start_time" name="start_time" type="text" class="form-control" style="height:36px;width:180px" onclick="WdatePicker({ skin: 'whyGreen',dateFmt:'yyyy-MM-dd' })" value="@ViewBag.start_time" />
+                                        <label>登记开始时间：</label>
+                                        <input id="start_time" name="start_time" type="text" class="form-control" style="width:160px" onclick="WdatePicker({ skin: 'whyGreen',dateFmt:'yyyy-MM-dd' })" value="@ViewBag.start_time" />
                                     </div>
                                     <div class="form-group">
-                                        <label>下单结束时间：</label>
-                                        <input id="end_time" name="end_time" type="text" class="form-control" style="height:36px;width:180px" onclick="WdatePicker({ skin: 'whyGreen',dateFmt:'yyyy-MM-dd' })" value="@ViewBag.end_time" />
+                                        <label>登记结束时间：</label>
+                                        <input id="end_time" name="end_time" type="text" class="form-control" style="width:160px" onclick="WdatePicker({ skin: 'whyGreen',dateFmt:'yyyy-MM-dd' })" value="@ViewBag.end_time" />
                                     </div>
                                     <div class="form-group">
-                                        <label>出货开始时间：</label>
-                                        <input id="deliver_start_time" name="deliver_start_time" type="text" class="form-control" style="height:36px;width:180px" onclick="WdatePicker({ skin: 'whyGreen',dateFmt:'yyyy-MM-dd' })" value="@ViewBag.deliver_start_time" />
+                                        <label>交货开始时间：</label>
+                                        <input id="deliver_start_time" name="deliver_start_time" type="text" class="form-control" style="width:220px" onclick="WdatePicker({ skin: 'whyGreen',dateFmt:'yyyy-MM-dd' })" value="@ViewBag.deliver_start_time" />
                                     </div>
                                     <div class="form-group">
-                                        <label>出货结束时间：</label>
-                                        <input id="deliver_end_time" name="deliver_end_time" type="text" class="form-control" style="height:36px;width:180px" onclick="WdatePicker({ skin: 'whyGreen',dateFmt:'yyyy-MM-dd' })" value="@ViewBag.deliver_end_time" />
+                                        <label>交货结束时间：</label>
+                                        <input id="deliver_end_time" name="deliver_end_time" type="text" class="form-control" style="width:160px" onclick="WdatePicker({ skin: 'whyGreen',dateFmt:'yyyy-MM-dd' })" value="@ViewBag.deliver_end_time" />
                                     </div>
                                 </div>
                                 <br />
@@ -148,7 +162,7 @@
                                         <th>订单号</th>
                                         <th>登记时间</th>
                                         <th>客户名称</th>
-                                        <th>客户订单号</th>
+                                        <th>客户单号</th>
                                         <th>名称规格</th>
 
                                         @if (UserManager.Current.GetLevel >= UserLevelEnum.ProductManager)
@@ -159,6 +173,7 @@
                                         <th>数量</th>
                                         <th>开单数</th>
                                         <th>退单数</th>
+                                        <th>剩余数</th>
                                         <th>交货日期</th>
                                         @if (UserManager.Current.GetLevel >= UserLevelEnum.ProductManager)
                                         {
@@ -174,27 +189,28 @@
                                     int index = 1;
                                     foreach (var item in Model)
                                     {
-                                        <tr>
-                                            <td>@index</td>
-                                            <td>@item.order_index</td>
-                                            <td>@item.order_time.ToString("yyyy-MM-dd")</td>
-                                            <td>@item.company_name</td>
-                                            <td>@item.company_order_index</td>
-                                            <td>@item.order_name</td>
-                                            
-                                            @if (UserManager.Current.GetLevel >= UserLevelEnum.ProductManager)
-                                            {
-                                                <td>@item.order_price</td>
-                                                <td>@item.order_all_price</td>
-                                            }
-                                            <td>@item.order_num</td>
-                                            <td style="color:darkseagreen">@item.open_num</td>
-                                            <td style="color:red">@item.tui_num</td>
-                                            <td>@item.deliver_time.ToString("yyyy-MM-dd")</td>
-                                            @if (UserManager.Current.GetLevel >= UserLevelEnum.ProductManager)
-                                            {
-                                                <td>@item.purchase_person</td>
-                                            }
+                                    <tr>
+                                        <td>@index</td>
+                                        <td>@item.order_index</td>
+                                        <td>@item.order_time.ToString("yyyy/MM/dd")</td>
+                                        <td>@item.company_name</td>
+                                        <td>@item.company_order_index</td>
+                                        <td>@item.order_name</td>
+
+                                        @if (UserManager.Current.GetLevel >= UserLevelEnum.ProductManager)
+                                        {
+                                            <td>@item.order_price</td>
+                                            <td>@item.order_all_price</td>
+                                        }
+                                        <td>@item.order_num</td>
+                                        <td style="color:darkseagreen">@item.open_num</td>
+                                        <td style="color:red">@item.tui_num</td>
+                                        <td style="color:orange">@item.remain_num</td>
+                                        <td>@item.deliver_time.ToString("yyyy/MM/dd")</td>
+                                        @if (UserManager.Current.GetLevel >= UserLevelEnum.ProductManager)
+                                        {
+                                            <td>@item.purchase_person</td>
+                                        }
                                         <td>
                                             @if (!string.IsNullOrEmpty(item.order_picture))
                                             {
@@ -205,21 +221,21 @@
                                                 <a href="javascript:return false;" target="_blank">暂无图纸</a>
                                             }
                                         </td>
-                                            
-                                            @if (UserManager.Current.GetLevel >= UserLevelEnum.ProductManager)
-                                            {
-                                                <td>
-                                                    <input type="button" class="btn btn-primary" onclick="window.location.href = '/OrderSeq/Edit?order_id=@item.id&seq_id=@item.seq_id'" value="编辑" />
-                                                </td>
-                                            }
-                                            @if (UserManager.Current.GetLevel >= UserLevelEnum.Boss)
-                                            {
-                                                <td>
-                                                    <input type="button" class="btn btn-primary" onclick="deleteTiShi(@item.id,@item.seq_id)" value="删除" />
-                                                </td>
-                                            }           
 
-                                        </tr>
+                                        @if (UserManager.Current.GetLevel >= UserLevelEnum.ProductManager)
+                                        {
+                                            <td>
+                                                <input type="button" class="btn btn-primary" onclick="window.location.href = '/OrderSeq/Edit?order_id=@item.id&seq_id=@item.seq_id'" value="编辑" />
+                                            </td>
+                                        }
+                                        @if (UserManager.Current.GetLevel >= UserLevelEnum.Boss)
+                                        {
+                                            <td>
+                                                <input type="button" class="btn btn-primary" onclick="deleteTiShi(@item.id,@item.seq_id)" value="删除" />
+                                            </td>
+                                        }
+
+                                    </tr>
                                             index++;
                                         }
                                     }

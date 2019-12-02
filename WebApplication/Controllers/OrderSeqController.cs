@@ -78,7 +78,7 @@ namespace WebApplication.Controllers
                 int seq_id = Convert.ToInt32(Request.Query["seq_id"]);
                 if (seq_id > 0)
                 {
-                    var obj = OMM.SelectByOrderSeqId(order_id, seq_id);
+                    var obj = OMM.SelectByOrderSeqId(seq_id);
                     return View(obj);
                 }
                 else
@@ -239,38 +239,7 @@ namespace WebApplication.Controllers
             ViewBag.order_num = order_num;
             ViewBag.order_all_price = order_all_price;
 
-            //从sale_info中获取订单的出货详情
-            List<Sale> saleList = SM.SelectByOrderId(order_id);
-            ViewBag.saleList = saleList;
-            double deliver_all_price = 0;
-            for (int i = 0; i < saleList.Count; i++)
-            {
-                deliver_all_price += saleList[i].deliver_all_price;
-            }
-            ViewBag.deliver_all_price = deliver_all_price;
-
-            //从salereturn_info中获取订单的退货详情
-            List<SaleReturn> saleReturnList = SRM.SelectByOrderIdForHistory(order_id);
-            ViewBag.saleReturnList = saleReturnList;
-            Int64 return_num = 0;
-            double return_all_price = 0;
-            for (int i = 0; i < saleReturnList.Count; i++)
-            {
-                return_num += saleReturnList[i].return_num;
-                return_all_price += saleReturnList[i].return_all_price;
-            }
-            ViewBag.return_num = return_num;
-            ViewBag.return_all_price = return_all_price;
-
-            if (activation == null)
-            {
-                ViewBag.activation = "off";
-            }
-            else
-            {
-                ViewBag.activation = activation;
-            }
-
+            
             ViewBag.start_time = start_time;
             ViewBag.end_time = end_time;
             ViewBag.order_id = order_id;

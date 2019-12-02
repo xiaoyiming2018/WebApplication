@@ -14,34 +14,9 @@ namespace BLL
         /// </summary>
         /// <param name="name"></param>
         /// <returns></returns>
-        public List<SaleReturn> SelectAll(int return_status,string start_time, string end_time, string return_index, string deliver_index,  string order_index, string company_name,
-            string company_order_index)
+        public List<SaleReturn> SelectAll(int return_status,string start_time, string end_time, string return_index="")
         {
-            List<SaleReturn> objList = SS.SelectAll(return_status,start_time, end_time, return_index, deliver_index,  order_index, company_name, company_order_index);
-            return objList;
-        }
-
-        /// <summary>
-        /// 模糊查询结果为一笔或多笔数据
-        /// </summary>
-        /// <param name="name"></param>
-        /// <returns></returns>
-        public List<SaleReturn> SelectReturnHistory(int return_status, string start_time, string end_time,  string deliver_index, string return_index, string order_index, string company_name,
-            string company_order_index)
-        {
-            List<SaleReturn> objList = SS.SelectReturnHistory(return_status,start_time, end_time, deliver_index, return_index, order_index, company_name, company_order_index);
-            return objList;
-        }
-
-        public List<SaleReturn> SelectMoneyAll(string start_time, string end_time, string deliver_index, string deliver_company_head, string order_index, string company_name, string company_order_index)
-        {
-            List<SaleReturn> objList = SS.SelectMoneyAll(start_time, end_time, deliver_index, deliver_company_head, order_index, company_name, company_order_index);
-            return objList;
-        }
-
-        public List<SaleReturn> SelectMoneyHistoryAll(string start_time = "2001-01-01", string end_time = "2222-01-01", string deliver_index = "", string deliver_company_head = "", string order_index = "", string company_name = "", string company_order_index = "")
-        {
-            List<SaleReturn> objList = SS.SelectMoneyHistoryAll(start_time, end_time, deliver_index, deliver_company_head, order_index, company_name, company_order_index);
+            List<SaleReturn> objList = SS.SelectAll(return_status,start_time, end_time, return_index);
             return objList;
         }
 
@@ -50,9 +25,9 @@ namespace BLL
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public SaleReturn SelectById(int seq_id, string deliver_index)
+        public List<SaleReturn> SelectAllByReturnIndex(string return_index)
         {
-            SaleReturn obj = SS.SelectById(seq_id, deliver_index);
+            List<SaleReturn> obj = SS.SelectAllByReturnIndex(return_index);
             return obj;
         }
 
@@ -61,44 +36,13 @@ namespace BLL
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public List<SaleReturn> SelectSeqByReturnIndex(string return_index)
+        public SaleReturn SelectSingleBySeqReturnIndex(int seq_id, string return_index)
         {
-            List<SaleReturn> objList = SS.SelectSeqByReturnIndex(return_index);
-            return objList;
-        }
-
-        /// <summary>
-        /// 根据id查询
-        /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
-        public List<SaleReturn> SelectByOrderIdForHistory(int order_id)
-        {
-            List<SaleReturn> objList = SS.SelectByOrderIdForHistory(order_id);
-            return objList;
-        }
-
-        /// <summary>
-        /// 根据id查询
-        /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
-        public List<SaleReturn> SelectByDeliverIndex(string deliver_index)
-        {
-            List<SaleReturn> objList = SS.SelectByDeliverIndex(deliver_index);
-            return objList;
-        }
-
-        /// <summary>
-        /// 根据id查询
-        /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
-        public SaleReturn SelectByReturnIndex(string return_index)
-        {
-            SaleReturn obj = SS.SelectByReturnIndex(return_index);
+            SaleReturn obj = SS.SelectSingleBySeqReturnIndex(seq_id, return_index);
             return obj;
         }
+
+
 
         /// <summary>
         /// 模糊查询结果为一笔或多笔数据

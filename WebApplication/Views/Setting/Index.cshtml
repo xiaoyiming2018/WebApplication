@@ -10,8 +10,10 @@
 <head>
     <meta name="viewport" content="width=device-width" />
     <title></title>
-    <link rel="stylesheet" type="text/css" href="~/assets/css/sweetalert.css">
-    <script type="text/javascript" src="~/assets/js/sweetalert-dev.js"></script>
+    <link href="~/js/dist/css/bootstrap-select.min.css" rel="stylesheet" />
+
+    <script src="~/assets/js/lib/bootstrap.min.js"></script>
+    <script src="~/js/dist/js/bootstrap-select.min.js"></script>
     <script type="text/javascript" src="~/Scripts/jquery-1.10.2.min.js"></script>
     <script type="text/javascript">
         var TempArrCategory = [];//存储option
@@ -25,7 +27,7 @@
             $('#submitUnit').click(function () {
                 var unit_length = $('#unit_id option').length;
                 var material_unit = $('#material_unit').val();
-                if (unit_length >1 ) {
+                if (unit_length > 1) {
                     swal("您输入的单位有误！", "", "error");
                 }
                 else {
@@ -42,11 +44,11 @@
                         success: function (msg) {
                             if (msg == "Success") {
                                 swal({ title: "执行成功!", text: "", type: "success" },
-                                    function () { window.location.href = '/Setting/Index';});
-                                
+                                    function () { window.location.href = '/Setting/Index'; });
+
                             }
                             else {
-                                swal("执行失败！","","error");
+                                swal("执行失败！", "", "error");
                             }
                         },
                         error: function (msg) {
@@ -94,7 +96,7 @@
 
             $('#submitOrderIndex').click(function () {
                 var order_index_begin = $('#order_index_begin').val();
-                if (order_index_begin =="") {
+                if (order_index_begin == "") {
                     swal("您输入的内容有误！", "", "error");
                 }
                 else {
@@ -128,7 +130,7 @@
 
             $('#submitPurchaseIndex').click(function () {
                 var purchase_index_begin = $('#purchase_index_begin').val();
-                if (purchase_index_begin=="") {
+                if (purchase_index_begin == "") {
                     swal("您输入的内容有误！", "", "error");
                 }
                 else {
@@ -198,7 +200,7 @@
                 var head_length = $('#head_id option').length;
                 var deliver_company_head = $('#deliver_company_head').val();
                 if (head_length > 1) {
-                    swal("您输入的抬头有误！","","error");
+                    swal("您输入的抬头有误！", "", "error");
                 }
                 else {
                     $.ajax({
@@ -231,7 +233,7 @@
 
             $('#submitReturnIndex').click(function () {
                 var return_index_begin = $('#return_index_begin').val();
-                if (return_index_begin=="") {
+                if (return_index_begin == "") {
                     swal("您输入的内容有误！", "", "error");
                 }
                 else {

@@ -9,8 +9,10 @@
 <head>
     <meta name="viewport" content="width=device-width" />
     <title></title>
-    <link rel="stylesheet" type="text/css" href="~/assets/css/sweetalert.css">
-    <script type="text/javascript" src="~/assets/js/sweetalert-dev.js"></script>
+    <link href="~/js/dist/css/bootstrap-select.min.css" rel="stylesheet" />
+
+    <script src="~/assets/js/lib/bootstrap.min.js"></script>
+    <script src="~/js/dist/js/bootstrap-select.min.js"></script>
     <script type="text/javascript" src="~/My97DatePicker/WdatePicker.js"></script>
     <script type="text/javascript" src="~/Scripts/jquery-1.10.2.min.js"></script>
 
@@ -33,23 +35,21 @@
                 var material_unit = $('#material_unit').val();
                 var material_price = $('#material_price').val();
                 var material_all_price = $('#material_all_price').val();
-                
+
                 var deliver_index = $('#deliver_index').val();
                 var deliver_time = $('#deliver_time').val();
                 var money_onoff = $('#money_onoff').val();
                 var money_way = $('#money_way').val();
-                
+
                 if (deliver_index == "" || deliver_time == "" || purchase_index == "" || category == "" || material_name == "" || material_num <= 0 ||
                     material_spec == "" || material_unit == "" || material_price == "" || material_all_price == "") {
-                    swal("输入信息有误！","请重新填写内容","error");
+                    swal("输入信息有误！", "请重新填写内容", "error");
                 }
-                else if (supplier_id<= 0)
-                {
+                else if (supplier_id <= 0) {
                     swal("供应商不存在！", "请从下拉框中选择相应的供应商！", "error");
                 }
-                else if (money_way < 1)
-                {
-                     swal("请选择结账方式！", "", "error");
+                else if (money_way < 1) {
+                    swal("请选择结账方式！", "", "error");
                 }
                 else {
                     $.ajax({
@@ -62,11 +62,12 @@
                         data: {
                             id: id, purchase_index: purchase_index, supplier_id: supplier_id, category: category, material_name: material_name,
                             material_num: material_num, material_spec: material_spec, material_unit: material_unit, material_price: material_price,
-                            material_all_price: material_all_price, deliver_index: deliver_index, deliver_time: deliver_time, money_onoff: money_onoff, money_way: money_way},
+                            material_all_price: material_all_price, deliver_index: deliver_index, deliver_time: deliver_time, money_onoff: money_onoff, money_way: money_way
+                        },
                         success: function (msg) {
                             if (msg == "Success") {
                                 swal({ title: "执行成功!", text: "", type: "success" },
-                                    function () { window.location.href = '/Deliver/Index';});                  
+                                    function () { window.location.href = '/Deliver/Index'; });
                             }
                             else {
                                 swal("执行失败！", "", "error");
@@ -98,30 +99,9 @@
                 });
             }
         }
-
-        function SelectTip(flag) {
-            var TxtObj = document.getElementById("txtPlace");
-            var SelectObj = document.getElementById("supplier_id")
-            var Arr = []
-            with (SelectObj) {
-                var SelectHTML = innerHTML.match(/<[^>]*>/)[0]
-                for (i = 0; i < TempArr.length; i++)
-                    if (TempArr[i][0].indexOf(TxtObj.value, 0) >= 0 || flag )//若找到以txt的内容开头的，添加option。若flag为true，对下拉框初始化
-                        Arr[Arr.length] = "<option value='" + TempArr[i][1] + "'>" + TempArr[i][0] + "</option>"
-                innerHTML = SelectHTML + Arr.join() + "</SELECT>"
-            }
-        }
-
-        function Init() {
-            var SelectObj = document.getElementById("supplier_id");
-            /*先将数据存入数组*/
-            with (SelectObj)
-            for (i = 0; i < length; i++)
-                TempArr[i] = [options[i].text, options[i].value]
-        }
     </script>
 </head>
-<body onload="Init()">
+<body>
     <div class="container-fluid">
         <div class="row">
             <div class="col-lg-12">
@@ -160,7 +140,7 @@
                                     <div class="form-group">
                                         <label for="example-input-normal" class="col-sm-4 control-label">购入单号</label>
                                         <div class="col-sm-4">
-                                            <input type="text" class="form-control" id="purchase_index" name="purchase_index" value="@if (Model != null) {@Model.purchase_index } else { @ViewBag.purchase_index} " @if (Model != null) { <text> readonly</text>} />
+                                            <input type="text" class="form-control" style="width:220px" id="purchase_index" name="purchase_index" value="@if (Model != null) {@Model.purchase_index } else { @ViewBag.purchase_index} " readonly />
                                             <input type="hidden" class="form-control" id="id" name="id" value="@if (Model!=null) {@Model.id } " readonly />
                                         </div>
                                     </div>
@@ -168,8 +148,7 @@
                                     <div class="form-group">
                                         <label for="example-input-normal" class="col-sm-4 control-label">供应商</label>
                                         <div class="col-sm-4">
-                                            <input id="txtPlace" name="txtPlace" class="form-control" onkeyup="SelectTip(0)">
-                                            <select class="form-control" id="supplier_id" name="supplier_id" onchange="txtPlace.value=options[selectedIndex].text;" size=5>
+                                            <select class="selectpicker" data-live-search="true" data-live-search-placeholder="搜索" id="supplier_id" name="supplier_id" style="padding:6px 50px">
                                                 <option value=""></option>
                                                 @{
                                                     CompanyManager CM = new CompanyManager();
@@ -178,7 +157,7 @@
                                                     {
                                                         for (int i = 0; i < objList.Count; i++)
                                                         {
-                                                            <!option value="@objList[i].id" @if (Model != null) { if (objList[i].id == Model.supplier_id) { <text> selected</text> } }>@objList[i].company_name</!option>
+                                                            <!option value="@objList[i].id" @if (Model != null) { if (objList[i].id == Model.supplier_id) { <text> selected</text>}}>@objList[i].company_name</!option>
                                                         }
                                                     }
                                                 }
@@ -189,7 +168,7 @@
                                     <div class="form-group">
                                         <label for="example-input-normal" class="col-sm-4 control-label">分类</label>
                                         <div class="col-sm-4">
-                                            <select class="form-control" id="category" name="category">
+                                            <select class="selectpicker" data-live-search="true" data-live-search-placeholder="搜索" id="category" name="category">
                                                 <option value=""></option>
                                                 @{
                                                     SettingManager SM = new SettingManager();
@@ -209,28 +188,28 @@
                                     <div class="form-group">
                                         <label for="example-input-normal" class="col-sm-4 control-label">物料名称</label>
                                         <div class="col-sm-4">
-                                            <input type="text" class="form-control" id="material_name" name="material_name" value="@if (Model!=null) {@Model.material_name }" />
+                                            <input type="text" class="form-control" style="width:220px" id="material_name" name="material_name" value="@if (Model!=null) {@Model.material_name }" />
                                         </div>
                                     </div>
 
                                     <div class="form-group">
                                         <label for="example-input-normal" class="col-sm-4 control-label">物料规格</label>
                                         <div class="col-sm-4">
-                                            <input type="text" class="form-control" id="material_spec" name="material_spec" value="@if (Model!=null) {@Model.material_spec }" />
+                                            <input type="text" class="form-control" style="width:220px" id="material_spec" name="material_spec" value="@if (Model!=null) {@Model.material_spec }" />
                                         </div>
                                     </div>
 
                                     <div class="form-group">
                                         <label for="example-input-normal" class="col-sm-4 control-label">购入数量</label>
                                         <div class="col-sm-4">
-                                            <input type="text" class="form-control" id="material_num" name="material_num" placeholder="0" value="@if (Model!=null) {@Model.material_num }" onchange="getProductPrice()" @if (Model!=null) {<text>readonly</text> } />
+                                            <input type="text" class="form-control" style="width:220px" id="material_num" name="material_num" placeholder="0" value="@if (Model!=null) {@Model.material_num }" onchange="getProductPrice()" @if (Model!=null) {<text>readonly</text> } />
                                         </div>
                                     </div>
 
                                     <div class="form-group">
                                         <label for="example-input-normal" class="col-sm-4 control-label">物料单位</label>
                                         <div class="col-sm-4">
-                                            <select class="form-control" id="material_unit" name="material_unit">
+                                            <select class="selectpicker" data-live-search="true" data-live-search-placeholder="搜索" id="material_unit" name="material_unit">
                                                 <option value=""></option>
                                                 @{
                                                     SettingManager UM = new SettingManager();
@@ -250,7 +229,7 @@
                                     <div class="form-group">
                                         <label for="example-input-normal" class="col-sm-4 control-label">单价</label>
                                         <div class="col-sm-4">
-                                            <input type="text" class="form-control" id="material_price" name="material_price" value="@if (Model!=null) {@Model.material_price }" onchange="getProductPrice()" />
+                                            <input type="text" class="form-control" style="width:220px" id="material_price" name="material_price" value="@if (Model!=null) {@Model.material_price }" onchange="getProductPrice()" />
                                         </div>
                                     </div>
 
@@ -258,7 +237,7 @@
                                         <div class="form-group">
                                             <label for="example-input-normal" class="col-sm-4 control-label">总价</label>
                                             <div class="col-sm-4">
-                                                <input type="text" class="form-control" id="material_all_price" name="material_all_price" placeholder="0" value="@if (Model !=null) { @Model.material_all_price}" readonly />
+                                                <input type="text" class="form-control" style="width:220px" id="material_all_price" name="material_all_price" placeholder="0" value="@if (Model !=null) { @Model.material_all_price}" readonly />
                                             </div>
                                         </div>
                                     </div>
@@ -266,19 +245,19 @@
                                     <div class="form-group">
                                         <label for="example-input-normal" class="col-sm-4 control-label">送货单号</label>
                                         <div class="col-sm-4">
-                                            <input type="text" class="form-control" id="deliver_index" name="deliver_index" value="@if (Model !=null) { @Model.deliver_index} " />
+                                            <input type="text" class="form-control" style="width:220px" id="deliver_index" name="deliver_index" value="@if (Model !=null) { @Model.deliver_index} " />
                                         </div>
                                     </div>
                                     <div class="form-group">
                                         <label for="example-input-normal" class="col-sm-4 control-label">送货时间</label>
                                         <div class="col-sm-4">
-                                            <input type="text" class="form-control" id="deliver_time" name="deliver_time" onclick="WdatePicker({ skin: 'whyGreen',dateFmt:'yyyy-MM-dd' })" value="@if (Model !=null) { @Model.deliver_time.ToString("yyyy-MM-dd")} " />
+                                            <input type="text" class="form-control" style="width:220px" id="deliver_time" name="deliver_time" onclick="WdatePicker({ skin: 'whyGreen',dateFmt:'yyyy-MM-dd' })" value="@if (Model !=null) { @Model.deliver_time.ToString("yyyy-MM-dd")} " />
                                         </div>
                                     </div>
                                     <div class="form-group">
                                         <label for="example-input-normal" class="col-sm-4 control-label">是否结账</label>
                                         <div class="col-sm-4">
-                                            <select class="form-control" id="money_onoff" name="money_onoff">
+                                            <select class="form-control" id="money_onoff" name="money_onoff" style="width:220px">
                                                 <option value=""></option>
                                                 @{
                                                     <!option value="0" @if (Model != null) { if (0 == Model.money_onoff) { <text> selected</text> } } else {<text> selected</text> }>未结账</!option>
@@ -290,7 +269,7 @@
                                     <div class="form-group">
                                         <label for="example-input-normal" class="col-sm-4 control-label">结账方式</label>
                                         <div class="col-sm-4">
-                                            <select class="form-control" id="money_way" name="money_way">
+                                            <select class="form-control" id="money_way" name="money_way" style="width:220px">
                                                 <option value=""></option>
                                                 @{
                                                     <!option value="1" @if (Model != null) { if (1 == Model.money_way) { <text> selected</text> } }>月结</!option>

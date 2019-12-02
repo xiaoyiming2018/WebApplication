@@ -15,8 +15,8 @@ namespace BLL
         /// </summary>
         /// <param name="name"></param>
         /// <returns></returns>
-        public List<Invoice> SelectAll(string invoice_index = "", string company_name = "", string order_index="", string company_order_index="") { 
-            List<Invoice> objList = IS.SelectAll(invoice_index, company_name, order_index, company_order_index);
+        public List<Invoice> SelectAll(int status, string start_time, string end_time, string confirm_start_time, string confirm_end_time, string invoice_index="", string company_name="") { 
+            List<Invoice> objList = IS.SelectAll(status, start_time, end_time, confirm_start_time, confirm_end_time, invoice_index, company_name);
             return objList;
         }
 
@@ -43,7 +43,7 @@ namespace BLL
         }
 
         /// <summary>
-        /// 插入
+        /// 更新
         /// </summary>
         /// <param name="obj"></param>
         /// <returns></returns>
@@ -53,6 +53,18 @@ namespace BLL
             return count;
         }
 
+        /// <summary>
+        /// 更新
+        /// </summary>
+        /// <param name="obj"></param>
+        /// <returns></returns>
+        public int UpdateStatus(int id)
+        {
+            int count = IS.UpdateStatus(id);
+            return count;
+        }
+
+        
         /// <summary>
         /// 插入
         /// </summary>

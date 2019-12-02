@@ -1,5 +1,5 @@
 ﻿@{
-    @model Model.SaleReturn;
+    @model IList<Model.SaleReturn>;
     @using Model;
     @using BLL;
 }
@@ -10,109 +10,109 @@
     <meta name="viewport" content="width=device-width" />
 
     <title></title>
-    <link rel="stylesheet" type="text/css" href="~/assets/css/sweetalert.css" />
-    <link href="~/assets/fontAwesome/css/fontawesome-all.min.css" rel="stylesheet">
-    <script type="text/javascript" src="~/assets/js/sweetalert-dev.js"></script>
+    <link href="~/js/dist/css/bootstrap-select.min.css" rel="stylesheet" />
+
+    <script src="~/assets/js/lib/bootstrap.min.js"></script>
+    <script src="~/js/dist/js/bootstrap-select.min.js"></script>
     <script type="text/javascript" src="~/My97DatePicker/WdatePicker.js"></script>
-    <script type="text/javascript" src="~/Scripts/jquery-1.10.2.min.js"></script>
 
     <script type="text/javascript">
         var TempArr = [];//存储option
         $(function () {
             $(".sidebar ul li:nth-of-type(5)").addClass("active open")
             $(".sidebar ul li:nth-of-type(5) ul li").removeClass()
-            $(".sidebar ul li:nth-of-type(5) ul li:nth-of-type(2)").addClass("active")
+
+            $(".sidebar ul li:nth-of-type(5) ul li:nth-of-type(@if (ViewBag.flag == null) {<text>2</text> } else { <text>3</text>} )").addClass("active")
             $('#submit').click(function () {
-                var flag = 0;
-                var deliver_index = $('#deliver_index').val()
-                if (deliver_index ==null) {
-                    swal("出货单号不能为空！", "", "error");
-                }
-                else
-                {
-                    var inputNum = document.getElementById('inputNum').value;
-                    var return_index = document.getElementById('return_index').value;
-                    var order_id = document.getElementById('order_id').value;
-                    //var deliver_index = document.getElementById('deliver_index').value;
+                    var flag = 0;
                     var deliver_index = $('#deliver_index').val()
-
-                    var seq_idList = document.getElementsByName("seq_id");
-                    var real_numList = document.getElementsByName("real_num");
-
-                    var return_numList = document.getElementsByName("return_num");
-                    var return_timeList = document.getElementsByName("return_time");
-                    var return_priceList = document.getElementsByName("return_price");
-                    var return_all_priceList = document.getElementsByName("return_all_price");
-
-                    var seq_id = new Array();
-
-                    var real_num = new Array();
-
-                    var return_num = new Array();
-                    var return_time = new Array();
-                    var return_price = new Array();
-                    var return_all_price = new Array();
-                    for (var i = 0; i < real_numList.length; i++) {
-                        seq_id.push(seq_idList[i].value);
-                        real_num.push(real_numList[i].value);
-
-                        return_num.push(return_numList[i].value);
-                        return_time.push(return_timeList[i].value);
-                        return_price.push(return_priceList[i].value);
-                        return_all_price.push(return_all_priceList[i].value);
-                        if (parseInt(return_numList[i].value) > parseInt(real_numList[i].value)) {
-                            flag = 1;
-                        }
-                    }
-
-                    var Seq_Id = seq_id.join(',');
-                    var Return_Num = return_num.join(',');
-                    var Return_Time = return_time.join(',');
-                    var Return_Price = return_price.join(',');
-                    var Return_All_Price = return_all_price.join(',');
-
-
-                    if (flag == 1) {
-                        swal("退货数量超过出货数量！", "", "error");
+                var order_index = $('#order_index').val()
+                if (deliver_index == null || order_index == null) {
+                        swal("信息不能为空！", "", "error");
                     }
                     else {
+                        var inputNum = document.getElementById('inputNum').value;
+                        var return_index = document.getElementById('return_index').value;
+                        var deliver_index = $('#deliver_index').val()
+                        var order_index = $('#order_index').val()
+
+                    var seq_idList = document.getElementsByName("seq_id");
+                        var real_numList = document.getElementsByName("real_num");
+
+                        var return_numList = document.getElementsByName("return_num");
+                        var return_priceList = document.getElementsByName("return_price");
+                        var return_all_priceList = document.getElementsByName("return_all_price");
+                        var remarkList = document.getElementsByName("remark");
+
+                        var seq_id = new Array();
+
+                        var real_num = new Array();
+
+                        var return_num = new Array();
+                        var return_price = new Array();
+                        var return_all_price = new Array();
+                        var remark = new Array();
+                        for (var i = 0; i < real_numList.length; i++) {
+                            seq_id.push(seq_idList[i].value);
+                            real_num.push(real_numList[i].value);
+
+                            return_num.push(return_numList[i].value);
+                            return_price.push(return_priceList[i].value);
+                            return_all_price.push(return_all_priceList[i].value);
+                            remark.push(remarkList[i].value);
+                            if (parseInt(return_numList[i].value) > parseInt(real_numList[i].value)) {
+                                flag = 1;
+                            }
+                        }
+
+                        var Seq_Id = seq_id.join(',');
+                        var Return_Num = return_num.join(',');
+                        var Return_Price = return_price.join(',');
+                        var Return_All_Price = return_all_price.join(',');
+                        var Remark = remark.join(',');
+
+                        if (flag == 1) {
+                            swal("退货数量超过出货数量！", "", "error");
+                        }
+                        else {
                         $.ajax({
                             type: "POST",
                             url: "/SaleReturn/EditHandle",
                             beforeSend: function (xhr) {
-                                xhr.setRequestHeader("XSRF-TOKEN",
-                                    $('input:hidden[name="__RequestVerificationToken"]').val());
-                            },
+                                    xhr.setRequestHeader("XSRF-TOKEN",
+                                        $('input:hidden[name="__RequestVerificationToken"]').val());
+                                },
                             data: {
-                                inputNum: inputNum, return_index: return_index, order_id: order_id, deliver_index: deliver_index,
-                                Seq_Id: Seq_Id, Return_Num: Return_Num, Return_Time: Return_Time, Return_Price: Return_Price, Return_All_Price: Return_All_Price
+                                inputNum: inputNum, return_index: return_index, deliver_index: deliver_index, order_index: order_index,
+                                Seq_Id: Seq_Id, Return_Num: Return_Num, Return_Price: Return_Price, Return_All_Price: Return_All_Price, Remark: Remark
                             },
                             success: function (msg) {
-                                if (msg == "Success") {
-                                    swal({ title: "执行成功!", text: "", type: "success" },
-                                        function () { window.location.href = '/SaleReturn/Index'; });
-                                    
-                                }
-                                else {
-                                    swal("执行失败，请检查提交内容！", "", "error");
-                                }
-                            },
+                                    if (msg == "Success") {
+                                        swal({ title: "执行成功!", text: "", type: "success" },
+                                        function () { window.location.href = '/SaleReturn/Edit?return_index=@ViewBag.return_index'; });
+
+                                    }
+                                    else {
+                                        swal("执行失败，请检查提交内容！", "", "error");
+                                    }
+                                },
                             error: function (msg) {
-                                swal("数据获取失败！", "", "error");
-                            }
-                        });
+                                    swal("数据获取失败！", "", "error");
+                                }
+                            });
+                        }
                     }
-                }
+                });
             });
-        });
 
         function getDeliverList() {
             var deliver_index = $('#deliver_index').val()
-            if (deliver_index != 0) {
+            var order_index = $('#order_index').val()
+            if (deliver_index != "" && order_index!="") {
                 $.ajax({
                     type: "POST",
                     url: "/SaleReturn/GetDeliverList",
-                    data: { deliver_index: deliver_index },
+                    data: { deliver_index: deliver_index, order_index: order_index },
                     success: function (msg) {
                         $('#deliver_div').html(msg);
                     },
@@ -123,30 +123,53 @@
             }
         }
 
-        function SelectTip(flag) {
-            var TxtObj = document.getElementById("txtPlace");
-            var SelectObj = document.getElementById("deliver_index")
-            var Arr = []
-            with (SelectObj) {
-                var SelectHTML = innerHTML.match(/<[^>]*>/)[0]
-                for (i = 0; i < TempArr.length; i++)
-                    if (TempArr[i][0].indexOf(TxtObj.value, 0) >= 0 || flag)//若找到以txt的内容开头的，添加option。若flag为true，对下拉框初始化
-                        Arr[Arr.length] = "<option value='" + TempArr[i][1] + "'>" + TempArr[i][0] + "</option>"
-                innerHTML = SelectHTML + Arr.join() + "</SELECT>"
-            }
-        }
-
-        function Init() {
-            var SelectObj = document.getElementById("deliver_index");
-            /*先将数据存入数组*/
-            with (SelectObj)
-            for (i = 0; i < length; i++)
-                TempArr[i] = [options[i].text, options[i].value];
+        function deleteTiShi(return_index, seq_id) {
+            swal({
+                title: "确定删除 ?",
+                text: "删除后将无法恢复 !",
+                type: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#DD6B55",
+                confirmButtonText: "删除",
+                cancelButtonText: "取消",
+                closeOnConfirm: false,//true表示不需要点击确认,fasle需要点击确认后再关闭对话框
+                closeOnCancel: false //true表示不需要点击确认,fasle需要点击确认后再关闭对话框
+            },
+                function (isConfirm) {
+                    if (isConfirm) {
+                        $.ajax({
+                            type: "POST",
+                            url: "/SaleReturnSeq/Del?return_index=" + return_index + "&seq_id=" + seq_id + "",
+                            beforeSend: function (xhr) {
+                                xhr.setRequestHeader("XSRF-TOKEN",
+                                    $('input:hidden[name="__RequestVerificationToken"]').val());
+                            },
+                            data: {
+                                return_index: return_index, seq_id: seq_id
+                            },
+                            success: function (msg) {
+                                if (msg == "Success") {
+                                    swal({ title: "已删除 !", text: "该条记录已删除 !", type: "success" },
+                                        function () { window.location.href = '/SaleReturn/Edit?return_index=@ViewBag.return_index'; });
+                                }
+                                else {
+                                    swal("执行失败 !", "该记录已保留 !", "error");
+                                }
+                            },
+                            error: function (msg) {
+                                swal("数据获取失败 !", "该记录已保留 !", "error");
+                            }
+                        });
+                    }
+                    else {
+                        swal("已取消 !", "该记录已保留 !", "error");
+                    }
+                });
         }
 
     </script>
 </head>
-<body onload="Init()">
+<body>
     <div class="container-fluid">
         <div class="row">
             <div class="col-lg-12">
@@ -155,10 +178,27 @@
                         <ol class="breadcrumb text-left">
                             <li><a href="/Supplier/Index">主页</a></li>
                             <li><a href="/Sale/Index">销售管理</a></li>
-                            <li><a href="/SaleReturn/Index">销售退货开单</a></li>
-                            <li class="active">
-                                退货开单
-                            </li>
+                            @if (ViewBag.flag == null)
+                            {
+                                <li><a href="/SaleReturn/Index">销售退货开单</a></li>
+                            }
+                            else
+                            {
+                                <li><a href="/SaleReturn/ReturnHistoryIndex">历史退货记录</a></li>
+                            }
+                            @if (ViewBag.flag == null)
+                            {
+                                <li class="active">
+                                    退货开单
+                                </li>
+                            }
+                            else
+                            {
+                                <li class="active">
+                                    退货详情
+                                </li>
+                            }
+
                         </ol>
                     </div>
                 </div>
@@ -169,9 +209,13 @@
                 <div class="col-lg-12">
                     <div class="card alert">
                         <div class="card-header">
+                            @if (ViewBag.flag == null)
+                            {
                             <h4>
                                 退货开单
                             </h4>
+                            }
+                                
                         </div>
 
                         <div class="card-body">
@@ -182,17 +226,17 @@
                                     <div class="form-group">
                                         <label for="example-input-normal" class="col-sm-4 control-label">退货单号</label>
                                         <div class="col-sm-4">
-                                            <input type="text" class="form-control" id="return_index" name="return_index" value="@ViewBag.return_index" readonly />
+                                            <input type="text" class="form-control" id="return_index" name="return_index" style="width:220px" value="@ViewBag.return_index" readonly />
                                         </div>
                                     </div>
 
-                                    <div class="form-group">
-                                        <label for="example-input-normal" class="col-sm-4 control-label">出货单号</label>
-                                        <div class="col-sm-4">
-                                            @if (Model == null)
-                                            {
-                                                <input id="txtPlace" name="txtPlace" class="form-control" onkeyup="SelectTip(0)">
-                                                <select class="form-control" id="deliver_index" name="deliver_index" onchange="getDeliverList();txtPlace.value=options[selectedIndex].text;" size=5>
+                                    @if (ViewBag.flag == null)
+                                    {
+
+                                        <div class="form-group">
+                                            <label for="example-input-normal" class="col-sm-4 control-label">送货单号</label>
+                                            <div class="col-sm-4">
+                                                <select class="selectpicker" data-live-search="true" data-live-search-placeholder="搜索" id="deliver_index" name="deliver_index" onchange="getDeliverList()">
                                                     <option value=""></option>
                                                     @{
                                                         SaleManager SM = new SaleManager();
@@ -206,28 +250,124 @@
                                                         }
                                                     }
                                                 </select>
-                                            }
-                                            else
-                                            {
-                                                <input type="text" class="form-control" id="deliver_index" name="deliver_index" value="@if (Model!=null) {@Model.deliver_index } " readonly />
-                                                <input type="hidden" class="form-control" id="id" name="id" value="@if (Model!=null) {@Model.id } " readonly />
-                                            }
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label for="example-input-normal" class="col-sm-4 control-label">订单号</label>
+                                            <div class="col-sm-4">
+                                                <select class="selectpicker" data-live-search="true" data-live-search-placeholder="搜索" id="order_index" name="order_index" onchange="getDeliverList()">
+                                                    <option value=""></option>
+                                                    @{
+                                                        OrderManager OM = new OrderManager();
+                                                        List<Order> orderList = OM.SelectOrderForSaleReturnAll();
+                                                        if (orderList.Count > 0)
+                                                        {
+                                                            for (int i = 0; i < orderList.Count; i++)
+                                                            {
+                                                                <!option value="@orderList[i].order_index">@orderList[i].order_index</!option>
+                                                            }
+                                                        }
+                                                    }
+                                                </select>
+                                            </div>
+                                        </div>
+
+                                        <div class="form-horizontal" id="deliver_div">
 
                                         </div>
-                                    </div>
 
-                                    <div class="form-horizontal" id="deliver_div">
-
-                                    </div>
-
-                                    <div class="form-group">
-                                        <div class="col-sm-offset-5">
-                                            <input type="button" id="submit" name="submit" class="btn btn-primary" style=" width:12%" value="提交" />
+                                        <div class="form-group">
+                                            <div class="col-sm-offset-5">
+                                                <input type="button" id="submit" name="submit" class="btn btn-primary" style=" width:12%" value="提交" />
+                                            </div>
                                         </div>
-                                    </div>
-
+                                    }
                                 </div>
                             </div>
+                        </div>
+                    </div><!-- /# card -->
+                </div><!-- /# column -->
+
+                <div class="col-lg-12">
+                    <div class="card alert">
+                        <div class="card-header">
+                            <h4>
+                                已退货订单
+                            </h4>
+                            <input type="hidden" value="@ViewBag.return_index" id="return_index" name="return_index" />
+                            <br />
+                        </div>
+                        <hr />
+                        <div class="card-body">
+                            @if (Model != null)
+                            {
+                                <table class="table table-responsive table-hover ">
+                                    <thead>
+                                        <tr>
+                                            <th>序号</th>
+                                            <th>送货单号</th>
+                                            <th>订单号</th>
+                                            <th>名称规格</th>
+                                            <th>单位</th>
+                                            <th>退货数量</th>
+                                            @if (UserManager.Current.GetLevel >= UserLevelEnum.ProductManager)
+                                            {
+                                                <th>退货单价</th>
+                                                <th>退货金额</th>
+                                            }
+                                            <th>备注</th>
+                                            @if (UserManager.Current.GetLevel >= UserLevelEnum.ProductManager && ViewBag.flag==null)
+                                            {
+                                                <th>编辑</th>
+                                            }
+                                            @if (UserManager.Current.GetLevel >= UserLevelEnum.Boss && ViewBag.flag == null)
+                                            {
+                                                <th>删除</th>
+                                            }
+
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @{
+                                            int index = 1;
+                                            foreach (var item in Model)
+                                            {
+                                        <tr>
+                                            <td>@index</td>
+                                            <td>@item.deliver_index</td>
+                                            <td>@item.order_index</td>
+                                            <td>@item.order_name</td>
+                                            <td>@item.unit</td>
+
+                                            <td>@item.return_num</td>
+                                            @if (UserManager.Current.GetLevel >= UserLevelEnum.ProductManager)
+                                            {
+                                                <td>@item.return_price</td>
+                                                <td>@item.return_all_price</td>
+                                            }
+                                            <td>@item.remark</td>
+                                            @if (UserManager.Current.GetLevel >= UserLevelEnum.ProductManager && ViewBag.flag == null)
+                                            {
+                                                <td>
+                                                    <input type="button" class="btn btn-primary" onclick="window.location.href = '/SaleReturnSeq/Edit?return_index=@ViewBag.return_index&seq_id=@item.seq_id'" value="编辑" />
+                                                </td>
+                                            }
+                                            @if (UserManager.Current.GetLevel >= UserLevelEnum.Boss && ViewBag.flag == null)
+                                            {
+                                                <td>
+                                                    <input type="button" class="btn btn-primary" onclick="deleteTiShi('@ViewBag.return_index',@item.seq_id)" value="删除" />
+                                                </td>
+                                            }
+
+                                        </tr>
+                                                index++;
+                                            }
+                                        }
+                                    </tbody>
+                                </table>
+                            }
+
                         </div>
                     </div><!-- /# card -->
                 </div><!-- /# column -->

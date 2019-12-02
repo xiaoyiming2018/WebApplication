@@ -11,8 +11,10 @@
 <head>
     <meta name="viewport" content="width=device-width" />
     <title></title>
-    <link rel="stylesheet" type="text/css" href="~/assets/css/sweetalert.css">
-    <script type="text/javascript" src="~/assets/js/sweetalert-dev.js"></script>
+    <link href="~/js/dist/css/bootstrap-select.min.css" rel="stylesheet" />
+
+    <script src="~/assets/js/lib/bootstrap.min.js"></script>
+    <script src="~/js/dist/js/bootstrap-select.min.js"></script>
     <script type="text/javascript" src="~/Scripts/jquery-1.10.2.min.js"></script>
     <script type="text/javascript" src="~/My97DatePicker/WdatePicker.js"></script>
     <script type="text/javascript">
@@ -27,7 +29,7 @@
             var deliver_index = $('#deliver_index').val();
             var money_onoff = $('#money_onoff').val();
             var money_way = $('#money_way').val();
-            
+
             if (money_way < 1) {
                 swal("请选择结账方式！", "", "error");
             }
@@ -35,7 +37,7 @@
             {
                 $.ajax({
                     type: "POST",
-                    url: "/SaleReturn/MoneyEdit",
+                    url: "/Sale/MoneyEdit",
                     beforeSend: function (xhr) {
                         xhr.setRequestHeader("XSRF-TOKEN",
                             $('input:hidden[name="__RequestVerificationToken"]').val());
@@ -46,7 +48,7 @@
                     success: function (msg) {
                         if (msg == "Success") {
                             swal({ title: "执行成功!", text: "", type: "success" },
-                                function () { window.location.href = '/SaleReturn/MoneyIndex'; });
+                                function () { window.location.href = '/Sale/MoneyIndex'; });
 
                         }
                         else {
@@ -80,7 +82,7 @@
                                 <li><a href="/SaleReturn/MoneyHistoryIndex">历史结款记录</a></li>
                             }
 
-                            <li class="active">出货详情</li>
+                            <li class="active">送货详情</li>
                         </ol>
                     </div>
                 </div>
@@ -97,56 +99,31 @@
                         <div class="card-body">
                             <div class="form-horizontal">
                                 <div class="form-group">
-                                    <label class="col-sm-2 control-label">出货单号：</label>
+                                    <label class="col-sm-2 control-label">送货单号：</label>
                                     <div class="col-sm-2">
                                         <input type="text" class="form-control" id="deliver_index" name="deliver_index" value="@ViewBag.deliver_index" disabled="disabled" />
                                     </div>
-                                    <label class="col-sm-2 control-label">出货公司抬头：</label>
+                                    <label class="col-sm-2 control-label">客户名称：</label>
                                     <div class="col-sm-2">
                                         <input type="text" class="form-control" value="@ViewBag.deliver_company_head" disabled="disabled" />
                                     </div>
-                                    <label class="col-sm-2 control-label">订单号：</label>
+                                    <label class="col-sm-2 control-label">送货开单时间：</label>
                                     <div class="col-sm-2">
-                                        <input type="text" class="form-control" value="@ViewBag.order_index" disabled="disabled" />
+                                        <input type="text" class="form-control" value="@ViewBag.insert_time.ToString("yyyy-MM-dd")" disabled="disabled" />
                                     </div>
                                 </div>
                                 <div class="form-group">
-                                    <label class="col-sm-2 control-label">公司名称：</label>
+                                    <label class="col-sm-2 control-label">送货总数量：</label>
                                     <div class="col-sm-2">
-                                        <input type="text" class="form-control" value="@ViewBag.company_name" disabled="disabled" />
-                                    </div>
-                                    <label class="col-sm-2 control-label">客户订单号：</label>
-                                    <div class="col-sm-2">
-                                        <input type="text" class="form-control" value="@ViewBag.company_order_index" disabled="disabled" />
-                                    </div>
-                                </div>
-                                <div class="form-group">
-                                    <label class="col-sm-2 control-label">出货总数量：</label>
-                                    <div class="col-sm-2">
-                                        <input type="text" class="form-control" value="@ViewBag.deliverNum" disabled="disabled" />
+                                        <input type="text" class="form-control" value="@ViewBag.real_num" disabled="disabled" />
                                     </div>
                                     @if (UserManager.Current.GetLevel >= UserLevelEnum.ProductManager)
                                     {
-                                        <label class="col-sm-2 control-label">出货总金额：</label>
+                                        <label class="col-sm-2 control-label">送货总金额：</label>
                                         <div class="col-sm-2">
-                                            <input type="text" class="form-control" value="@ViewBag.deliverPrice" disabled="disabled" />
+                                            <input type="text" class="form-control" value="@ViewBag.deliver_price" disabled="disabled" />
                                         </div>
                                     }
-
-                                </div>
-                                <div class="form-group">
-                                    <label class="col-sm-2 control-label">退单总数量：</label>
-                                    <div class="col-sm-2">
-                                        <input type="text" class="form-control" value="@ViewBag.returnNum" disabled="disabled" />
-                                    </div>
-                                    @if (UserManager.Current.GetLevel >= UserLevelEnum.ProductManager)
-                                    {
-                                        <label class="col-sm-2 control-label">退单总金额：</label>
-                                        <div class="col-sm-2">
-                                            <input type="text" class="form-control" value="@ViewBag.returnPrice" disabled="disabled" />
-                                        </div>
-                                    }
-
                                 </div>
                                 @if (UserManager.Current.GetLevel >= UserLevelEnum.ProductManager)
                                 {
@@ -208,25 +185,34 @@
                 <div class="col-lg-12">
                     <div class="card alert">
                         <div class="card-header">
-                            <h4>销售出货明细</h4>
+                            <h4>销售送货明细</h4>
+                            <form class="form-inline" action="/Sale/MoneySeqIndex?deliver_index=@ViewBag.deliver_index&deliver_status=@if (ViewBag.flag == "Return") {<text>0</text>} else { <text>1</text>} " method="post" id="myfrom">
+                                <div class="form-group">
+                                    <label>订单号：</label>
+                                    <input id="order_index" name="order_index" type="text" class="form-control" style="height:36px" value="@ViewBag.order_index" />
+                                    <label>名称规格：</label>
+                                    <input id="order_name" name="order_name" type="text" class="form-control" style="height:36px" value="@ViewBag.order_name" />
+                                </div>
+                                <div class="form-group">
+                                    <input type="submit" value="查询" class="btn btn-primary" />
+                                </div>
+                            </form>
                         </div>
                         <div class="card-body">
                             <table class="table table-responsive table-hover ">
                                 <thead>
                                     <tr>
                                         <th>序号</th>
-                                        <th>下单明细</th>
-                                        <th>下单数量</th>
-                                        <th>下单时间</th>
-                                        <th>需求出货时间</th>
-                                        <th>实际出货数量</th>
-                                        <th>实际出货时间</th>
+                                        <th>订单号</th>
+                                        <th>名称规格</th>
+                                        <th>送货数量</th>
+                                        <th>单位</th>
+                                        <th>送货时间</th>
                                         @if (UserManager.Current.GetLevel >= UserLevelEnum.ProductManager)
                                         {
-                                            <th>出货单价</th>
-                                            <th>出货总价</th>
+                                            <th>送货单价</th>
+                                            <th>送货总价</th>
                                             <th>采购人员</th>
-                                            <th>需求单位</th>
                                         }
 
                                     </tr>
@@ -238,19 +224,17 @@
                                         {
                                     <tr>
                                         <td>@index</td>
+                                        <td>@item.order_index</td>
                                         <td>@item.order_name</td>
-                                        <td>@item.order_num</td>
-                                        <td>@item.order_time.ToString("yyyy-MM-dd")</td>
-                                        <td>@item.deliver_time.ToString("yyyy-MM-dd")</td>
-
                                         <td>@item.real_num</td>
-                                        <td>@item.real_time.ToString("yyyy-MM-dd")</td>
+                                        <td>@item.unit</td>
+                                        <td>@item.deliver_time.ToString("yyyy-MM-dd")</td>
                                         @if (UserManager.Current.GetLevel >= UserLevelEnum.ProductManager)
                                         {
                                             <td>@item.deliver_price</td>
                                             <td>@item.deliver_all_price</td>
                                             <td>@item.purchase_person</td>
-                                            <td>@item.unit</td>
+
                                         }
 
                                     </tr>
@@ -263,61 +247,6 @@
                     </div><!-- /# card -->
                 </div><!-- /# column -->
 
-                <div class="col-lg-12">
-                    <div class="card alert">
-                        <div class="card-header">
-                            <h4>销售退货明细</h4>
-                        </div>
-                    @if (ViewBag.saleReturn!=null)
-                    {
-                        <div class="card-body">
-                            <table class="table table-responsive table-hover ">
-                                <thead>
-                                    <tr>
-                                        <th>序号</th>
-                                        <th>退货单号</th>
-                                        <th>下单明细</th>
-                                        <th>下单数量</th>
-                                        <th>退货数量</th>
-                                        <th>退货时间</th>
-                                        @if (UserManager.Current.GetLevel >= UserLevelEnum.ProductManager)
-                                        {
-                                            <th>退货单价</th>
-                                            <th>退货总价</th>
-                                        }
-
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @{
-                                        int index1 = 1;
-                                        foreach (var item in ViewBag.saleReturn)
-                                        {
-                                    <tr>
-                                        <td>@index1</td>
-                                        <td>@item.return_index</td>
-                                        <td>@item.order_name</td>
-                                        <td>@item.order_num</td>
-
-                                        <td>@item.return_num</td>
-                                        <td>@if (item.return_num !=0) {@item.return_time.ToString("yyyy-MM-dd")} else { <text>-</text>}</td>
-                                        @if (UserManager.Current.GetLevel >= UserLevelEnum.ProductManager)
-                                        {
-                                            <td>@if (item.return_num != 0) {@item.return_price}else{<text>-</text>}</td>
-                                            <td>@if (item.return_num != 0) {@item.return_all_price}else {<text>-</text>}</td>
-                                        }
-
-                                    </tr>
-                                            index1++;
-                                        }
-                                    }
-                                </tbody>
-                            </table>
-                        </div>
-                    }
-                        
-                    </div><!-- /# card -->
-                </div><!-- /# column -->
             </div><!-- /# row -->
         </div>
     </div><!-- /# container-fluid -->

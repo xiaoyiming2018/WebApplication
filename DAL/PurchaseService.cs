@@ -93,7 +93,7 @@ namespace DAL
         /// </summary>
         /// <param name="name"></param>
         /// <returns></returns>
-        public List<Purchase> SelectHistory(string start_time, string end_time, string company_name, string purchase_index,
+        public List<Purchase> SelectHistory(string start_time, string end_time, string confirm_start_time, string confirm_end_time, string company_name, string purchase_index,
             string material_name, string deliver_index)
         {
             try
@@ -105,8 +105,9 @@ namespace DAL
                  "FROM jinchen.purchase_info a, jinchen.company_info b " +
                    " where a.supplier_id = b.id and a.purchase_index ~* '{0}' and b.company_name ~* '{1}' and a.material_name ~* '{2}' and " +
                    "a.deliver_index ~* '{3}' and to_char(a.deliver_time,'yyyy-MM-dd')>='{4}' and to_char(a.deliver_time,'yyyy-MM-dd')<='{5}' and a.status=1 " +
+                   "and to_char(a.confirm_time,'yyyy-MM-dd')>='{6}' and to_char(a.confirm_time,'yyyy-MM-dd')<='{7}' " +
                    "order by a.purchase_index ";
-                sql = string.Format(sql, purchase_index, company_name, material_name, deliver_index, start_time, end_time);
+                sql = string.Format(sql, purchase_index, company_name, material_name, deliver_index, start_time, end_time, confirm_start_time, confirm_end_time);
 
                 objList = PostgreHelper.GetEntityList<Purchase>(sql);
 

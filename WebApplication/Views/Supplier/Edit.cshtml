@@ -8,8 +8,10 @@
 <head>
     <meta name="viewport" content="width=device-width" />
     <title></title>
-    <link rel="stylesheet" type="text/css" href="~/assets/css/sweetalert.css">
-    <script type="text/javascript" src="~/assets/js/sweetalert-dev.js"></script>
+    <link href="~/js/dist/css/bootstrap-select.min.css" rel="stylesheet" />
+
+    <script src="~/assets/js/lib/bootstrap.min.js"></script>
+    <script src="~/js/dist/js/bootstrap-select.min.js"></script>
     <script type="text/javascript" src="~/Scripts/jquery-1.10.2.min.js"></script>
     <script src="~/js/xlsx.core.min.js"></script>
     <script src="~/assets/js/lib/jquery.min.js"></script>
@@ -47,7 +49,7 @@
                 if (company_name == "" || tax_num == "" || account == "" || bank == "" || address == "" ||
                     name == "" || position == "" || telephone == "" || email == "") {
 
-                    swal("信息不能为空！","请将信息补充完整！","error");
+                    swal("信息不能为空！", "请将信息补充完整！", "error");
                 }
                 else {
                     $.ajax({
@@ -59,12 +61,13 @@
                         },
                         data: {
                             id: id, company_name: company_name, tax_num: tax_num, account: account, bank: bank, address: address,
-                            name: name, position: position, telephone: telephone, email: email },
+                            name: name, position: position, telephone: telephone, email: email
+                        },
                         success: function (msg) {
                             if (msg == "Success") {
                                 swal({ title: "执行成功!", text: "", type: "success" },
                                     function () { window.location.href = '/Supplier/Index'; });
-                                
+
                             }
                             else {
                                 swal("执行失败！", "", "error");
@@ -105,7 +108,7 @@
                     if (msg == "Success") {
                         swal({ title: "执行成功!", text: "", type: "success" },
                             function () { window.location.href = '/Supplier/Index'; });
-                        
+
                     }
                     else {
                         swal("执行失败！", "您提交的文件内容或格式有误!", "error");

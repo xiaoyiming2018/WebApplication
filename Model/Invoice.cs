@@ -12,13 +12,6 @@ namespace Model
         //公司名称
         public string company_name { get; set; }
 
-        //订单id
-        public int order_id { get; set; }
-        //订单号
-        public string order_index { get; set; }
-        //客户订单号
-        public string company_order_index { get; set; }
-
         //发票类型
         public int invoice_type { get; set; }
         //发票号
@@ -36,6 +29,10 @@ namespace Model
 
         //备注
         public string remark { get; set; }
+        //状态（0：未对账，1：已对账）
+        public int status { get; set; }
+        //对账日期
+        public DateTime confirm_time { get; set; }
 
     }
 }

@@ -14,40 +14,6 @@ namespace WebApplication.Controllers
         SaleManager SM = new SaleManager();
         OrderManager OM = new OrderManager();
         /// <summary>
-        /// 用户列表首页
-        /// </summary>
-        /// <param name="page">分页页码</param>
-        /// <param name="size">每页显示数量</param>
-        /// <returns></returns>
-        public IActionResult Index(string start_time, string end_time, string order_name, string unit)
-        {
-            
-            string deliver_index = Convert.ToString(Request.Query["deliver_index"]);
-            Sale sale = SM.SelectDeliverByDeliverIndex(deliver_index);
-            ViewBag.deliver_index = deliver_index;
-            ViewBag.deliver_company_head = sale.deliver_company_head;
-            ViewBag.order_index = sale.order_index;
-            ViewBag.company_name = sale.company_name;
-            ViewBag.company_order_index = sale.company_order_index;
-
-            ViewBag.start_time = start_time;
-            ViewBag.end_time = end_time;
-
-            if (start_time == null)
-            {
-                start_time = "2001-01-01";
-            }
-            if (end_time == null)
-            {
-                end_time = "2222-01-01";
-            }
-
-            var objList = SM.SelectSeqByDeliverIndex(deliver_index);
-            return View(objList);
-            
-        }
-
-        /// <summary>
         /// 插入更新页面
         /// </summary>
         /// <returns></returns>
@@ -56,17 +22,21 @@ namespace WebApplication.Controllers
             try
             {
                 string deliver_index = Convert.ToString(Request.Query["deliver_index"]);
+                int seq_id = Convert.ToInt32(Request.Query["seq_id"]);    
+                Order order = OM.SelectByOrderSeqId(seq_id);
+
                 ViewBag.deliver_index = deliver_index;
-                Sale sale=SM.SelectDeliverByDeliverIndex(deliver_index);
-                ViewBag.deliver_company_head = sale.deliver_company_head;
-                ViewBag.order_index = sale.order_index;
-                ViewBag.order_id = sale.order_id;
-                ViewBag.company_name = sale.company_name;
-                ViewBag.company_order_index = sale.company_order_index;
+                ViewBag.seq_id = seq_id;
+                ViewBag.order_index = order.order_index;//订单号，名称谷歌
+                ViewBag.order_name = order.order_name;
+                ViewBag.unit = order.unit;
+                ViewBag.remain_num = order.remain_num;
+                ViewBag.order_price = order.order_price;
+                ViewBag.order_all_price = order.order_all_price;    
 
-                List<Sale> res = SM.SelectSeqByDeliverIndex(deliver_index);
-
-                return View(res);
+                Sale sale = SM.SelectSingleBySeqIndex(seq_id, deliver_index);
+     
+                return View(sale);
 
             }
             catch (Exception ex)
@@ -79,90 +49,35 @@ namespace WebApplication.Controllers
         /// 编辑处理页面
         /// </summary>
         /// <returns></returns>
-        public IActionResult EditHandle()
+        public IActionResult EditHandle(Sale sale)
         {
+            Order orderOld = OM.SelectByOrderSeqId(sale.seq_id);//获取原来的出货数量
+            Sale saleOld = SM.SelectSingleBySeqIndex(sale.seq_id,sale.deliver_index);
 
-            int inputNum = Convert.ToInt32(HttpContext.Request.Form["inputNum"]);
-            int order_id = Convert.ToInt32(HttpContext.Request.Form["order_id"]);
-            string deliver_index = Convert.ToString(HttpContext.Request.Form["deliver_index"]);
-            string deliver_company_head = Convert.ToString(HttpContext.Request.Form["deliver_company_head"]);
-
-            string[] seq_id = Convert.ToString(HttpContext.Request.Form["Seq_Id"]).Split(',');
-            string[] real_num = Convert.ToString(HttpContext.Request.Form["Real_Num"]).Split(',');
-            string[] real_time = Convert.ToString(HttpContext.Request.Form["Real_Time"]).Split(',');
-            string[] deliver_price = Convert.ToString(HttpContext.Request.Form["Deliver_Price"]).Split(',');
-            string[] deliver_all_price = Convert.ToString(HttpContext.Request.Form["Deliver_All_Price"]).Split(',');
+            Order orderNew = new Order();
+            orderNew.seq_id = sale.seq_id;
+            orderNew.remain_num = orderOld.remain_num+ saleOld.real_num - sale.real_num;
+            orderNew.open_num = orderOld.open_num- saleOld.real_num+sale.real_num;
+            orderNew.tui_num = orderOld.tui_num;
 
 
-            bool flag = true;
-            Sale objSale = new Sale();
-            objSale.order_id = order_id;
-            objSale.deliver_index = deliver_index;
-            objSale.deliver_company_head = deliver_company_head;
-            objSale.insert_time = DateTime.Now.ToLocalTime();
+            Sale saleNew = new Sale();
+            saleNew.deliver_index = sale.deliver_index;
+            saleNew.seq_id= sale.seq_id;
+            saleNew.deliver_company_head = saleOld.deliver_company_head;
+            saleNew.insert_time = DateTime.Now.ToLocalTime();
 
-            Order objOrder = new Order();
-            for (int i = 0; i < inputNum; i++)
-            {
-                objSale.seq_id = Convert.ToInt32(seq_id[i]);
-                Sale saleOld = SM.SelectById(objSale.seq_id,deliver_index);//获取原来的出货数量
+            saleNew.real_num = sale.real_num;
+            saleNew.deliver_price = sale.deliver_price;
+            saleNew.deliver_all_price = sale.deliver_all_price;
+            saleNew.remark = sale.remark;
 
-                if (real_num[i] == "" || real_num[i] == "出货已完成")
-                {
-                    continue;
-                }
-                else
-                {
-                    objSale.real_num = Convert.ToInt32(real_num[i]);
-                }
 
-                if (real_time[i] == "")
-                {
-                    continue;
-                }
-                else
-                {
-                    objSale.real_time = Convert.ToDateTime(real_time[i]);
-                }
+            int countOrder = OM.UpdateSeqNum(orderNew);
+            int countSale = SM.UpdateDeliverDetails(saleNew);
 
-                if (deliver_price[i] == "")
-                {
-                    continue;
-                }
-                else
-                {
-                    objSale.deliver_price = Convert.ToDouble(deliver_price[i]);
-                }
 
-                if (deliver_all_price[i] == "")
-                {
-                    continue;
-                }
-                else
-                {
-                    objSale.deliver_all_price = Convert.ToDouble(deliver_all_price[i]);
-                }
-                Order order = OM.SelectByOrderSeqId(order_id, objSale.seq_id);
-                objOrder.remain_num = order.remain_num + saleOld.real_num - objSale.real_num;
-                objOrder.open_num = order.open_num-saleOld.real_num + objSale.real_num;
-                objOrder.tui_num = order.tui_num;
-                objOrder.seq_id = objSale.seq_id;
-                //更新OrderSeq
-                OM.UpdateSeqNum(objOrder);
-
-                //更新Sale
-                objSale.seq_id = objSale.seq_id;
-                int count = SM.Update(objSale);
-
-                if (count <= 0)
-                {
-                    flag = false;
-                    return Json("Fail");
-                }
-
-            }
-
-            if (flag == true)
+            if (countOrder + countSale > 1)
             {
                 return Json("Success");
             }
@@ -181,27 +96,21 @@ namespace WebApplication.Controllers
         {
             try
             {
-                int count = 0;
-                int order_id = Convert.ToInt32(Request.Query["order_id"]);
-                Sale order = new Sale();
-                ViewBag.order_id = order_id;
-
+                string deliver_index = Convert.ToString(Request.Query["deliver_index"]);
                 int seq_id = Convert.ToInt32(Request.Query["seq_id"]);
-                //List<Sale> orderList = SM.SelectSaleSeqList(order_id);
-                List<Sale> orderList = new List<Sale>();
-                if (orderList.Count > 1)
-                {
-                    //count = SM.DelSaleSeq(seq_id);
-                    ViewBag.key = "SaleSeq";
+                Order orderOld = OM.SelectByOrderSeqId(seq_id);//获取原来的出货数量
+                Sale saleOld = SM.SelectSingleBySeqIndex(seq_id, deliver_index);
+                Order orderNew = new Order();
+                orderNew.seq_id = seq_id;
+                orderNew.remain_num = orderOld.remain_num + saleOld.real_num;
+                orderNew.open_num = orderOld.open_num - saleOld.real_num;
+                orderNew.tui_num = orderOld.tui_num;
 
-                }
-                else
-                {
-                    //count = SM.DelSaleSeq(seq_id);
-                    //SM.DelSale(order_id);
-                    ViewBag.key = "Sale";
-                }
+                OM.UpdateSeqNum(orderNew);
 
+
+                ViewBag.deliver_index = deliver_index;
+                int count = SM.Del(seq_id,deliver_index);
                 if (count > 0)
                 {
                     return Json("Success");

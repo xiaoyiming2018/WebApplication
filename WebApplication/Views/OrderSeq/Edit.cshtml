@@ -9,8 +9,10 @@
 <head>
     <meta name="viewport" content="width=device-width" />
     <title></title>
-    <link rel="stylesheet" type="text/css" href="~/assets/css/sweetalert.css">
-    <script type="text/javascript" src="~/assets/js/sweetalert-dev.js"></script>
+    <link href="~/js/dist/css/bootstrap-select.min.css" rel="stylesheet" />
+
+    <script src="~/assets/js/lib/bootstrap.min.js"></script>
+    <script src="~/js/dist/js/bootstrap-select.min.js"></script>
     <script type="text/javascript" src="~/My97DatePicker/WdatePicker.js"></script>
     <script type="text/javascript" src="~/Scripts/jquery-1.10.2.min.js"></script>
 
@@ -48,7 +50,7 @@
                                 $('input:hidden[name="__RequestVerificationToken"]').val());
                         },
                         data: {
-                            order_index: order_index, company_order_index: company_order_index, customer_id:customer_id,seq_id: seq_id,order_name: order_name, order_time: order_time,
+                            order_index: order_index, company_order_index: company_order_index, customer_id: customer_id, seq_id: seq_id, order_name: order_name, order_time: order_time,
                             order_num: order_num, order_price: order_price, order_all_price: order_all_price,
                             deliver_time: deliver_time, unit: unit, order_id: order_id, order_picture: order_picture, purchase_person: purchase_person
                         },
@@ -56,8 +58,8 @@
                             if (msg == "Success") {
                                 swal({ title: "执行成功!", text: "", type: "success" },
                                     function () { window.location.href = '/Order/Index'; });
-                                
-                            }                     
+
+                            }
                             else {
                                 swal("执行失败！", "", "error");
                             }
@@ -80,8 +82,7 @@
                 if (files.length <= 0) {
                     swal("请先上传再提交！", "", "error");
                 }
-                else
-                {
+                else {
                     $.ajax({
                         type: "POST",
                         url: "/api/File",
@@ -105,18 +106,18 @@
                         }
                     });
                 }
-                
+
             });
         })
 
         function getProductPrice() {
             var order_num = $('#order_num').val()
             var order_price = $('#order_price').val()
-            if (order_num >= 0 && order_price>=0) {
+            if (order_num >= 0 && order_price >= 0) {
                 $.ajax({
                     type: "POST",
                     url: "/OrderSeq/GetProductPrice",
-                    data: { order_num: order_num, order_price: order_price},
+                    data: { order_num: order_num, order_price: order_price },
                     success: function (msg) {
                         $('#price_div').html(msg);
                     },
@@ -166,24 +167,33 @@
                                     </div>
                                     <label class="col-sm-2 control-label">客户订单号：</label>
                                     <div class="col-sm-2">
-                                        <input type="text" class="form-control" id="company_order_index" name="company_order_index" value="@ViewBag.company_order_index" @if (Model == null) { <text> readonly</text>} />
+                                        <input type="text" class="form-control" id="company_order_index" name="company_order_index" value="@ViewBag.company_order_index" @if (Model != null) { <text> readonly</text>} />
                                     </div>
                                     <label class="col-sm-2 control-label">公司名称：</label>
                                     <div class="col-sm-2">
-                                        <select class="form-control" id="customer_id" name="customer_id">
-                                            <option value=""></option>
-                                            @{
-                                                CompanyManager CM = new CompanyManager();
-                                                List<Company> objList = CM.SelectAll(type: 0);
-                                                if (objList.Count > 0)
-                                                {
-                                                    for (int i = 0; i < objList.Count; i++)
+                                        @if (Model == null)
+                                        {
+                                            <select class="form-control" id="customer_id" name="customer_id">
+                                                <option value=""></option>
+                                                @{
+                                                    CompanyManager CM = new CompanyManager();
+                                                    List<Company> objList = CM.SelectAll(type: 0);
+                                                    if (objList.Count > 0)
                                                     {
-                                                        <!option value="@objList[i].id" @if (objList[i].company_name == ViewBag.company_name) { <text> selected</text>} @if (Model == null) { <text> disabled</text>}>@objList[i].company_name</!option>
+                                                        for (int i = 0; i < objList.Count; i++)
+                                                        {
+                                                            <!option value="@objList[i].id">@objList[i].company_name</!option>
+                                                        }
                                                     }
                                                 }
-                                            }
-                                        </select>
+                                            </select>
+                                        }
+                                        else
+                                        {
+                                            <input type="text" class="form-control" id="company_name" name="company_name" value="@ViewBag.company_name" @if (Model != null) { <text> readonly</text>} />
+                                            <input type="hidden" class="form-control" id="customer_id" name="customer_id" value="@Model.customer_id" />
+                                        }
+
                                     </div>
                                 </div>
                             </div>
@@ -216,14 +226,14 @@
                                     <div class="form-group">
                                         <label for="example-input-normal" class="col-sm-4 control-label">下单时间</label>
                                         <div class="col-sm-4">
-                                            <input type="text" class="form-control" id="order_time" name="order_time" onclick="WdatePicker({ skin: 'whyGreen',dateFmt:'yyyy-MM-dd' })" value="@if (Model != null) {@Model.deliver_time.ToString("yyyy-MM-dd")} else { @ViewBag.order_time}" readonly/>
+                                            <input type="text" class="form-control" id="order_time" name="order_time" onclick="WdatePicker({ skin: 'whyGreen',dateFmt:'yyyy-MM-dd' })" value="@if (Model != null) {@Model.order_time.ToString("yyyy-MM-dd")} else { @ViewBag.order_time}" readonly/>
                                         </div>
                                     </div>
 
                                     <div class="form-group">
                                         <label for="example-input-normal" class="col-sm-4 control-label">交货日期</label>
                                         <div class="col-sm-4">
-                                            <input type="text" class="form-control" id="deliver_time" name="deliver_time" onclick="WdatePicker({ skin: 'whyGreen',dateFmt:'yyyy-MM-dd' })" value="@if (Model != null) {@Model.deliver_time.ToString("yyyy-MM-dd")} else { @ViewBag.order_time}" />
+                                            <input type="text" class="form-control" id="deliver_time" name="deliver_time" onclick="WdatePicker({ skin: 'whyGreen',dateFmt:'yyyy-MM-dd' })" value="@if (Model != null) {@Model.deliver_time.ToString("yyyy-MM-dd")} else { @ViewBag.deliver_time}" />
                                         </div>
                                     </div>
 

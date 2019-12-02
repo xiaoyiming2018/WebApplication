@@ -83,8 +83,19 @@
 
                 </td>
             }
-            <td><input type="text" name="remark" style="width:100px;border-right-style: none;border-left-style: none;border-top-style: none;" /></td>
-        </tr>
+            <td>
+                @if (item.remain_num == 0)
+                {
+                    <input type="text" name="remark" style="width:100px;border:none;outline:none;" value="出货已完成" readonly />
+                }
+                else
+                {
+                <input type="text" name="remark" style="width:100px;border-right-style: none;border-left-style: none;border-top-style: none;" />
+                }
+
+            </td>
+
+            </tr>
                 index++;
             }
         <tr><td ><input id="inputNum" name="inputNum" value="@(index-1)" hidden/></td></tr>

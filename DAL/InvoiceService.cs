@@ -14,18 +14,20 @@ namespace DAL
         /// <param name="invoice_name"></param>
         /// <param name="company_name"></param>
         /// <returns></returns>
-        public List<Invoice> SelectAll(string invoice_index, string company_name, string order_index, string company_order_index)
+        public List<Invoice> SelectAll(int status, string start_time, string end_time, string confirm_start_time, string confirm_end_time, 
+            string invoice_index, string company_name)
         {
             try
             {
                 List<Invoice> objList = new List<Invoice>();
                 string sql = null;
-                sql = "select a.id,b.company_name,c.order_index,c.company_order_index,a.invoice_type,a.invoice_index," +
-                    "a.invoice_time,a.invoice_price,a.invoice_ratio,a.invoice_all_price,a.pay_type,a.remark " +
-                    "from jinchen.invoice_info a,jinchen.company_info b,jinchen.order_info c " +
-                    "where c.customer_id=b.id and a.order_id=c.id and a.invoice_index ~* '{0}' and b.company_name ~* '{1}' and c.order_index ~*'{2}' and c.company_order_index ~* '{3}'" +
+                sql = "select a.id,a.company_name,a.invoice_type,a.invoice_index," +
+                    "a.invoice_time,a.invoice_price,a.invoice_ratio,a.invoice_all_price,a.pay_type,a.remark,confirm_time " +
+                    "from jinchen.invoice_info a " +
+                    "where a.invoice_index ~* '{0}' and a.company_name ~* '{1}' and a.status={2} and to_char(invoice_time,'yyyy-MM-dd')>='{3}' " +
+                    "and to_char(invoice_time,'yyyy-MM-dd')<='{4}' and to_char(confirm_time,'yyyy-MM-dd')>='{5}' and to_char(confirm_time,'yyyy-MM-dd')<='{6}' " +
                     "order by a.invoice_time desc";
-                sql = string.Format(sql, invoice_index, company_name, order_index, company_order_index);
+                sql = string.Format(sql, invoice_index, company_name, status,start_time,end_time, confirm_start_time, confirm_end_time);
 
                 objList = PostgreHelper.GetEntityList<Invoice>(sql);
 
@@ -49,7 +51,7 @@ namespace DAL
             {
                 Invoice objList = new Invoice();
                 string sql = null;
-                sql = "select * from jinchen.invoice_info a,jinchen.order_info b where a.order_id=b.id and a.id={0}";
+                sql = "select * from jinchen.invoice_info a where a.id={0}";
                 sql = string.Format(sql, id);
 
                 objList = PostgreHelper.GetSingleEntity<Invoice>(sql);
@@ -72,7 +74,7 @@ namespace DAL
             try
             {
                 Invoice invoice = new Invoice();
-                invoice.order_id = obj.order_id;
+                invoice.company_name = obj.company_name;
                 invoice.invoice_type = obj.invoice_type;
                 invoice.invoice_index = obj.invoice_index;
                 invoice.invoice_time = obj.invoice_time;
@@ -101,12 +103,33 @@ namespace DAL
             {
                 int count = 0;
                 string sql = "update jinchen.invoice_info set invoice_type={0},invoice_index='{1}',invoice_time='{2}'," +
-                    "invoice_price={3},invoice_ratio={4},invoice_all_price={5},pay_type={6},remark='{7}' where id={8}";
+                    "invoice_price={3},invoice_ratio={4},invoice_all_price={5},pay_type={6},remark='{7}',company_name='{8}' where id={9}";
                 sql = string.Format(sql, obj.invoice_type, obj.invoice_index, obj.invoice_time, obj.invoice_price, 
-                    obj.invoice_ratio, obj.invoice_all_price, obj.pay_type, obj.remark, obj.id);
+                    obj.invoice_ratio, obj.invoice_all_price, obj.pay_type, obj.remark,obj.company_name, obj.id);
                 count = PostgreHelper.ExecuteNonQuery(sql);
                 return count;
-    }
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        /// <summary>
+        /// 更新
+        /// </summary>
+        /// <param name="obj"></param>
+        /// <returns></returns>
+        public int UpdateStatus(int id)
+        {
+            try
+            {
+                int count = 0;
+                string sql = "update jinchen.invoice_info set status=1,confirm_time='{0}' where id={1}";
+                sql = string.Format(sql,DateTime.Now.ToLocalTime().ToString("yyyy-MM-dd HH:mm:ss"), id);
+                count = PostgreHelper.ExecuteNonQuery(sql);
+                return count;
+            }
             catch (Exception ex)
             {
                 throw ex;

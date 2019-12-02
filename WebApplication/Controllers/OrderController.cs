@@ -254,7 +254,8 @@ namespace WebApplication.Controllers
         }
 
         public IActionResult HistoryIndex(string start_time, string end_time, string deliver_start_time, string deliver_end_time, 
-            string company_name, string order_index, string company_order_index,string purchase_person, int pageindex = 1, int pagesize = 8)
+            string company_name, string order_index, string company_order_index,string purchase_person, string day, string month, string year, 
+            int pageindex = 1, int pagesize = 8)
         {
             ViewBag.company_name = company_name;
             ViewBag.order_index = order_index;
@@ -281,6 +282,28 @@ namespace WebApplication.Controllers
             if (deliver_end_time == null)
             {
                 deliver_end_time = "2222-01-01";
+            }
+
+            DateTime dt = DateTime.Now;
+            DateTime dt2 = dt.AddMonths(1);
+
+            if (day == "1")
+            {
+                start_time = DateTime.Now.ToLocalTime().ToString("yyyy-MM-dd");
+                end_time = DateTime.Now.ToLocalTime().ToString("yyyy-MM-dd");
+                ViewBag.day = "1";
+            }
+            if (month == "1")
+            {
+                start_time = dt.AddDays(-(dt.Day) + 1).ToString("yyyy-MM-dd");
+                end_time = dt2.AddDays(-dt.Day).ToString("yyyy-MM-dd");
+                ViewBag.month = "1";
+            }
+            if (year == "1")
+            {
+                start_time = dt.AddMonths(-dt.Month + 1).AddDays(-dt.Day + 1).ToString("yyyy-MM-dd");
+                end_time = new DateTime(DateTime.Now.Year, 12, 31).ToString("yyyy-MM-dd");
+                ViewBag.year = "1";
             }
 
             var objList = OM.SelectAll(1, start_time, end_time, deliver_start_time, deliver_end_time,  company_name, order_index, company_order_index, purchase_person);

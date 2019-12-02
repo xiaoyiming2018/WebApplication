@@ -20,15 +20,25 @@ namespace WebApplication.Controllers
         /// <param name="page">分页页码</param>
         /// <param name="size">每页显示数量</param>
         /// <returns></returns>
-        public IActionResult Index(string invoice_index, string company_name, string order_index, string company_order_index, int pageindex = 1, int pagesize = 8)
+        public IActionResult Index(string start_time, string end_time,string invoice_index, string company_name, int pageindex = 1, int pagesize = 8)
         {
-            
+            ViewBag.start_time = start_time;
+            ViewBag.end_time = end_time;
             ViewBag.invoice_index = invoice_index;
             ViewBag.company_name = company_name;
-            ViewBag.order_index = order_index;
-            ViewBag.company_order_index = company_order_index;
+            
+            if (start_time == null)
+            {
+                start_time = "2001-01-01";
+            }
+            if (end_time == null)
+            {
+                end_time = "2222-01-01";
+            }
+            string confirm_start_time = "0001-01-01";
+            string confirm_end_time = "2222-01-01";
 
-            var objList = IM.SelectAll(invoice_index, company_name, order_index, company_order_index);
+            var objList = IM.SelectAll(0, start_time, end_time, confirm_start_time, confirm_end_time, invoice_index, company_name);
             var pagedList = PagedList<Invoice>.PageList(pageindex, pagesize, objList);
             ViewBag.model = pagedList.Item2;
             return View(pagedList.Item1);
@@ -47,15 +57,7 @@ namespace WebApplication.Controllers
                 if (id>0)
                 {
                     Invoice invoice = IM.SelectById(id);
-                    ViewBag.order_id = invoice.order_id;
-                    Order order = OM.SelectById(invoice.order_id);
-                    ViewBag.order_index = order.order_index;
-                    ViewBag.company_name = order.company_name;
-                    ViewBag.company_order_index = order.company_order_index;
-
-                    List<Order> orderList = OM.SelectForInvoiceOrderList(invoice.order_id);
-                    ViewBag.orderList = orderList;
-
+                    ViewBag.company_name = invoice.company_name;
                     return View(invoice);
                 }
                 else
@@ -77,8 +79,8 @@ namespace WebApplication.Controllers
         public IActionResult EditHandle(Invoice invoice)
         {
             int count = 0;
-            int id = 0;
-            int order_id = invoice.order_id;
+            int id = invoice.id;
+            string company_name = invoice.company_name;
             int invoice_type = invoice.invoice_type;
             string invoice_index = invoice.invoice_index;
             DateTime invoice_time = invoice.invoice_time;
@@ -87,13 +89,10 @@ namespace WebApplication.Controllers
             double invoice_all_price = invoice.invoice_all_price;
             int pay_type = invoice.pay_type;
             string remark = invoice.remark;
-            if (!string.IsNullOrEmpty(HttpContext.Request.Form["id"]))
-            {
-                id = Convert.ToInt32(HttpContext.Request.Form["id"]);
-            }
+            string qq = Convert.ToString(HttpContext.Request.Form["id"]);
 
             Invoice objInvoice = new Invoice();
-            objInvoice.order_id = order_id;
+            objInvoice.company_name = company_name;
             objInvoice.invoice_type = invoice_type;
             objInvoice.invoice_index = invoice_index;
             objInvoice.invoice_time = invoice_time;
@@ -110,11 +109,6 @@ namespace WebApplication.Controllers
             }
             else
             {
-                //修改订单的invoice_status为1
-                Order order = new Order();
-                order.invoice_status = 1;
-                order.id = order_id;
-                OM.UpdateInvoiceStatus(order);
                 count = IM.Insert(objInvoice);
             }
 
@@ -129,6 +123,32 @@ namespace WebApplication.Controllers
         }
 
         /// <summary>
+        /// 结款
+        /// </summary>
+        /// <returns></returns>
+        public IActionResult Confirm()
+        {
+            try
+            {
+                int id = Convert.ToInt32(Request.Query["id"]);
+
+                int count = IM.UpdateStatus(id);
+                if (count>0)
+                {
+                    return Json("Success");
+                }
+                else
+                {
+                    return Json("Fail");
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        /// <summary>
         /// 删除数据
         /// </summary>
         /// <returns></returns>
@@ -137,13 +157,7 @@ namespace WebApplication.Controllers
             try
             {
                 int id = Convert.ToInt32(Request.Query["id"]);
-                Invoice invoice = IM.SelectById(id);
-                
-                //修改订单的invoice_status为0
-                Order order = new Order();
-                order.invoice_status = 0;
-                order.id = invoice.order_id;
-                OM.UpdateInvoiceStatus(order);
+                Invoice invoice = IM.SelectById(id);                
 
                 int count = IM.Del(id);
                 if (count > 0)
@@ -172,17 +186,68 @@ namespace WebApplication.Controllers
         }
 
         /// <summary>
-        /// 
+        /// 用户列表首页
         /// </summary>
+        /// <param name="page">分页页码</param>
+        /// <param name="size">每页显示数量</param>
         /// <returns></returns>
-        public IActionResult GetOrderList(int order_id)
+        public IActionResult HistoryIndex(string start_time, string end_time, string confirm_start_time, string confirm_end_time, string invoice_index, string company_name, 
+            string day, string month, string year, int pageindex = 1, int pagesize = 8)
         {
-            Order order = OM.SelectById(order_id);
-            ViewBag.company_name = order.company_name;
-            ViewBag.company_order_index = order.company_order_index;
 
-            List<Order> orderList = OM.SelectForInvoiceOrderList(order_id);
-            return View(orderList);
+            ViewBag.start_time = start_time;
+            ViewBag.end_time = end_time;
+            ViewBag.confirm_start_time = confirm_start_time;
+            ViewBag.confirm_end_time = confirm_end_time;
+            ViewBag.invoice_index = invoice_index;
+            ViewBag.company_name = company_name;
+
+            if (start_time == null)
+            {
+                start_time = "2001-01-01";
+            }
+            if (end_time == null)
+            {
+                end_time = "2222-01-01";
+            }
+
+            if (confirm_start_time == null)
+            {
+                confirm_start_time = "2001-01-01";
+            }
+            if (confirm_end_time == null)
+            {
+                confirm_end_time = "2222-01-01";
+            }
+
+            DateTime dt = DateTime.Now;
+            DateTime dt2 = dt.AddMonths(1);
+
+            if (day == "1")
+            {
+                confirm_start_time = DateTime.Now.ToLocalTime().ToString("yyyy-MM-dd");
+                confirm_end_time = DateTime.Now.ToLocalTime().ToString("yyyy-MM-dd");
+                ViewBag.day = "1";
+            }
+            if (month == "1")
+            {
+                confirm_start_time = DateTime.Now.ToLocalTime().ToString("yyyy-MM-dd");
+                confirm_end_time = DateTime.Now.ToLocalTime().ToString("yyyy-MM-dd");
+                ViewBag.month = "1";
+            }
+            if (year == "1")
+            {
+                confirm_start_time = DateTime.Now.ToLocalTime().ToString("yyyy-MM-dd");
+                confirm_end_time = DateTime.Now.ToLocalTime().ToString("yyyy-MM-dd");
+                ViewBag.year = "1";
+            }
+
+            var objList = IM.SelectAll(1, start_time,end_time,confirm_start_time, confirm_end_time, invoice_index, company_name);
+            var pagedList = PagedList<Invoice>.PageList(pageindex, pagesize, objList);
+            ViewBag.model = pagedList.Item2;
+            return View(pagedList.Item1);
+
         }
+
     }
 }

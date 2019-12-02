@@ -275,11 +275,15 @@ namespace WebApplication.Controllers
         }
 
 
-        public IActionResult HistoryIndex(string start_time, string end_time, string company_name, string purchase_index, string material_name, string deliver_index, int pageindex = 1, int pagesize = 8)
+        public IActionResult HistoryIndex(string start_time, string end_time, string confirm_start_time, string confirm_end_time, string company_name, string purchase_index, 
+            string material_name, string deliver_index,string day,string month,string year, int pageindex = 1, int pagesize = 8)
         {
             
             ViewBag.start_time = start_time;
             ViewBag.end_time = end_time;
+
+            ViewBag.confirm_start_time = confirm_start_time;
+            ViewBag.confirm_end_time = confirm_end_time;
 
             ViewBag.company_name = company_name;
             ViewBag.purchase_index = purchase_index;
@@ -295,7 +299,38 @@ namespace WebApplication.Controllers
                 end_time = "2222-01-01";
             }
 
-            var objList = PM.SelectHistory(start_time, end_time, company_name,purchase_index, material_name, deliver_index);
+            if (confirm_start_time == null)
+            {
+                confirm_start_time = "0001-01-01";
+            }
+            if (confirm_end_time == null)
+            {
+                confirm_end_time = "2222-01-01";
+            }
+
+            DateTime dt = DateTime.Now;
+            DateTime dt2 = dt.AddMonths(1);
+            
+            if (day == "1")
+            {
+                confirm_start_time = DateTime.Now.ToLocalTime().ToString("yyyy-MM-dd");
+                confirm_end_time = DateTime.Now.ToLocalTime().ToString("yyyy-MM-dd");
+                ViewBag.day = "1";
+            }
+            if (month == "1")
+            {
+                confirm_start_time = dt.AddDays(-(dt.Day) + 1).ToString("yyyy-MM-dd");
+                confirm_end_time = dt2.AddDays(-dt.Day).ToString("yyyy-MM-dd");
+                ViewBag.month = "1";
+            }
+            if (year == "1")
+            {
+                confirm_start_time = dt.AddMonths(-dt.Month + 1).AddDays(-dt.Day + 1).ToString("yyyy-MM-dd");
+                confirm_end_time = new DateTime(DateTime.Now.Year, 12, 31).ToString("yyyy-MM-dd");
+                ViewBag.year = "1";
+            }
+
+            var objList = PM.SelectHistory(start_time, end_time, confirm_start_time, confirm_end_time, company_name,purchase_index, material_name, deliver_index);
             var pagedList = PagedList<Purchase>.PageList(pageindex, pagesize, objList);
             ViewBag.model = pagedList.Item2;
             return View(pagedList.Item1);

@@ -23,11 +23,36 @@ namespace DAL
                 sql = "select c.id,c.company_order_index,c.order_index,b.company_name,a.order_time,a.order_name,a.deliver_time," +
                     " order_num,order_price,order_all_price,tui_num, open_num,remain_num,purchase_person,a.seq_id,a.order_picture " +
                     "from jinchen.orderseq_info a,jinchen.company_info b,jinchen.order_info c where a.order_id=c.id and c.customer_id=b.id and " +
-                    " b.company_name ~* '{0}' and c.order_index ~* '{1}' and c.company_order_index ~*'{2}' and to_char(a.order_time,'yyyy-MM-dd')>='{3}' and to_char(a.order_time,'yyyy-MM-dd')<='{4}' and order_status={5} " +
+                    " b.company_name ~* '{0}' and c.order_index ~* '{1}' and c.company_order_index ~*'{2}' and to_char(a.order_time,'yyyy-MM-dd')>='{3}' and to_char(a.order_time,'yyyy-MM-dd')<='{4}' and a.order_status={5} " +
                     " and to_char(a.deliver_time,'yyyy-MM-dd')>='{6}' and to_char(a.deliver_time,'yyyy-MM-dd')<='{7}' and purchase_person ~*'{8}' " +
-                    "  " +
-                    " order by a.order_time desc,c.order_index desc";
+                    " order by a.order_time desc,c.order_index desc,order_name";
                 sql = string.Format(sql, company_name, order_index, company_order_index,start_time,end_time, order_status, deliver_start_time, deliver_end_time,purchase_person);
+
+                objList = PostgreHelper.GetEntityList<Order>(sql);
+
+                return objList;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        /// <summary>
+        /// 用于订单管理：根据联系人名模糊查询，查询结果为一笔或多笔数据
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
+        public List<Order> SelectOrderForDropDown(int order_status)
+        {
+            try
+            {
+                List<Order> objList = new List<Order>();
+                string sql = null;
+                sql = "select a.order_id,b.order_index " +
+                    "from jinchen.orderseq_info a,jinchen.order_info b where a.order_id=b.id and a.order_status={0} " +
+                    "group by b.order_index,a.order_id order by b.order_index ";
+                sql = string.Format(sql,order_status);
 
                 objList = PostgreHelper.GetEntityList<Order>(sql);
 
@@ -95,20 +120,20 @@ namespace DAL
         }
 
         /// <summary>
-        /// 用于订单管理：根据联系人名模糊查询，查询结果为一笔或多笔数据
+        /// 查询出可以开退货单的订单
         /// </summary>
         /// <param name="name"></param>
         /// <returns></returns>
-        public List<Order> SelectForSaleAll(int order_status)
+        public List<Order> SelectOrderForSaleReturnAll()
         {
             try
             {
                 List<Order> objList = new List<Order>();
                 string sql = null;
-                sql = "select * " +
-                    "from jinchen.order_info a where a.order_status={0} " +
+                sql = "select order_index " +
+                    "from jinchen.order_info a group by order_index " +
                     " order by a.order_index";
-                sql = string.Format(sql, order_status);
+                sql = string.Format(sql);
 
                 objList = PostgreHelper.GetEntityList<Order>(sql);
 
@@ -174,14 +199,14 @@ namespace DAL
         /// </summary>
         /// <param name="id">用户id</param>
         /// <returns></returns>
-        public Order SelectByOrderSeqId(int order_id, int seq_id)
+        public Order SelectByOrderSeqId(int seq_id)
         {
             try
             {
                 Order obj = new Order();
                 string sql = null;
-                sql = "select * from jinchen.orderseq_info a where a.order_id={0} and a.seq_id={1}";
-                sql = string.Format(sql, order_id, seq_id);
+                sql = "select * from jinchen.orderseq_info a,jinchen.order_info b where a.order_id=b.id and a.seq_id={0}";
+                sql = string.Format(sql, seq_id);
 
                 obj = PostgreHelper.GetSingleEntity<Order>(sql);
 
@@ -207,85 +232,6 @@ namespace DAL
                 sql = "select a.id,a.order_index " +
                     "from jinchen.order_info a where to_char(a.insert_time,'yyyy-MM-dd')='{0}' ";
                 sql = string.Format(sql, start_time);
-
-                objList = PostgreHelper.GetEntityList<Order>(sql);
-
-                return objList;
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
-        }
-
-        /// <summary>
-        /// 查询订单下的序号
-        /// </summary>
-        /// <param name="id">用户id</param>
-        /// <returns></returns>
-        public Order SelectForHistoryOrder(int order_id)
-        {
-            try
-            {
-                Order obj = new Order();
-                string sql = null;
-                sql = "select b.order_id, a.order_index, sum(b.remain_num) as remain_num " +
-                    "from jinchen.order_info a, jinchen.orderseq_info b where a.id = b.order_id and b.order_id={0} group by b.order_id, a.order_index ";
-                sql = string.Format(sql,order_id);
-
-                obj = PostgreHelper.GetSingleEntity<Order>(sql);
-
-                return obj;
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
-        }
-
-        /// <summary>
-        /// 查询订单下的序号
-        /// </summary>
-        /// <param name="id">用户id</param>
-        /// <returns></returns>
-        public List<Order> SelectByInvoiceStatus(int invoice_status)
-        {
-            try
-            {
-                List<Order> objList = new List<Order>();
-                string sql = null;
-                sql = "select * from jinchen.order_info where invoice_status={0} and order_status=1";
-                sql = string.Format(sql, invoice_status);
-
-                objList = PostgreHelper.GetEntityList<Order>(sql);
-
-                return objList;
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
-        }
-
-        /// <summary>
-        /// 查询订单下的序号
-        /// </summary>
-        /// <param name="id">用户id</param>
-        /// <returns></returns>
-        public List<Order> SelectForInvoiceOrderList(int order_id)
-        {
-            try
-            {
-                List<Order> objList = new List<Order>();
-                string sql = null;
-                sql = "	select res1.order_name,res1.order_time,res1.order_num,res1.tui_num,res1.order_price,res1.order_all_price,res2.deliver_all_price,"+
-                    "res1.unit,res1.purchase_person " +
-                    "from(select * from jinchen.orderseq_info where order_id = '{0}') res1 " +
-                     "left join " +
-                     "(select seq_id, sum(a.deliver_all_price) as deliver_all_price " +
-                      "from jinchen.sale_info a where order_id = {0} group by seq_id) res2 " +
-                       " on res1.seq_id = res2.seq_id";
-                sql = string.Format(sql, order_id);
 
                 objList = PostgreHelper.GetEntityList<Order>(sql);
 
@@ -418,30 +364,8 @@ namespace DAL
             try
             {
                 int count = 0;
-                string sql = "update jinchen.order_info set order_status={0} where id={1}";
-                sql = string.Format(sql, obj.order_status, obj.id);
-                count = PostgreHelper.ExecuteNonQuery(sql);
-                return count;
-
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
-        }
-
-        /// <summary>
-        /// 更新订单的状态，若status为1则
-        /// </summary>
-        /// <param name="obj"></param>
-        /// <returns></returns>
-        public int UpdateInvoiceStatus(Order obj)
-        {
-            try
-            {
-                int count = 0;
-                string sql = "update jinchen.order_info set invoice_status={0} where id={1}";
-                sql = string.Format(sql, obj.invoice_status, obj.id);
+                string sql = "update jinchen.orderseq_info set order_status={0} where seq_id={1}";
+                sql = string.Format(sql, obj.order_status, obj.seq_id);
                 count = PostgreHelper.ExecuteNonQuery(sql);
                 return count;
 

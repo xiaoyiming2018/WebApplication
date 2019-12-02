@@ -1,5 +1,5 @@
 ﻿@{
-    @model IList<Model.SaleReturn>
+    @model IList<Model.Sale>
     @using Model;
     @using BLL;
 
@@ -10,8 +10,10 @@
 <head>
     <meta name="viewport" content="width=device-width" />
     <title></title>
-    <link rel="stylesheet" type="text/css" href="~/assets/css/sweetalert.css">
-    <script type="text/javascript" src="~/assets/js/sweetalert-dev.js"></script>
+    <link href="~/js/dist/css/bootstrap-select.min.css" rel="stylesheet" />
+
+    <script src="~/assets/js/lib/bootstrap.min.js"></script>
+    <script src="~/js/dist/js/bootstrap-select.min.js"></script>
     <script type="text/javascript" src="~/Scripts/jquery-1.10.2.min.js"></script>
     <script type="text/javascript" src="~/My97DatePicker/WdatePicker.js"></script>
     <script type="text/javascript">
@@ -37,7 +39,7 @@
                     if (isConfirm) {
                         $.ajax({
                             type: "POST",
-                            url: "/SaleReturn/DeliverConfirm?deliver_index=" + deliver_index + "",
+                            url: "/Sale/DeliverConfirm?deliver_index=" + deliver_index + "",
                             beforeSend: function (xhr) {
                                 xhr.setRequestHeader("XSRF-TOKEN",
                                     $('input:hidden[name="__RequestVerificationToken"]').val());
@@ -48,7 +50,7 @@
                             success: function (msg) {
                                 if (msg == "Success") {
                                     swal({ title: "已确认 !", text: "", type: "success" },
-                                        function () { window.location.href = '/SaleReturn/MoneyHistoryIndex'; });
+                                        function () { window.location.href = '/Sale/MoneyHistoryIndex'; });
                                 }
                                 else {
                                     swal("执行失败 !", "", "error");
@@ -63,6 +65,34 @@
                         swal("操作已终止 !", "该记录已保留 !", "error");
                     }
                 });
+        }
+
+        function CheckOrCancleAll(obj) {
+            if (obj.is(":checked")) {
+                $('input.form-control').prop('checked', false);
+                obj.prop('checked', true);
+                if (obj.attr('name') == "day") {
+                    document.getElementById("day").value = "1";
+                    document.getElementById("month").value = "0";
+                    document.getElementById("year").value = "0";
+                }
+                else if (obj.attr('name') == "month") {
+                    document.getElementById("day").value = "0";
+                    document.getElementById("month").value = "1";
+                    document.getElementById("year").value = "0";
+                }
+                else if (obj.attr('name') == "year") {
+                    document.getElementById("day").value = "0";
+                    document.getElementById("month").value = "0";
+                    document.getElementById("year").value = "1";
+                }
+            }
+            else {
+                document.getElementById("day").value = "0";
+                document.getElementById("month").value = "0";
+                document.getElementById("year").value = "0";
+            }
+
         }
     </script>
 </head>
@@ -86,47 +116,70 @@
                 <div class="col-lg-12">
                     <div class="card alert">
                         <div class="card-header">
-                            <form class="form-horizontal" action="/SaleReturn/MoneyHistoryIndex" method="post" id="myfrom">
+                            <form class="form-horizontal" action="/Sale/MoneyHistoryIndex" method="post" id="myfrom">
                                 <div class="form-inline">
                                     <div class="form-group">
-                                        <label>出&nbsp;货&nbsp;&nbsp;单&nbsp;号：</label>
-                                        <input id="deliver_index" name="deliver_index" type="text" class="form-control" style="height:36px" value="@ViewBag.deliver_index" />
-                                    </div>
-                                    <div class="form-group">
-                                        <label>出货公司抬头：</label>
-                                        <input id="deliver_company_head" name="deliver_company_head" type="text" class="form-control" style="height:36px" value="@ViewBag.deliver_company_head" />
-                                    </div>
-
-                                    <div class="form-group">
-                                        <label>订&nbsp;&nbsp;单&nbsp;&nbsp;号：</label>
-                                        <input id="order_index" name="order_index" type="text" class="form-control" style="height:36px" value="@ViewBag.order_index" />
+                                        <label>送货单号：</label>
+                                        <select class="selectpicker" data-live-search="true" data-live-search-placeholder="搜索" id="deliver_index" name="deliver_index" style="padding:6px 50px">
+                                            <option value=""></option>
+                                            @{
+                                                SaleManager SM = new SaleManager();
+                                                List<Sale> saleList = SM.SelectMoneyAll(1, "2001-01-01", "2222-01-01");
+                                                if (saleList.Count > 0)
+                                                {
+                                                    for (int i = 0; i < saleList.Count; i++)
+                                                    {
+                                                        <!option value="@saleList[i].deliver_index" @if (Model != null) { if (saleList[i].deliver_index == ViewBag.deliver_index) { <text> selected</text>}}>@saleList[i].deliver_index</!option>
+                                                    }
+                                                }
+                                            }
+                                        </select>
                                     </div>
                                     <div class="form-group">
                                         <label>客户名称：</label>
-                                        <input id="company_name" name="company_name" type="text" class="form-control" style="height:36px" value="@ViewBag.company_name" />
+                                        <select class="selectpicker" data-live-search="true" data-live-search-placeholder="搜索" id="deliver_company_head" name="deliver_company_head" style="padding:6px 50px">
+                                            <option value=""></option>
+                                            @{
+                                                CompanyManager CM = new CompanyManager();
+                                                List<Company> objList = CM.SelectAll(type: 0);
+                                                if (objList.Count > 0)
+                                                {
+                                                    for (int i = 0; i < objList.Count; i++)
+                                                    {
+                                                        <!option value="@objList[i].company_name" @if (Model != null) { if (objList[i].company_name == ViewBag.deliver_company_head) { <text> selected</text>}}>@objList[i].company_name</!option>
+                                                    }
+                                                }
+                                            }
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>开始时间：</label>
+                                        <input id="start_time" name="start_time" type="text" class="form-control" onclick="WdatePicker({ skin: 'whyGreen',dateFmt:'yyyy-MM-dd' })" value="@ViewBag.start_time" />
+                                    </div>
+                                    <div class="form-group">
+                                        <label>结束时间：</label>
+                                        <input id="end_time" name="end_time" type="text" class="form-control" onclick="WdatePicker({ skin: 'whyGreen',dateFmt:'yyyy-MM-dd' })" value="@ViewBag.end_time" />
                                     </div>
                                 </div>
                                 <br />
                                 <div class="form-inline">
                                     <div class="form-group">
-                                        <label>客户订单号：</label>
-                                        <input id="company_order_index" name="company_order_index" type="text" class="form-control" style="height:36px" value="@ViewBag.company_order_index" />
+                                        <label>本日</label>
+                                        <input id="day" name="day" type="checkbox" class="form-control" onclick="CheckOrCancleAll($(this))" style="width:16px" value="0" @if (ViewBag.day == "1") { <text> checked</text> } />
                                     </div>
                                     <div class="form-group">
-                                        <label>开&nbsp;&nbsp;始&nbsp;&nbsp;&nbsp;&nbsp;时&nbsp;&nbsp;间：</label>
-                                        <input id="start_time" name="start_time" type="text" class="form-control" style="height:36px" onclick="WdatePicker({ skin: 'whyGreen',dateFmt:'yyyy-MM-dd' })" value="@ViewBag.start_time" />
+                                        <label>本月</label>
+                                        <input id="month" name="month" type="checkbox" class="form-control" onclick="CheckOrCancleAll($(this))" style="width:16px" value="0" @if (ViewBag.month == "1") { <text> checked</text> } />
                                     </div>
                                     <div class="form-group">
-                                        <label>结束时间：</label>
-                                        <input id="end_time" name="end_time" type="text" class="form-control" style="height:36px" onclick="WdatePicker({ skin: 'whyGreen',dateFmt:'yyyy-MM-dd' })" value="@ViewBag.end_time" />
+                                        <label>本年</label>
+                                        <input id="year" name="year" type="checkbox" class="form-control" onclick="CheckOrCancleAll($(this))" style="width:16px" value="0" @if (ViewBag.year == "1") { <text> checked</text> } />
                                     </div>
                                     <div class="form-group">
                                         <input type="submit" value="查询" class="btn btn-primary" style="width:80px" />
                                     </div>
                                 </div>
                                 <br />
-
-
                             </form>
                         </div>
                         <div class="card-body">
@@ -134,22 +187,17 @@
                                 <thead>
                                     <tr>
                                         <th>编号</th>
-                                        <th>出货单号</th>
-                                        <th>出货公司抬头</th>
-                                        <th>订单号</th>
-                                        <th>客户公司</th>
-                                        <th>客户订单号</th>
-                                        <th>订单总数</th>
-                                        <th>出货总数</th>
+                                        <th>送货单号</th>
+                                        <th>客户名称</th>
+                                        <th>送货总数</th>
                                         @if (UserManager.Current.GetLevel >= UserLevelEnum.ProductManager)
                                         {
-                                            <th>出货总价</th>
+                                            <th>送货总价</th>
                                             <th>结款与否</th>
                                             <th>结款方式</th>
                                         }
-
-                                        <th>确认时间</th>
-                                        <th>出货详情</th>
+                                        <th>确认结款时间</th>
+                                        <th>送货详情</th>
                                         @if (UserManager.Current.GetLevel >= UserLevelEnum.Boss)
                                         {
                                             <th>取消确认</th>
@@ -165,10 +213,6 @@
                                         <td>@index</td>
                                         <td>@item.deliver_index</td>
                                         <td>@item.deliver_company_head</td>
-                                        <td>@item.order_index</td>
-                                        <td>@item.company_name</td>
-                                        <td>@item.company_order_index</td>
-                                        <td>@item.order_num</td>
                                         <td>@item.real_num</td>
                                         @if (UserManager.Current.GetLevel >= UserLevelEnum.ProductManager)
                                         {
@@ -202,7 +246,7 @@
 
                                         <td>@item.confirm_time</td>
                                         <td>
-                                            <button class="btn btn-primary" onclick="window.location.href = '/SaleReturn/MoneySeqIndex?deliver_index=@item.deliver_index&deliver_status=@item.deliver_status'">出货详情</button>
+                                            <button class="btn btn-primary" onclick="window.location.href = '/Sale/MoneySeqIndex?deliver_index=@item.deliver_index&deliver_status=1'">送货详情</button>
                                         </td>
                                         @if (UserManager.Current.GetLevel >= UserLevelEnum.Boss)
                                         {
@@ -218,7 +262,7 @@
                                     }
                                 </tbody>
                             </table>
-                            <div class="page-nav" id="pageIndex">@Html.Raw(PagerHtmlString.Pager(ViewBag.model, "SaleReturn", "MoneyHistoryIndex", true))</div>
+                            <div class="page-nav" id="pageIndex">@Html.Raw(PagerHtmlString.Pager(ViewBag.model, "Sale", "MoneyHistoryIndex", true))</div>
                         </div>
                     </div><!-- /# card -->
                 </div><!-- /# column -->

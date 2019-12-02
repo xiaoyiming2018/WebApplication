@@ -7,9 +7,10 @@
 <head>
     <meta name="viewport" content="width=device-width" />
     <title></title>
-    <link rel="stylesheet" type="text/css" href="~/assets/css/sweetalert.css">
-    <script type="text/javascript" src="~/assets/js/sweetalert-dev.js"></script>
-    <script type="text/javascript" src="~/Scripts/jquery-1.10.2.min.js"></script>
+    <link href="~/js/dist/css/bootstrap-select.min.css" rel="stylesheet" />
+
+    <script src="~/assets/js/lib/bootstrap.min.js"></script>
+    <script src="~/js/dist/js/bootstrap-select.min.js"></script>
     <script src="~/js/xlsx.core.min.js"></script>
     <script src="~/assets/js/lib/jquery.min.js"></script>
     <script type="text/javascript">
@@ -23,7 +24,7 @@
                 if (files.length == 0) return;
                 var f = files[0];
                 if (!/\.xlsx$/g.test(f.name)) {
-                    swal("仅支持读取xlsx格式！","请重新上传文件！","error");
+                    swal("仅支持读取xlsx格式！", "请重新上传文件！", "error");
                     return;
                 }
                 readWorkbookFromLocalFile(f, function (workbook) {
@@ -56,11 +57,12 @@
                         },
                         data: {
                             id: id, company_name: company_name, tax_num: tax_num, account: account, bank: bank, address: address,
-                            name: name, position: position, telephone: telephone, email: email},
+                            name: name, position: position, telephone: telephone, email: email
+                        },
                         success: function (msg) {
                             if (msg == "Success") {
                                 swal({ title: "执行成功!", text: "", type: "success" },
-                                    function () { window.location.href = '/Customer/Index'; });  
+                                    function () { window.location.href = '/Customer/Index'; });
                             }
                             else if (msg == "Fail") {
                                 swal("执行失败！", "", "error");
@@ -86,13 +88,12 @@
         function inputList() {
             var num = document.getElementById('inputNum').value;
             var allList = new Array();
-            for (var i = 0; i < num;i++)
-            {
+            for (var i = 0; i < num; i++) {
                 var indexList = document.getElementsByName("index" + i + "");
                 for (var j = 0; j < indexList.length; j++) {
-                    
+
                     allList.push(indexList[j].value);
-                }                
+                }
             }
             var AllList = allList.join(',');
 
@@ -123,7 +124,7 @@
 
         function selectFile() {
             document.getElementById('file').click();
-               
+
             document.getElementById("company_name").value = "";
             document.getElementById("tax_num").value = "";
             document.getElementById("address").value = "";
@@ -167,7 +168,7 @@
         // 将csv转换成表格
         function csv2table(csv) {
             var html = '<div class="card alert"> <div class=\"card-header\"><h4>已导入信息</h4><div class=\"card-header-right-icon\"><button class=\"btn btn-primary\" onclick=\"inputList()\">提交导入信息</button></div></div>';
-            html +=  '<div class=\"card-body\"><table class=\"table table-responsive\">';
+            html += '<div class=\"card-body\"><table class=\"table table-responsive\">';
             var rows = csv.split('\n');
             rows.pop(); // 最后一行没用的
             rows.forEach(function (row, idx) {
@@ -179,15 +180,14 @@
                 }
                 html += '<tr>';
                 columns.forEach(function (column) {
-                    if (idx >= 1)
-                    {
+                    if (idx >= 1) {
                         html += '<td ><input type=\"text\" style=\"border:none;width:50px\" name=\"index' + idx + '\" value=\"' + column + '\" readonly/></td>';
                     }
-                     
+
                 });
                 html += '</tr>';
             });
-            html += '</table></div ><input type=\"hidden\" id=\"inputNum\" value=\"' + rows.length+'\"/> </div > ';
+            html += '</table></div ><input type=\"hidden\" id=\"inputNum\" value=\"' + rows.length + '\"/> </div > ';
             return html;
         }
 
@@ -265,7 +265,7 @@
 
         function exportSpecialExcel() {
             var aoa = [
-                ['客户名称', '税号', '地址', '银行账号', '开户行','联系人','职务','手机号','邮箱']
+                ['客户名称', '税号', '地址', '银行账号', '开户行', '联系人', '职务', '手机号', '邮箱']
             ];
             var sheet = XLSX.utils.aoa_to_sheet(aoa);
             openDownloadDialog(sheet2blob(sheet), '客户列表.xlsx');

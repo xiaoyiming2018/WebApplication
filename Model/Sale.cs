@@ -80,5 +80,8 @@ namespace Model
 
         //备注
         public string remark { get; set; }
+
+        // 地址
+        public string address { get; set; }
     }
 }

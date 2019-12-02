@@ -10,8 +10,10 @@
 <head>
     <meta name="viewport" content="width=device-width" />
     <title></title>
-    <link rel="stylesheet" type="text/css" href="~/assets/css/sweetalert.css">
-    <script type="text/javascript" src="~/assets/js/sweetalert-dev.js"></script>
+    <link href="~/js/dist/css/bootstrap-select.min.css" rel="stylesheet" />
+
+    <script src="~/assets/js/lib/bootstrap.min.js"></script>
+    <script src="~/js/dist/js/bootstrap-select.min.js"></script>
     <script type="text/javascript" src="~/Scripts/jquery-1.10.2.min.js"></script>
     <script type="text/javascript" src="~/My97DatePicker/WdatePicker.js"></script>
     <script type="text/javascript">
@@ -23,7 +25,7 @@
 
         function confirmTiShi(return_index) {
             swal({
-                title: "是否确认 ?",
+                title: "是否确认?",
                 text: "确认后将无法恢复 !",
                 type: "warning",
                 showCancelButton: true,
@@ -47,7 +49,7 @@
                             },
                             success: function (msg) {
                                 if (msg == "Success") {
-                                    swal({ title: "已确认 !", text: "", type: "success" },
+                                    swal({ title: "已确认 !", text: "该条退货单已确认 !", type: "success" },
                                         function () { window.location.href = '/SaleReturn/Index'; });
                                 }
                                 else {
@@ -89,47 +91,42 @@
                             <form class="form-horizontal" action="/SaleReturn/Index" method="post" id="myfrom">
                                 <div class="form-inline">
                                     <div class="form-group">
-                                        <label>退&nbsp;货&nbsp;&nbsp;单&nbsp;号：</label>
-                                        <input id="return_index" name="return_index" type="text" class="form-control" style="height:36px" value="@ViewBag.return_index" />
+                                        <label>退货单号：</label>
+                                        <select class="selectpicker" data-live-search="true" data-live-search-placeholder="搜索" id="return_index" name="return_index" style="padding:6px 50px">
+                                            <option value=""></option>
+                                            @{
+                                                SaleReturnManager SM = new SaleReturnManager();
+                                                List<SaleReturn> saleList = SM.SelectAll(0,"2001-01-01", "2222-01-01");
+                                                if (saleList.Count > 0)
+                                                {
+                                                    for (int i = 0; i < saleList.Count; i++)
+                                                    {
+                                                        <!option value="@saleList[i].return_index" @if (Model != null) { if (saleList[i].return_index == ViewBag.return_index) { <text> selected</text>}}>@saleList[i].return_index</!option>
+                                                    }
+                                                }
+                                            }
+                                        </select>
                                     </div>
                                     <div class="form-group">
-                                        <label>出货单号：</label>
-                                        <input id="deliver_index" name="deliver_index" type="text" class="form-control" style="height:36px" value="@ViewBag.deliver_index" />
-                                    </div>
-
-
-                                    <div class="form-group">
-                                        <label>订&nbsp;&nbsp;单&nbsp;&nbsp;号：</label>
-                                        <input id="order_index" name="order_index" type="text" class="form-control" style="height:36px" value="@ViewBag.order_index" />
+                                        <label>开始时间：</label>
+                                        <input id="start_time" name="start_time" type="text" class="form-control" onclick="WdatePicker({ skin: 'whyGreen',dateFmt:'yyyy-MM-dd' })" value="@ViewBag.start_time" />
                                     </div>
                                     <div class="form-group">
-                                        <label>客户公司：</label>
-                                        <input id="company_name" name="company_name" type="text" class="form-control" style="height:36px" value="@ViewBag.company_name" />
+                                        <label>结束时间：</label>
+                                        <input id="end_time" name="end_time" type="text" class="form-control" onclick="WdatePicker({ skin: 'whyGreen',dateFmt:'yyyy-MM-dd' })" value="@ViewBag.end_time" />
                                     </div>
                                 </div>
                                 <br />
                                 <div class="form-inline">
                                     <div class="form-group">
-                                        <label>客户订单号：</label>
-                                        <input id="company_order_index" name="company_order_index" type="text" class="form-control" style="height:36px" value="@ViewBag.company_order_index" />
-                                        <div class="form-group">
-                                            <label>开始时间：</label>
-                                            <input id="start_time" name="start_time" type="text" class="form-control" style="height:36px" onclick="WdatePicker({ skin: 'whyGreen',dateFmt:'yyyy-MM-dd' })" value="@ViewBag.start_time" />
-                                        </div>
-                                        <div class="form-group">
-                                            <label>结束时间：</label>
-                                            <input id="end_time" name="end_time" type="text" class="form-control" style="height:36px" onclick="WdatePicker({ skin: 'whyGreen',dateFmt:'yyyy-MM-dd' })" value="@ViewBag.end_time" />
-                                        </div>
-                                        <div class="form-group">
-                                            <input type="submit" value="查询" class="btn btn-primary" style="width:80px" />
-                                        </div>
-                                        <div class="form-group">
-                                            @if (UserManager.Current.GetLevel >= UserLevelEnum.ProductManager)
-                                            {
-                                                <input type="button" value="退货开单" class="btn btn-primary" style="width:80px" onclick="window.location.href = '/SaleReturn/Edit'" />
-                                            }
+                                        <input type="submit" value="查询" class="btn btn-primary" style="width:80px" />
+                                    </div>
+                                    <div class="form-group">
+                                        @if (UserManager.Current.GetLevel >= UserLevelEnum.ProductManager)
+                                        {
+                                            <input type="button" value="退货开单" class="btn btn-primary" style="width:80px" onclick="window.location.href = '/SaleReturn/Edit?return_index=new'" />
+                                        }
 
-                                        </div>
                                     </div>
                                 </div>
 
@@ -144,26 +141,18 @@
                                     <tr>
                                         <th>编号</th>
                                         <th>退货单号</th>
-                                        <th>出货单号</th>
-                                        <th>订单号</th>
-                                        <th>客户公司</th>
-                                        <th>客户订单号</th>
-                                        <th>订单总数</th>
-
-                                        <th>出货总数</th>
                                         <th>退货总数</th>
                                         @if (UserManager.Current.GetLevel >= UserLevelEnum.ProductManager)
                                         {
                                             <th>退货总价</th>
                                         }
 
-
-                                        <th>创建时间</th>
-                                        <th>退单详情</th>
+                                        <th>退货开单日期</th>
                                         @if (UserManager.Current.GetLevel >= UserLevelEnum.Boss)
                                         {
-                                            <th>确认</th>
+                                            <th>退货详情</th>
                                         }
+                                        <th>退货单确认</th>
 
                                     </tr>
                                 </thead>
@@ -175,24 +164,21 @@
                                     <tr>
                                         <td>@index</td>
                                         <td>@item.return_index</td>
-                                        <td>@item.deliver_index</td>
-                                        <td>@item.order_index</td>
-                                        <td>@item.company_name</td>
-                                        <td>@item.company_order_index</td>
-                                        <td>@item.order_num</td>
 
-                                        <td>@item.real_num</td>
                                         <td>@item.return_num</td>
                                         @if (UserManager.Current.GetLevel >= UserLevelEnum.ProductManager)
                                         {
                                             <td>@item.return_all_price</td>
                                         }
 
-                                        <td>@item.insert_time</td>
-                                        <td>
-                                            <button class="btn btn-primary" onclick="window.location.href = '/SaleReturnSeq/Index?return_index=@item.return_index'">退货详情</button>
-                                        </td>
-                                        @if (UserManager.Current.GetLevel >= UserLevelEnum.Boss)
+                                        <td>@item.insert_time.ToString("yyyy-MM-dd")</td>
+                                        @if (UserManager.Current.GetLevel >= UserLevelEnum.ProductManager)
+                                        {
+                                            <td>
+                                                <button class="btn btn-primary" onclick="window.location.href='/SaleReturn/Edit?return_index=@item.return_index'">退货详情</button>
+                                            </td>
+                                        }
+                                        @if (UserManager.Current.GetLevel >= UserLevelEnum.ProductManager)
                                         {
                                             <td>
                                                 <button class="btn btn-primary" onclick="confirmTiShi('@item.return_index')">确认</button>
