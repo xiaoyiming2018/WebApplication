@@ -13,11 +13,10 @@
     @*<link href="~/assets/css/lib/bootstrap.min.css" rel="stylesheet">*@
     <link href="~/js/dist/css/bootstrap-select.min.css" rel="stylesheet" />
 
-    <script src="~/Scripts/jquery-3.3.1.min.js"></script>
     <script src="~/assets/js/lib/bootstrap.min.js"></script>
-
-    <script type="text/javascript" src="~/My97DatePicker/WdatePicker.js"></script>
     <script src="~/js/dist/js/bootstrap-select.min.js"></script>
+    <script type="text/javascript" src="~/My97DatePicker/WdatePicker.js"></script>
+
     <script type="text/javascript">
         var money = 0;
         var index = 1;
@@ -25,8 +24,7 @@
         $(function () {
             $(".sidebar ul li:nth-of-type(5)").addClass("active open")
             $(".sidebar ul li:nth-of-type(5) ul li").removeClass()
-            $(".sidebar ul li:nth-of-type(5) ul li:nth-of-type(1)").addClass("active");
-
+            $(".sidebar ul li:nth-of-type(5) ul li:nth-of-type(1)").addClass("active")
             $('#submit').click(function () {
                 var flag = 0;
                 var deliver_index = document.getElementById('deliver_index').value;
@@ -89,9 +87,7 @@
                                 if (msg == "Success") {
                                     swal({ title: "执行成功!", text: "", type: "success" },
                                         function () { window.location.href = '/Sale/Edit?deliver_index=@ViewBag.deliver_index'; });
-                                }
-                                else if (msg == "Price"){
-                                    swal("价格不能为空！", "", "error");
+
                                 }
                                 else {
                                     swal("执行失败，请检查提交文件内容！", "", "error");
@@ -105,6 +101,25 @@
                 }
             });
         });
+
+        function add(index) {
+            $.ajax({
+                type: "POST",
+                url: "/Sale/GetOrderSelect",
+                data: { index: index },
+                success: function (msg) {
+                    $('#addTest1').append(msg);
+                },
+                error: function (msg) {
+                    swal("获取订单失败！", "请重新操作！", "error");
+                }
+            });
+        }
+
+    function del(a) {
+    var addstep = a;
+    $("#addTest"+addstep+"").remove();
+    }
 
     function getOrderList() {
     var order_id = $('#order_id').val();
@@ -123,101 +138,80 @@
         }
     }
 
-        function doPrint() {
-            
-            var company_head = document.getElementById('company_head').value;
-            if (company_head == "") {
-                swal("请选择送货公司抬头！", "", "error");
-            }
-            else {
-                $("#deliver_head").html(company_head);
-                window.print();
-                return false;
-            }
-            
-        };
+    function doPrint() {
+    window.print();
+    return false;
+    };
 
     window.onbeforeprint = function () {
 
-        $(".sidebar").hide()
-        $(".header").hide()
-        $("#Data1").show()
-        $("#wrap").hide()
-        $(".sidebar.sidebar-shrink ~ .content-wrap").css("margin-left", 0)
+    $(".sidebar").hide()
+    $(".header").hide()
+    $("#Data1").show()
+    $("#wrap").hide()
+    $(".sidebar.sidebar-shrink ~ .content-wrap").css("margin-left", 0)
     }
     window.onafterprint = function () {
-        $("#Data1").hide()
-        $("#wrap").show()
-        $(".sidebar").show()
-        $(".header").show()
-        $(".sidebar.sidebar-shrink ~ .content-wrap").css("margin-left", "250px")
+    $("#Data1").hide()
+    $("#wrap").show()
+    $(".sidebar").show()
+    $(".header").show()
+    $(".sidebar.sidebar-shrink ~ .content-wrap").css("margin-left", "250px")
     }
 
     function deleteTiShi(deliver_index, seq_id) {
-        swal({
-        title: "确定删除 ?",
-        text: "删除后将无法恢复 !",
-        type: "warning",
-        showCancelButton: true,
-        confirmButtonColor: "#DD6B55",
-        confirmButtonText: "删除",
-        cancelButtonText: "取消",
-        closeOnConfirm: false,//true表示不需要点击确认,fasle需要点击确认后再关闭对话框
-        closeOnCancel: false //true表示不需要点击确认,fasle需要点击确认后再关闭对话框
-        },
-        function (isConfirm) {
-        if (isConfirm) {
-        $.ajax({
-            type: "POST",
-            url: "/SaleSeq/Del?deliver_index=" + deliver_index + "&seq_id=" + seq_id + "",
-            beforeSend: function (xhr) {
-                xhr.setRequestHeader("XSRF-TOKEN",
-                $('input:hidden[name="__RequestVerificationToken"]').val());
-            },
-            data: {
-                deliver_index: deliver_index, seq_id: seq_id
-            },
-            success: function (msg) {
-                if (msg == "Success") {
-                swal({ title: "已删除 !", text: "该条记录已删除 !", type: "success" },
-                function () { window.location.href = '/Sale/Edit?deliver_index=@ViewBag.deliver_index&order_index=@ViewBag.order_index&order_name=@ViewBag.order_name'; });
-                }
-                else {
-                swal("执行失败 !", "该记录已保留 !", "error");
-                }
-            },
-            error: function (msg) {
-            swal("数据获取失败 !", "该记录已保留 !", "error");
-            }
-        });
-        }
-        else {
-        swal("已取消 !", "该记录已保留 !", "error");
-        }
-        });
-        }
-
-        function getProductPrice(id) {
-            var real_num = $('#real_num' + id + '').val()
-            var deliver_price = $('#deliver_price' + id + '').val()
-            
-            if (real_num >= 0 && deliver_price >= 0) {
-                $.ajax({
-                    type: "POST",
-                    url: "/Sale/GetProductPrice",
-                    data: { id: id, real_num: real_num, deliver_price: deliver_price },
-                    success: function (msg) {
-                        $('#price_div' + id + '').html(msg);
-                    },
-                    error: function (msg) {
-                        swal("获取价格失败！", "", "error");
-                    }
-                });
-            }
-        }
+    swal({
+    title: "确定删除 ?",
+    text: "删除后将无法恢复 !",
+    type: "warning",
+    showCancelButton: true,
+    confirmButtonColor: "#DD6B55",
+    confirmButtonText: "删除",
+    cancelButtonText: "取消",
+    closeOnConfirm: false,//true表示不需要点击确认,fasle需要点击确认后再关闭对话框
+    closeOnCancel: false //true表示不需要点击确认,fasle需要点击确认后再关闭对话框
+    },
+    function (isConfirm) {
+    if (isConfirm) {
+    $.ajax({
+    type: "POST",
+    url: "/SaleSeq/Del?deliver_index=" + deliver_index + "&seq_id=" + seq_id + "",
+    beforeSend: function (xhr) {
+    xhr.setRequestHeader("XSRF-TOKEN",
+    $('input:hidden[name="__RequestVerificationToken"]').val());
+    },
+    data: {
+    deliver_index: deliver_index, seq_id: seq_id
+    },
+    success: function (msg) {
+    if (msg == "Success") {
+    swal({ title: "已删除 !", text: "该条记录已删除 !", type: "success" },
+    function () { window.location.href = '/Sale/Edit?deliver_index=@ViewBag.deliver_index&order_index=@ViewBag.order_index&order_name=@ViewBag.order_name'; });
+    }
+    else {
+    swal("执行失败 !", "该记录已保留 !", "error");
+    }
+    },
+    error: function (msg) {
+    swal("数据获取失败 !", "该记录已保留 !", "error");
+    }
+    });
+    }
+    else {
+    swal("已取消 !", "该记录已保留 !", "error");
+    }
+    });
+    }
+    function Init() {
+    var SelectObj = document.getElementById("order_id");
+    /*先将数据存入数组*/
+    with (SelectObj)
+    for (i = 0; i < length; i++)
+    TempArr[i] = [options[i].text, options[i].value]
+    }
     </script>
 </head>
-<body>
+<body onload="Init()">
     <div class="container-fluid" id="wrap">
         <div class="row">
             <div class="col-lg-12">
@@ -258,7 +252,7 @@
                                         <div class="form-group">
                                             <label for="example-input-normal" class="col-sm-4 control-label">客户名称</label>
                                             <div class="col-sm-3">
-                                                <select class="selectpicker" data-live-search="true" data-live-search-placeholder="搜索" data-size="5" id="deliver_company_head" name="deliver_company_head" @if (Model != null) { <text> disabled</text>}>
+                                                <select class="selectpicker" data-live-search="true" data-live-search-placeholder="搜索" id="deliver_company_head" name="deliver_company_head" @if (Model != null) { <text> disabled</text>}>
                                                     <option value=""></option>
                                                     @{
                                                         CompanyManager CM = new CompanyManager();
@@ -296,18 +290,33 @@
                                             </div>
                                         </div>
 
-                                        <div class="form-group" id="order_div">
+                                        <div class="form-horizontal" id="order_div">
+                                        </div>
+
+                                        <div id="addTest3">
+                                            <div class="form-group">
+                                                <label for="example-input-normal" class="col-sm-4 control-label">订单号</label>
+                                                <div class="col-sm-3">
+                                                    <select class="selectpicker" data-live-search="true" data-live-search-placeholder="搜索" id="order_id" name="order_id" onchange="getOrderList();">
+                                                        <option value=""></option>
+                                                    </select>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                     <div class="form-group">
-                                        <label for="example-input-normal" class="col-sm-4 control-label"></label>
-                                        <div class="col-sm-4">
-                                            <input type="button" id="submit" name="submit" class="btn btn-primary" style=" width:28%" value="加入送货单" />
+                                        <div class="col-sm-5">
+                                            <input type="button" id="test" name="test" class="btn btn-info" value="+添加" onclick="add()" />
                                         </div>
                                     </div>
-
+                                    <div class="form-group">
+                                        <div class="col-sm-offset-5">
+                                            <input type="button" id="submit" name="submit" class="btn btn-primary" style=" width:12%" value="提交开单" />
+                                        </div>
+                                    </div>
+                                    
                                 </div>
-                            </div>
+                                </div>
                         </div>
                     </div><!-- /# card -->
                 </div><!-- /# column -->
@@ -317,29 +326,13 @@
                             <h4>
                                 已开送货订单
                             </h4>
-                            <div class="pull-right">
-                                <label>送货抬头：</label>
-                                <select class="selectpicker" data-live-search="true" data-live-search-placeholder="搜索" id="company_head" name="company_head">
-                                    <option value=""></option>
-                                    @{
-                                        SettingManager SettingM = new SettingManager();
-                                        List<Setting> settings = SettingM.SelectConfigList(6);
-                                        if (settings.Count > 0)
-                                        {
-                                            for (int i = 0; i < settings.Count; i++)
-                                            {
-                                                <!option value="@settings[i].config_list">@settings[i].config_list</!option>
-                                            }
-                                        }
-                                    }
-                                </select>
+                            <input type="hidden" value="@ViewBag.deliver_index" id="deliver_index" name="deliver_index" />
+                            <div class="card-header-right-icon">
                                 @if (UserManager.Current.GetLevel >= UserLevelEnum.ProductManager && Model != null)
                                 {
                                     <input type="button" value="送货单打印" class="btn btn-primary" onclick="doPrint()" style="width:100px" />
                                 }
                             </div>
-                            <input type="hidden" value="@ViewBag.deliver_index" id="deliver_index" name="deliver_index" />
-                            
                             <hr />
                             <form class="form-inline" action="/Sale/Edit?deliver_index=@ViewBag.deliver_index" method="post" id="myfrom">
                                 <div class="form-group">
@@ -354,9 +347,8 @@
                             </form>
 
                         </div>
-
+                        
                         <div class="card-body">
-                            
                             @if (Model != null)
                             {
                                 <table class="table table-responsive table-hover ">
@@ -438,7 +430,7 @@
                 <table class="table" border="0" cellspacing="0" cellpadding="0">
                     <tbody>
                         <tr style="font-weight:bold">
-                            <td style="font-size:30px;text-align:center;padding:2px;border:0;" colspan="6"><span id="deliver_head">昆山市欧锐吉五金商行</span></td>
+                            <td style="font-size:30px;text-align:center;padding:2px;border:0;" colspan="6">昆山市欧锐吉五金商行</td>
                         </tr>
                         <tr style="font-weight:bold">
                             <td style="font-size:25px;text-align:center;padding:2px;border:0;" colspan="6">送货单</td>
@@ -456,7 +448,7 @@
                             <td style="padding:2px;border:0;text-align:left">@ViewBag.address</td>
                             <td style="padding:2px;border:0;"></td>
                             <td style="padding:2px;border:0;"></td>
-                            <td style="padding:2px;border:0;text-align:right">打印日期：</td>
+                            <td style="padding:2px;border:0;text-align:right">送货日期：</td>
                             <td style="padding:2px;border:0;text-align:right">@(DateTime.Now.ToLocalTime().ToString("yyyy-MM-dd HH:ss:mm"))</td>
                         </tr>
                     </tbody>
@@ -478,7 +470,7 @@
                     <tbody>
                         @{
                             int index1 = 1;
-                            double money = 0;
+                            double money =0;
                             foreach (var item in Model)
                             {
                                 <tr>
@@ -495,13 +487,13 @@
                                 index1++;
                             }
                         }
-                        <tr>
-                            <td style="border-right-style:none;text-align:right" colspan="2">合计金额（大写）：</td>
-                            <td style="border-left-style:none;text-align:left" colspan="2">@SettingManager.CmycurD(Convert.ToDecimal(money))</td>
-                            <td>小写金额：</td>
-                            <td colspan="2">@money</td>
-                            <td></td>
-                        </tr>
+                                <tr>
+                                    <td style="border-right-style:none;text-align:right" colspan="2">合计金额（大写）：</td>
+                                    <td style="border-left-style:none;text-align:left" colspan="2">@SettingManager.CmycurD(Convert.ToDecimal(money))</td>
+                                    <td>小写金额：</td>
+                                    <td colspan="2">@money</td>
+                                    <td></td>
+                                </tr>
                     </tbody>
                 </table>
                 <label for="example-input-normal">注：以上货品请校对数量，如有质量问题，请在收货后3天内通知本公司，逾期数不负责。</label>
@@ -517,7 +509,7 @@
             </div>
         </div>
     }
-    
+
 </body>
 </html >
 

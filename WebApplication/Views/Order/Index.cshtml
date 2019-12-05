@@ -51,6 +51,9 @@
                                     swal({ title: "已删除 !", text: "该条记录已删除 !", type: "success" },
                                         function () { window.location.href = '/Order/Index'; });
                                 }
+                                else if (msg == "Existence") {
+                                    swal("该订单已有送货记录!", "请先删除送货记录！", "error");
+                                }
                                 else {
                                     swal("执行失败 !", "该记录已保留 !", "error");
                                 }

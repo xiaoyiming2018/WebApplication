@@ -45,7 +45,11 @@
                                     swal({ title: "已删除 !", text: "该条记录已删除 !", type: "success" },
                                         function () { window.location.href = '/Customer/Index'; });
                                 }
-                                else {
+                                else if (msg == "Existence") {
+                                    swal("执行失败 !", "现有订单中已关联该客户，请先删除对应的订单号!", "error");
+                                }
+                                else 
+                                {
                                     swal("执行失败 !", "该记录已保留 !", "error");
                                 }
                             },

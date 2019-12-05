@@ -58,9 +58,9 @@ namespace BLL
         /// </summary>
         /// <param name="obj"></param>
         /// <returns></returns>
-        public int UpdateStatus(int id)
+        public int UpdateStatus(int id, int pay_type)
         {
-            int count = IS.UpdateStatus(id);
+            int count = IS.UpdateStatus(id, pay_type);
             return count;
         }
 

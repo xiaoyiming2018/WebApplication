@@ -64,15 +64,7 @@
                                 swal({ title: "执行成功!", text: "", type: "success" },
                                     function () { window.location.href = '/Customer/Index'; });
                             }
-                            else if (msg == "Fail") {
-                                swal("执行失败！", "", "error");
-                            }
                             else {
-                                document.getElementById("company_name1").value = msg.company_name;
-                                document.getElementById("account1").value = msg.account;
-                                document.getElementById("tax_num1").value = msg.tax_num;
-                                document.getElementById("bank1").value = msg.bank;
-                                document.getElementById("address1").value = msg.address;
                                 swal("客户名称已存在！", "请重新填写客户名称！", "error");
                             }
                         },

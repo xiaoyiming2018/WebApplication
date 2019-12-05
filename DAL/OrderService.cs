@@ -171,6 +171,30 @@ namespace DAL
         }
 
         /// <summary>
+        /// 查询订单下对应客户
+        /// </summary>
+        /// <param name="id">用户id</param>
+        /// <returns></returns>
+        public List<Order> SelectByCustomerId(int customer_id)
+        {
+            try
+            {
+                List<Order> obj = new List<Order>();
+                string sql = null;
+                sql = "select * from jinchen.order_info a where a.customer_id={0}";
+                sql = string.Format(sql, customer_id);
+
+                obj = PostgreHelper.GetEntityList<Order>(sql);
+
+                return obj;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        /// <summary>
         /// 查询某一订单号
         /// </summary>
         /// <param name="id">用户id</param>

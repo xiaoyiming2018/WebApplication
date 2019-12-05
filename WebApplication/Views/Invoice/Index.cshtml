@@ -23,48 +23,54 @@
         });
 
         function confirmTiShi(id) {
-            swal({
-                title: "确定对账 ?",
-                text: "",
-                type: "warning",
-                showCancelButton: true,
-                confirmButtonColor: "#DD6B55",
-                confirmButtonText: "确认",
-                cancelButtonText: "取消",
-                closeOnConfirm: false,//true表示不需要点击确认,fasle需要点击确认后再关闭对话框
-                closeOnCancel: false //true表示不需要点击确认,fasle需要点击确认后再关闭对话框
-            },
-                function (isConfirm) {
-                    if (isConfirm) {
-                        $.ajax({
-                            type: "POST",
-                            url: "/Invoice/Confirm?id=" + id + "",
-                            beforeSend: function (xhr) {
-                                xhr.setRequestHeader("XSRF-TOKEN",
-                                    $('input:hidden[name="__RequestVerificationToken"]').val());
-                            },
-                            data: {
-                                id: id
-                            },
-                            success: function (msg) {
-                                if (msg == "Success") {
-                                    swal({ title: "对账成功 !", text: "", type: "success" },
-                                        function () { window.location.href = '/Invoice/Index'; });
+            var pay_type = $('#pay_type').val();
+            if (pay_type == "") {
+                swal("请选择付款方式！", "", "error");
+            }
+            else {
+                swal({
+                    title: "确定对账 ?",
+                    text: "",
+                    type: "warning",
+                    showCancelButton: true,
+                    confirmButtonColor: "#DD6B55",
+                    confirmButtonText: "确认",
+                    cancelButtonText: "取消",
+                    closeOnConfirm: false,//true表示不需要点击确认,fasle需要点击确认后再关闭对话框
+                    closeOnCancel: false //true表示不需要点击确认,fasle需要点击确认后再关闭对话框
+                },
+                    function (isConfirm) {
+                        if (isConfirm) {
+                            $.ajax({
+                                type: "POST",
+                                url: "/Invoice/Confirm?id=" + id + "&pay_type=" + pay_type+"",
+                                beforeSend: function (xhr) {
+                                    xhr.setRequestHeader("XSRF-TOKEN",
+                                        $('input:hidden[name="__RequestVerificationToken"]').val());
+                                },
+                                data: {
+                                    id: id
+                                },
+                                success: function (msg) {
+                                    if (msg == "Success") {
+                                        swal({ title: "对账成功 !", text: "", type: "success" },
+                                            function () { window.location.href = '/Invoice/Index'; });
+                                    }
+                                    else {
+                                        swal("执行失败 !", "该记录已保留 !", "error");
+                                    }
+                                },
+                                error: function (msg) {
+                                    swal("数据获取失败 !", "该记录已保留 !", "error");
                                 }
-                                else {
-                                    swal("执行失败 !", "该记录已保留 !", "error");
-                                }
-                            },
-                            error: function (msg) {
-                                swal("数据获取失败 !", "该记录已保留 !", "error");
-                            }
-                        });
-                    }
-                    else {
-                        swal("已取消 !", "该记录已保留 !", "error");
-                    }
-                });
-        }
+                            });
+                        }
+                        else {
+                            swal("已取消 !", "该记录已保留 !", "error");
+                        }
+                    });
+                }
+            }
 
         function deleteTiShi(id) {
             swal({
@@ -108,6 +114,33 @@
                         swal("已取消 !", "该记录已保留 !", "error");
                     }
                 });
+        }
+        function CheckOrCancleAll(obj) {
+            if (obj.is(":checked")) {
+                $('input.form-control').prop('checked', false);
+                obj.prop('checked', true);
+                if (obj.attr('name') == "day") {
+                    document.getElementById("day").value = "1";
+                    document.getElementById("month").value = "0";
+                    document.getElementById("year").value = "0";
+                }
+                else if (obj.attr('name') == "month") {
+                    document.getElementById("day").value = "0";
+                    document.getElementById("month").value = "1";
+                    document.getElementById("year").value = "0";
+                }
+                else if (obj.attr('name') == "year") {
+                    document.getElementById("day").value = "0";
+                    document.getElementById("month").value = "0";
+                    document.getElementById("year").value = "1";
+                }
+            }
+            else {
+                document.getElementById("day").value = "0";
+                document.getElementById("month").value = "0";
+                document.getElementById("year").value = "0";
+            }
+
         }
 
     </script>
@@ -180,6 +213,19 @@
                                 <br/>
                                 <div class="form-inline">
                                     <div class="form-group">
+                                        <label>本日</label>
+                                        <input id="day" name="day" type="checkbox" class="form-control" onclick="CheckOrCancleAll($(this))" style="width:16px" value="0" @if (ViewBag.day == "1") { <text> checked</text> } />
+                                    </div>
+                                    <div class="form-group">
+                                        <label>本月</label>
+                                        <input id="month" name="month" type="checkbox" class="form-control" onclick="CheckOrCancleAll($(this))" style="width:16px" value="0" @if (ViewBag.month == "1") { <text> checked</text> } />
+                                    </div>
+                                    <div class="form-group">
+                                        <label>本年</label>
+                                        <input id="year" name="year" type="checkbox" class="form-control" onclick="CheckOrCancleAll($(this))" style="width:16px" value="0" @if (ViewBag.year == "1") { <text> checked</text> } />
+                                        <label>（开票日期）</label>
+                                    </div>
+                                    <div class="form-group">
                                         <input type="submit" value="查询" class="btn btn-primary" style="width:80px" />
                                     </div>
                                     @if (UserManager.Current.GetLevel >= UserLevelEnum.ProductManager)
@@ -207,11 +253,12 @@
                                         <th>金额</th>
                                         <th>税额</th>
                                         <th>价税合计</th>
-                                        <th>付款方式</th>
+
                                         <th>备注</th>
                                         @if (UserManager.Current.GetLevel >= UserLevelEnum.ProductManager)
                                         {
                                             <th>编辑</th>
+                                            <th>付款方式</th>
                                         }
 
                                         @if (UserManager.Current.GetLevel >= UserLevelEnum.Boss)
@@ -244,19 +291,19 @@
                                         <td>@item.invoice_price</td>
                                         <td>@item.invoice_ratio</td>
                                         <td>@item.invoice_all_price</td>
-                                        @if (item.pay_type == 0)
-                                        {
-                                            <td>转账</td>
-                                        }
-                                        else
-                                        {
-                                            <td>现金</td>
-                                        }
+
                                         <td>@item.remark</td>
                                         @if (UserManager.Current.GetLevel >= UserLevelEnum.ProductManager)
                                         {
                                             <td>
                                                 <input type="button" class="btn btn-primary" onclick="window.location.href = '/Invoice/Edit?id=@item.id'" value="编辑" />
+                                            </td>
+                                            <td>
+                                                <select class="form-control" id="pay_type" name="pay_type">
+                                                    <option value=""></option>
+                                                    <!option value="0">转账</!option>
+                                                    <!option value="1">现金</!option>
+                                                </select>
                                             </td>
                                         }
 

@@ -120,13 +120,13 @@ namespace DAL
         /// </summary>
         /// <param name="obj"></param>
         /// <returns></returns>
-        public int UpdateStatus(int id)
+        public int UpdateStatus(int id,int pay_type)
         {
             try
             {
                 int count = 0;
-                string sql = "update jinchen.invoice_info set status=1,confirm_time='{0}' where id={1}";
-                sql = string.Format(sql,DateTime.Now.ToLocalTime().ToString("yyyy-MM-dd HH:mm:ss"), id);
+                string sql = "update jinchen.invoice_info set status=1,confirm_time='{0}',pay_type={1} where id={2}";
+                sql = string.Format(sql,DateTime.Now.ToLocalTime().ToString("yyyy-MM-dd HH:mm:ss"),pay_type, id);
                 count = PostgreHelper.ExecuteNonQuery(sql);
                 return count;
             }

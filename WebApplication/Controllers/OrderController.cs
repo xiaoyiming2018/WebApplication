@@ -208,41 +208,6 @@ namespace WebApplication.Controllers
         }
 
         /// <summary>
-        /// 删除数据
-        /// </summary>
-        /// <returns></returns>
-        public IActionResult Del()
-        {
-            try
-            {
-                int id = Convert.ToInt32(Request.Query["id"]);
-                
-                Order order=OM.SelectById(id);
-                if (order !=null)
-                {
-                    ViewBag.Message = "请先删除该订单号下的所有订单！";
-                    return View("Views/Order/alert.cshtml");
-                }
-                else
-                {
-                    int count = OM.DelOrder(id);
-                    if (count > 0)
-                    {
-                        return Json("Success");
-                    }
-                    else
-                    {
-                        return Json("Fail");
-                    }
-                }    
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
-        }
-
-        /// <summary>
         /// 获取价格
         /// </summary>
         /// <returns></returns>

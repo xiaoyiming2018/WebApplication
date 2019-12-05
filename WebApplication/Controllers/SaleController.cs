@@ -146,18 +146,18 @@ namespace WebApplication.Controllers
                     objOrder.open_num = Convert.ToInt32(real_num[i]);
                 }
 
-                if (deliver_price[i] == "")
+                if (real_num[i] != "" &&  deliver_price[i] == "")
                 {
-                    continue;
+                    return Json("Price");
                 }
                 else
                 {
                     objSale.deliver_price = Convert.ToDouble(deliver_price[i]);
                 }
 
-                if (deliver_all_price[i] == "")
+                if (real_num[i] != "" && deliver_all_price[i] == "")
                 {
-                    continue;
+                    return Json("Price");
                 }
                 else
                 {
@@ -240,6 +240,27 @@ namespace WebApplication.Controllers
         {
             List<Order> order = OM.SelectOrderSeqList(order_id);
             return View(order);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        public IActionResult GetOrderSelect(int order_id)
+        {
+            List<Order> order = OM.SelectAll(0,"0001-01-01","2222-01-01", "0001-01-01", "2222-01-01");
+            return View(order);
+        }
+
+        /// <summary>
+        /// 获取价格
+        /// </summary>
+        /// <returns></returns>
+        public IActionResult GetProductPrice(int id, int real_num, double deliver_price)
+        {
+            ViewBag.deliver_all_price = real_num * deliver_price;
+            ViewBag.id = "order_all_price" + id;
+            return View();
         }
 
         /// <summary>

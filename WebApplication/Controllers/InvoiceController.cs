@@ -20,7 +20,8 @@ namespace WebApplication.Controllers
         /// <param name="page">分页页码</param>
         /// <param name="size">每页显示数量</param>
         /// <returns></returns>
-        public IActionResult Index(string start_time, string end_time,string invoice_index, string company_name, int pageindex = 1, int pagesize = 8)
+        public IActionResult Index(string start_time, string end_time,string invoice_index, string company_name,
+            string day, string month, string year, int pageindex = 1, int pagesize = 8)
         {
             ViewBag.start_time = start_time;
             ViewBag.end_time = end_time;
@@ -34,6 +35,28 @@ namespace WebApplication.Controllers
             if (end_time == null)
             {
                 end_time = "2222-01-01";
+            }
+
+            DateTime dt = DateTime.Now;
+            DateTime dt2 = dt.AddMonths(1);
+
+            if (day == "1")
+            {
+                start_time = DateTime.Now.ToLocalTime().ToString("yyyy-MM-dd");
+                end_time = DateTime.Now.ToLocalTime().ToString("yyyy-MM-dd");
+                ViewBag.day = "1";
+            }
+            if (month == "1")
+            {
+                start_time = dt.AddDays(-(dt.Day) + 1).ToString("yyyy-MM-dd");
+                end_time = dt2.AddDays(-dt.Day).ToString("yyyy-MM-dd");
+                ViewBag.month = "1";
+            }
+            if (year == "1")
+            {
+                start_time = dt.AddMonths(-dt.Month + 1).AddDays(-dt.Day + 1).ToString("yyyy-MM-dd");
+                end_time = new DateTime(DateTime.Now.Year, 12, 31).ToString("yyyy-MM-dd");
+                ViewBag.year = "1";
             }
             string confirm_start_time = "0001-01-01";
             string confirm_end_time = "2222-01-01";
@@ -87,7 +110,6 @@ namespace WebApplication.Controllers
             double invoice_price = invoice.invoice_price;
             double invoice_ratio = invoice.invoice_ratio;
             double invoice_all_price = invoice.invoice_all_price;
-            int pay_type = invoice.pay_type;
             string remark = invoice.remark;
             string qq = Convert.ToString(HttpContext.Request.Form["id"]);
 
@@ -99,7 +121,7 @@ namespace WebApplication.Controllers
             objInvoice.invoice_price = invoice_price;
             objInvoice.invoice_ratio = invoice_ratio;
             objInvoice.invoice_all_price = invoice_all_price;
-            objInvoice.pay_type = pay_type;
+            objInvoice.pay_type = 0;
             objInvoice.remark = remark;
             if (id>0)
             {
@@ -131,8 +153,8 @@ namespace WebApplication.Controllers
             try
             {
                 int id = Convert.ToInt32(Request.Query["id"]);
-
-                int count = IM.UpdateStatus(id);
+                int pay_type = Convert.ToInt32(Request.Query["pay_type"]);
+                int count = IM.UpdateStatus(id, pay_type);
                 if (count>0)
                 {
                     return Json("Success");
@@ -231,14 +253,14 @@ namespace WebApplication.Controllers
             }
             if (month == "1")
             {
-                confirm_start_time = DateTime.Now.ToLocalTime().ToString("yyyy-MM-dd");
-                confirm_end_time = DateTime.Now.ToLocalTime().ToString("yyyy-MM-dd");
+                confirm_start_time = dt.AddDays(-(dt.Day) + 1).ToString("yyyy-MM-dd");
+                confirm_end_time = dt2.AddDays(-dt.Day).ToString("yyyy-MM-dd");
                 ViewBag.month = "1";
             }
             if (year == "1")
             {
-                confirm_start_time = DateTime.Now.ToLocalTime().ToString("yyyy-MM-dd");
-                confirm_end_time = DateTime.Now.ToLocalTime().ToString("yyyy-MM-dd");
+                confirm_start_time = dt.AddMonths(-dt.Month + 1).AddDays(-dt.Day + 1).ToString("yyyy-MM-dd");
+                confirm_end_time = new DateTime(DateTime.Now.Year, 12, 31).ToString("yyyy-MM-dd");
                 ViewBag.year = "1";
             }
 

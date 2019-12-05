@@ -40,9 +40,9 @@ namespace BLL
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public Company SelectSingleByName(string company_name)
+        public Company SelectSingleByName(string company_name,int company_type)
         {
-            Company obj = CS.SelectSingleByName(company_name);
+            Company obj = CS.SelectSingleByName(company_name, company_type);
             return obj;
         }
 

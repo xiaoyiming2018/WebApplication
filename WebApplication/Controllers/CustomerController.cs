@@ -15,6 +15,7 @@ namespace WebApplication.Controllers
     {
         CompanyManager UM = new CompanyManager();
         ContactManager CM = new ContactManager();
+        OrderManager OM = new OrderManager();
         /// <summary>
         /// 用户列表首页
         /// </summary>
@@ -85,7 +86,7 @@ namespace WebApplication.Controllers
             {
                 id = Convert.ToInt32(HttpContext.Request.Form["id"]);
             }
-            Company obj = UM.SelectSingleByName(company_name);
+            Company obj = UM.SelectSingleByName(company_name, 0);
 
             if (id <= 0)
             {
@@ -132,7 +133,7 @@ namespace WebApplication.Controllers
                     count = UM.Insert(objCompany);
                     if (count>0)
                     {
-                        Company res = UM.SelectSingleByName(company_name);
+                        Company res = UM.SelectSingleByName(company_name, 0);
                         Contact res1 = new Contact();
                         res1.customer_id = res.id;
                         res1.name = name;
@@ -197,7 +198,7 @@ namespace WebApplication.Controllers
                     objCompany.bank = res[5];
                     objCompany.company_type = 0;
 
-                    Company obj = UM.SelectSingleByName(res[1]);
+                    Company obj = UM.SelectSingleByName(res[1],0);
                     if (obj != null)
                     {
                         return Json("Fail");
@@ -211,7 +212,7 @@ namespace WebApplication.Controllers
                     }
                     else
                     {
-                        Company company = UM.SelectSingleByName(res[1]);
+                        Company company = UM.SelectSingleByName(res[1],0);
                         Contact contact = new Contact();
                         contact.customer_id = company.id;
                         if (res[6] == "")
@@ -227,7 +228,7 @@ namespace WebApplication.Controllers
                 }
                 else
                 {
-                    Company company = UM.SelectSingleByName(company_name);
+                    Company company = UM.SelectSingleByName(company_name,0);
                     Contact contact = new Contact();
 
                     contact.customer_id = company.id;                    
@@ -261,15 +262,23 @@ namespace WebApplication.Controllers
             try
             {
                 int id = Convert.ToInt32(Request.Query["id"]);
-                int count = UM.Del(id);
-                if (count > 0)
+                List<Order> order = OM.SelectByCustomerId(id);
+                if (order.Count > 0)
                 {
-                    return Json("Success");
+                    return Json("Existence");
                 }
                 else
                 {
-                    return Json("Fail");
-                }
+                    int count = UM.Del(id);
+                    if (count > 0)
+                    {
+                        return Json("Success");
+                    }
+                    else
+                    {
+                        return Json("Fail");
+                    }              
+                }                               
             }
             catch (Exception ex)
             {

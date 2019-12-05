@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace BLL
-{
+{using Microsoft.Extensions.DependencyInjection;
     public class UserManager
     {
         public UserService US = new UserService();

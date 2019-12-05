@@ -45,6 +45,17 @@ namespace BLL
         }
 
 
+        /// <summary>
+        /// 查询出可以开退货单的订单
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
+        public List<Order> SelectByCustomerId(int customer_id)
+        {
+            List<Order> objList = OS.SelectByCustomerId(customer_id);
+            return objList;
+        }
+
 
         /// <summary>
         /// 根据id查询

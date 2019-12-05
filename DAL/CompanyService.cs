@@ -62,13 +62,13 @@ namespace DAL
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public Company SelectSingleByName(string company_name)
+        public Company SelectSingleByName(string company_name,int company_type)
         {
             try
             {
                 Company obj = new Company();
-                string sql = "select * from jinchen.company_info where company_name='{0}'";
-                sql = string.Format(sql, company_name);
+                string sql = "select * from jinchen.company_info where company_name='{0}' and company_type={1} ";
+                sql = string.Format(sql, company_name, company_type);
                 obj = PostgreHelper.GetSingleEntity<Company>(sql);
                 return obj;
             }

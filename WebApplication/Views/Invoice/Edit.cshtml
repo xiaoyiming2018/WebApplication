@@ -30,11 +30,10 @@
                 var invoice_price = $('#invoice_price').val();
                 var invoice_ratio = $('#invoice_ratio').val();
                 var invoice_all_price = $('#invoice_all_price').val();
-                var pay_type = $('#pay_type').val();
                 var remark = $('#remark').val();
 
                 if (company_name == "" || invoice_type == "" || invoice_index == "" || invoice_time == ""
-                    || invoice_price == "" || invoice_ratio == "" || invoice_all_price == "" || pay_type == "") {
+                    || invoice_price == "" || invoice_ratio == "" || invoice_all_price == "") {
                     swal("信息不能为空！", "请将信息填充完整！", "error");
                 }
                 else {
@@ -47,7 +46,7 @@
                         },
                         data: {
                             id: id, company_name:company_name,invoice_type: invoice_type, invoice_index: invoice_index, invoice_time: invoice_time,
-                            invoice_price: invoice_price, invoice_ratio: invoice_ratio, invoice_all_price: invoice_all_price, pay_type: pay_type, remark: remark
+                            invoice_price: invoice_price, invoice_ratio: invoice_ratio, invoice_all_price: invoice_all_price, remark: remark
                         },
                         success: function (msg) {
                             if (msg == "Success") {
@@ -191,17 +190,6 @@
                                             <label for="example-input-normal" class="col-sm-4 control-label">价税统计</label>
                                             <div class="col-sm-4" id="price_div">
                                                 <input type="text" class="form-control" id="invoice_all_price" name="invoice_all_price" style="width:220px" placeholder="0" value="@if (Model!=null) { @Model.invoice_all_price; }" readonly />
-                                            </div>
-                                        </div>
-
-                                        <div class="form-group">
-                                            <label for="example-input-normal" class="col-sm-4 control-label">付款方式</label>
-                                            <div class="col-sm-4">
-                                                <select class="form-control" id="pay_type" name="pay_type" style="width:220px">
-                                                    <option value=""></option>
-                                                    <!option value="0" @if (Model != null) { if (Model.pay_type == 0) { <text> selected</text>} }>转账</!option>
-                                                    <!option value="1" @if (Model != null) { if (Model.pay_type == 1) { <text> selected</text>} }>现金</!option>
-                                                </select>
                                             </div>
                                         </div>
 

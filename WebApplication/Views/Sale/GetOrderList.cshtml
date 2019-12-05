@@ -50,11 +50,11 @@
             <td>
                 @if (item.remain_num == 0)
                 {
-                    <input type="text" name="real_num" style="width:100px;border:none;outline:none;" value="出货已完成" readonly />
+                    <input type="text" id="real_num@{@item.seq_id}" name="real_num" style="width:100px;border:none;outline:none;" value="出货已完成" readonly />
                 }
                 else
                 {
-                    <input type="text" name="real_num" style="width:100px;border-right-style: none;border-left-style: none;border-top-style: none;" />
+                    <input type="text" id="real_num@{@item.seq_id}" name="real_num" style="width:100px;border-right-style: none;border-left-style: none;border-top-style: none;" onchange="getProductPrice(@item.seq_id)" />
                 }
 
             </td>
@@ -63,15 +63,15 @@
                 <td>
                     @if (item.remain_num == 0)
                     {
-                        <input type="text" name="deliver_price" style="width:100px;border:none;outline:none;" value="出货已完成" readonly />
+                        <input type="text" id="deliver_price@{@item.seq_id}" name="deliver_price" style="width:100px;border:none;outline:none;" value="出货已完成" readonly />
                     }
                     else
                     {
-                        <input type="text" name="deliver_price" style="width:100px;border-right-style: none;border-left-style: none;border-top-style: none;" />
+                        <input type="text" id="deliver_price@{@item.seq_id}" name="deliver_price" style="width:100px;border-right-style: none;border-left-style: none;border-top-style: none;" onchange="getProductPrice(@item.seq_id)" />
                     }
 
                 </td>
-                <td>
+                <td id="price_div@{@item.seq_id}">
                     @if (item.remain_num == 0)
                     {
                         <input type="text" name="deliver_all_price" style="width:100px;border:none;outline:none;" value="出货已完成" readonly />

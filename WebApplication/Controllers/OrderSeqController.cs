@@ -177,27 +177,38 @@ namespace WebApplication.Controllers
 
                 int seq_id = Convert.ToInt32(Request.Query["seq_id"]);
                 List<Order> orderList = OMM.SelectOrderSeqList(order_id);
-                if (orderList.Count > 1)
-                {
-                    count = OMM.DelOrderSeq(seq_id);
-                    ViewBag.key = "OrderSeq";
 
+                List<Sale> sales = SM.SelectByOrderId(order_id);
+                //在删除order之前需判断一下该order是否已开送货单，若开了则提示无法删除送货单
+                if (sales.Count >= 1)
+                {
+                    return Json("Existence");
                 }
                 else
                 {
-                    count = OMM.DelOrderSeq(seq_id);
-                    OMM.DelOrder(order_id);
-                    ViewBag.key = "Order";
-                }
+                    if (orderList.Count > 1)
+                    {
+                        count = OMM.DelOrderSeq(seq_id);
+                        ViewBag.key = "OrderSeq";
 
-                if (count > 0)
-                {
-                    return Json("Success");
+                    }
+                    else
+                    {
+                        count = OMM.DelOrderSeq(seq_id);
+                        OMM.DelOrder(order_id);
+                        ViewBag.key = "Order";
+                    }
+
+                    if (count > 0)
+                    {
+                        return Json("Success");
+                    }
+                    else
+                    {
+                        return Json("Fail");
+                    }
                 }
-                else
-                {
-                    return Json("Fail");
-                }
+                
             }
             catch (Exception ex)
             {

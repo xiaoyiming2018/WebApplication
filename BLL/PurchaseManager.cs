@@ -22,6 +22,17 @@ namespace BLL
         }
 
         /// <summary>
+        /// 用于生成唯一的采购单号
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
+        public List<Purchase> SelectBySupplierId(int supplier_id)
+        {
+            List<Purchase> objList = PS.SelectBySupplierId(supplier_id);
+            return objList;
+        }
+
+        /// <summary>
         /// 模糊查询结果为一笔或多笔数据
         /// </summary>
         /// <param name="name"></param>

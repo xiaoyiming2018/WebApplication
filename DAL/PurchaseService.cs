@@ -36,6 +36,32 @@ namespace DAL
         }
 
         /// <summary>
+        /// 用于自动生成采购单号
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
+        public List<Purchase> SelectBySupplierId(int supplier_id)
+        {
+            try
+            {
+                List<Purchase> objList = new List<Purchase>();
+                string sql = null;
+                sql = "SELECT * " +
+                 "FROM jinchen.purchase_info a, jinchen.company_info b " +
+                   " where a.supplier_id = b.id and supplier_id={0} ";
+                sql = string.Format(sql, supplier_id);
+
+                objList = PostgreHelper.GetEntityList<Purchase>(sql);
+
+                return objList;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        /// <summary>
         /// 根据id查询单笔数据
         /// </summary>
         /// <param name="id">用户id</param>
