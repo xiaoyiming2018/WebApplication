@@ -22,7 +22,8 @@ namespace WebApplication.Controllers
         /// <param name="page">分页页码</param>
         /// <param name="size">每页显示数量</param>
         /// <returns></returns>
-        public IActionResult Index(string start_time, string end_time, string deliver_index, string deliver_company_head,int pageindex = 1, int pagesize = 8)
+        public IActionResult Index(string start_time, string end_time, string deliver_index, string deliver_company_head,
+            int pageindex = 1, int pagesize = 20)
         {
 
             ViewBag.start_time = start_time;
@@ -33,7 +34,7 @@ namespace WebApplication.Controllers
 
             if (start_time == null)
             {
-                start_time = "2001-01-01";
+                start_time = "0001-01-01";
             }
             if (end_time == null)
             {
@@ -184,7 +185,6 @@ namespace WebApplication.Controllers
                 //插入Sale中
                 objSale.seq_id = objSale.seq_id;
                 int count=SM.Insert(objSale);
-                SM.UpdateDeliverHead(deliver_company_head,deliver_index);
 
                 if (count<=0)
                 {
@@ -236,9 +236,9 @@ namespace WebApplication.Controllers
         /// 
         /// </summary>
         /// <returns></returns>
-        public IActionResult GetOrderList(int order_id)
+        public IActionResult GetOrderList(int order_id,string deliver_company_head)
         {
-            List<Order> order = OM.SelectOrderSeqList(order_id);
+            List<Order> order = OM.SelectOrderSeqList(order_id, deliver_company_head);
             return View(order);
         }
 
@@ -269,7 +269,8 @@ namespace WebApplication.Controllers
         /// <param name="page">分页页码</param>
         /// <param name="size">每页显示数量</param>
         /// <returns></returns>
-        public IActionResult MoneyIndex(string start_time, string end_time, string deliver_index, string deliver_company_head, int pageindex = 1, int pagesize = 8)
+        public IActionResult MoneyIndex(string start_time, string end_time, string deliver_index, string deliver_company_head,
+            string order_name,int pageindex = 1, int pagesize = 20)
         {
             ViewBag.start_time = start_time;
             ViewBag.end_time = end_time;
@@ -277,17 +278,35 @@ namespace WebApplication.Controllers
             ViewBag.deliver_index = deliver_index;
 
             ViewBag.deliver_company_head = deliver_company_head;
+            ViewBag.order_name = order_name;
 
             if (start_time == null)
             {
-                start_time = "2001-01-01";
+                start_time = "0001-01-01";
             }
             if (end_time == null)
             {
                 end_time = "2222-01-01";
             }
 
-            var objList = SM.SelectMoneyAll(0, start_time, end_time, deliver_index, deliver_company_head);
+            List<Sale> sales = SM.SelectForDzIndex();
+            string count_num = "";
+            int num = sales.Count;
+            if (num < 10)
+            {
+                count_num = "00" + num;
+            }
+            else if (num < 100)
+            {
+                count_num = "0" + num;
+            }
+            else
+            {
+                count_num = "" + num;
+            }
+            ViewBag.dz_index = SettingM.SelectInUse(8).index_begin + count_num;
+
+            var objList = SM.SelectMoneyAll(0, start_time, end_time, "0001-01-01", "2222-01-01", deliver_index, deliver_company_head,order_name);
             var pagedList = PagedList<Sale>.PageList(pageindex, pagesize, objList);
             ViewBag.model = pagedList.Item2;
             return View(pagedList.Item1);
@@ -299,23 +318,106 @@ namespace WebApplication.Controllers
         /// <param name="page">分页页码</param>
         /// <param name="size">每页显示数量</param>
         /// <returns></returns>
-        public IActionResult MoneyHistoryIndex(string start_time, string end_time, string deliver_index, string deliver_company_head,
-            string day, string month, string year, int pageindex = 1, int pagesize = 8)
+        public IActionResult MoneyHistoryIndex(string start_time, string end_time, string confirm_start_time, string confirm_end_time, string deliver_index, 
+            string deliver_company_head,string order_name,string dz_index,string day, string month, string year, int pageindex = 1, int pagesize = 20)
         {
             ViewBag.start_time = start_time;
             ViewBag.end_time = end_time;
 
+            ViewBag.confirm_start_time = confirm_start_time;
+            ViewBag.confirm_end_time = confirm_end_time;
+
             ViewBag.deliver_index = deliver_index;
+            ViewBag.order_name = order_name;
+            ViewBag.dz_index = dz_index;
 
             ViewBag.deliver_company_head = deliver_company_head;
 
             if (start_time == null)
             {
-                start_time = "2001-01-01";
+                start_time = "0001-01-01";
             }
             if (end_time == null)
             {
                 end_time = "2222-01-01";
+            }
+
+            if (confirm_start_time == null)
+            {
+                confirm_start_time = "0001-01-01";
+            }
+            if (confirm_end_time == null)
+            {
+                confirm_end_time = "2222-01-01";
+            }
+
+            DateTime dt = DateTime.Now;
+            DateTime dt2 = dt.AddMonths(1);
+
+            if (day == "1")
+            {
+                start_time = DateTime.Now.ToLocalTime().ToString("yyyy-MM-dd");
+                end_time = DateTime.Now.ToLocalTime().ToString("yyyy-MM-dd");
+                ViewBag.day = "1";
+            }
+            if (month == "1")
+            {
+                start_time = dt.AddDays(-(dt.Day) + 1).ToString("yyyy-MM-dd");
+                end_time = dt2.AddDays(-dt.Day).ToString("yyyy-MM-dd");
+                ViewBag.month = "1";
+            }
+            if (year == "1")
+            {
+                start_time = dt.AddMonths(-dt.Month + 1).AddDays(-dt.Day + 1).ToString("yyyy-MM-dd");
+                end_time = new DateTime(DateTime.Now.Year, 12, 31).ToString("yyyy-MM-dd");
+                ViewBag.year = "1";
+            }           
+
+            var objList = SM.SelectMoneyAll(1, start_time, end_time, confirm_start_time, confirm_end_time, deliver_index, deliver_company_head,order_name,dz_index);
+            var pagedList = PagedList<Sale>.PageList(pageindex, pagesize, objList);
+            ViewBag.model = pagedList.Item2;
+            return View(pagedList.Item1);
+        }
+
+
+        /// <summary>
+        /// 用户列表首页
+        /// </summary>
+        /// <param name="page">分页页码</param>
+        /// <param name="size">每页显示数量</param>
+        /// <returns></returns>
+        public IActionResult MoneyFinalIndex(string start_time, string end_time, string confirm_start_time, string confirm_end_time, string deliver_index,
+            string deliver_company_head, string order_name, string dz_index,string invoice_index, string day, string month, string year, int pageindex = 1, int pagesize = 20)
+        {
+            ViewBag.start_time = start_time;
+            ViewBag.end_time = end_time;
+
+            ViewBag.confirm_start_time = confirm_start_time;
+            ViewBag.confirm_end_time = confirm_end_time;
+
+            ViewBag.deliver_index = deliver_index;
+            ViewBag.order_name = order_name;
+            ViewBag.dz_index = dz_index;
+            ViewBag.invoice_index = invoice_index;
+
+            ViewBag.deliver_company_head = deliver_company_head;
+
+            if (start_time == null)
+            {
+                start_time = "0001-01-01";
+            }
+            if (end_time == null)
+            {
+                end_time = "2222-01-01";
+            }
+
+            if (confirm_start_time == null)
+            {
+                confirm_start_time = "0001-01-01";
+            }
+            if (confirm_end_time == null)
+            {
+                confirm_end_time = "2222-01-01";
             }
 
             DateTime dt = DateTime.Now;
@@ -340,73 +442,14 @@ namespace WebApplication.Controllers
                 ViewBag.year = "1";
             }
 
-
-            var objList = SM.SelectMoneyAll(1, start_time, end_time, deliver_index, deliver_company_head);
+            var objList = SM.SelectMoneyAll(2, start_time, end_time, confirm_start_time, confirm_end_time, deliver_index, deliver_company_head, 
+                order_name, dz_index, invoice_index);
             var pagedList = PagedList<Sale>.PageList(pageindex, pagesize, objList);
             ViewBag.model = pagedList.Item2;
             return View(pagedList.Item1);
         }
-
         /// <summary>
-        /// 结款
-        /// </summary>
-        /// <returns></returns>
-        public IActionResult DeliverConfirm()
-        {
-            try
-            {
-                bool flag = true;
-                string deliver_index = Convert.ToString(Request.Query["deliver_index"]);
-                List<Sale> saleList = SM.SelectSeqByDeliverIndex(deliver_index);
-
-
-                DateTimeFormatInfo dtFormat = new DateTimeFormatInfo();
-                dtFormat.ShortDatePattern = "yyyy/M/d H:mm:ss";
-                DateTime dt = Convert.ToDateTime("0001/1/1 0:00:00", dtFormat);
-
-                for (int i = 0; i < saleList.Count; i++)
-                {
-                    int status = 0;
-                    if (saleList[i].deliver_status == 0)
-                    {
-                        status = 1;
-                        dt = DateTime.Now.ToLocalTime();
-                    }
-                    else
-                    {
-                        status = 0;
-                        dt = Convert.ToDateTime("0001/1/1 0:00:00");
-                    }
-
-                    Sale sale = new Sale();
-                    sale.deliver_status = status;
-                    sale.confirm_time = dt;
-                    sale.deliver_index = saleList[i].deliver_index;
-                    sale.seq_id = saleList[i].seq_id;
-
-                    int count = SM.UpdateDeliverStatus(sale);
-                    if (count < 1)
-                    {
-                        flag = false;
-                    }
-                }
-                if (flag)
-                {
-                    return Json("Success");
-                }
-                else
-                {
-                    return Json("Fail");
-                }
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
-        }
-
-        /// <summary>
-        /// 插入更新页面
+        /// 更新结款方式
         /// </summary>
         /// <returns></returns>
         public IActionResult MoneyEdit()
@@ -414,11 +457,13 @@ namespace WebApplication.Controllers
             try
             {
                 string deliver_index = Convert.ToString(HttpContext.Request.Form["deliver_index"]);
+                int seq_id = Convert.ToInt32(HttpContext.Request.Form["seq_id"]);
                 int money_onoff = Convert.ToInt32(HttpContext.Request.Form["money_onoff"]);
                 int money_way = Convert.ToInt32(HttpContext.Request.Form["money_way"]);
 
                 Sale sale = new Sale();
                 sale.deliver_index = deliver_index;
+                sale.seq_id = seq_id;
                 sale.money_onoff = money_onoff;
                 sale.money_way = money_way;
                 int count = SM.UpdateMoney(sale);
@@ -439,48 +484,145 @@ namespace WebApplication.Controllers
             }
         }
 
-        public IActionResult MoneySeqIndex( string order_index, string order_name)
+        public IActionResult MoneySeqIndex()
         {
-
             string deliver_index = Convert.ToString(Request.Query["deliver_index"]);
+            int seq_id = Convert.ToInt32(Request.Query["seq_id"]);
 
-            if (!string.IsNullOrEmpty(Request.Query["deliver_status"]))
+            Sale sale = SM.SelectSingleBySeqIndex(seq_id,deliver_index);
+            return View(sale);
+        }
+
+        public IActionResult GetPickerList()
+        {
+            try
             {
-                if (Convert.ToInt32(Request.Query["deliver_status"]) == 0)
+                string[] duizhang = Convert.ToString(HttpContext.Request.Form["Dui_Zhang"]).Split(',');
+                List<Sale> saleList = new List<Sale>();
+                if (duizhang.Length <= 1 && duizhang[0]=="")
                 {
-                    ViewBag.flag = "Return";
+                    return View(saleList);
+                }
+
+                for (int i = 0; i < duizhang.Length; i++)
+                {
+                    string[] detail = duizhang[i].Split('+');
+                    string deliver_index = detail[0];
+                    int seq_id = Convert.ToInt32(detail[1]);
+
+                    Sale sale=SM.SelectSingleBySeqIndex(seq_id, deliver_index);
+                    saleList.Add(sale);
+                }
+                return View(saleList);
+
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+
+        /// <summary>
+        /// 插入更新页面
+        /// </summary>
+        /// <returns></returns>
+        public IActionResult DuiZhang()
+        {
+            try
+            {
+                int count = 0;
+                bool flag = true;
+                string[] duizhang = Convert.ToString(HttpContext.Request.Form["Dui_Zhang"]).Split(',');
+                string dz_index = Convert.ToString(HttpContext.Request.Form["dz_index"]);
+                Sale sale = new Sale();
+                if (duizhang.Length<1)
+                {
+                    return Json("Fail");
+                }
+
+                for (int i=0;i<duizhang.Length;i++)
+                {
+                    string[] detail= duizhang[i].Split('+');
+                    string deliver_index = detail[0];
+                    int seq_id = Convert.ToInt32(detail[1]);
+                    sale.deliver_index = deliver_index;
+                    sale.seq_id = seq_id;
+                    sale.deliver_status = 1;
+                    sale.confirm_time = DateTime.Now.ToLocalTime();
+                    count = SM.UpdateDeliverStatus(sale);
+                    SM.UpdateDzIndex(dz_index, deliver_index, seq_id);
+                    if (count<1)
+                    {
+                        flag = false;
+                    }
+                }
+                
+                if (flag)
+                {
+                    return Json("Success");
                 }
                 else
                 {
-                    ViewBag.flag = "History";
+                    return Json("Fail");
                 }
+
             }
-
-            Sale sale = SM.SelectDeliverByDeliverIndex(deliver_index);
-            ViewBag.money_onoff = sale.money_onoff;
-            ViewBag.money_way = sale.money_way;
-            ViewBag.deliver_index = deliver_index;
-            ViewBag.deliver_company_head = sale.deliver_company_head;
-            ViewBag.insert_time = sale.insert_time;//出货时间
-
-            ViewBag.order_index = order_index;
-            ViewBag.order_name = order_name;
-
-
-            List<Sale> saleList = SM.SelectSeqByDeliverIndex(deliver_index, order_index, order_name);
-            Int64 real_num = 0;
-            double deliver_price = 0;
-            for (int i=0;i<saleList.Count;i++)
+            catch (Exception ex)
             {
-                real_num += saleList[i].real_num;
-                deliver_price += saleList[i].deliver_all_price;
+                throw ex;
             }
-            ViewBag.real_num = real_num;//总的送货数量
-            ViewBag.deliver_price = deliver_price;//送货总价
-
-            return View(saleList);
-
         }
 
+        /// <summary>
+        /// 插入更新页面
+        /// </summary>
+        /// <returns></returns>
+        public IActionResult PutInvoice()
+        {
+            try
+            {
+                int count = 0;
+                bool flag = true;
+                string[] duizhang = Convert.ToString(HttpContext.Request.Form["Dui_Zhang"]).Split(',');
+                string invoice_index = Convert.ToString(HttpContext.Request.Form["invoice_index"]);
+                Sale sale = new Sale();
+                if (duizhang.Length < 1)
+                {
+                    return Json("Fail");
+                }
+
+                for (int i = 0; i < duizhang.Length; i++)
+                {
+                    string[] detail = duizhang[i].Split('+');
+                    string deliver_index = detail[0];
+                    int seq_id = Convert.ToInt32(detail[1]);
+                    sale.deliver_index = deliver_index;
+                    sale.seq_id = seq_id;
+                    sale.deliver_status = 2;
+                    sale.real_time = DateTime.Now.ToLocalTime();//记录绑定发票的日期
+                    count = SM.UpdateDeliverStatusInvoice(sale);
+                    SM.UpdateInvoiceIndex(invoice_index, deliver_index, seq_id);
+                    if (count < 1)
+                    {
+                        flag = false;
+                    }
+                }
+
+                if (flag)
+                {
+                    return Json("Success");
+                }
+                else
+                {
+                    return Json("Fail");
+                }
+
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
     }
 }

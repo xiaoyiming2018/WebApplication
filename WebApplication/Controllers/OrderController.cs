@@ -21,7 +21,7 @@ namespace WebApplication.Controllers
         /// <param name="size">每页显示数量</param>
         /// <returns></returns>
         public IActionResult Index(string start_time, string end_time,string deliver_start_time, string deliver_end_time, string company_name, 
-            string order_index,string company_order_index,string purchase_person, int pageindex = 1, int pagesize = 8)
+            string order_index,string company_order_index,string purchase_person, int pageindex = 1, int pagesize = 20)
         {            
                           
             ViewBag.company_name = company_name;
@@ -35,7 +35,7 @@ namespace WebApplication.Controllers
             ViewBag.deliver_end_time = deliver_end_time;
             if (start_time==null)
             {
-                start_time = "2001-01-01";
+                start_time = "0001-01-01";
             }
             if (end_time == null)
             {
@@ -44,7 +44,7 @@ namespace WebApplication.Controllers
 
             if (deliver_start_time == null)
             {
-                deliver_start_time = "2001-01-01";
+                deliver_start_time = "0001-01-01";
             }
             if (deliver_end_time == null)
             {
@@ -220,7 +220,7 @@ namespace WebApplication.Controllers
 
         public IActionResult HistoryIndex(string start_time, string end_time, string deliver_start_time, string deliver_end_time, 
             string company_name, string order_index, string company_order_index,string purchase_person, string day, string month, string year, 
-            int pageindex = 1, int pagesize = 8)
+            int pageindex = 1, int pagesize = 20)
         {
             ViewBag.company_name = company_name;
             ViewBag.order_index = order_index;
@@ -233,7 +233,7 @@ namespace WebApplication.Controllers
 
             if (start_time == null)
             {
-                start_time = "2001-01-01";
+                start_time = "0001-01-01";
             }
             if (end_time == null)
             {
@@ -242,7 +242,7 @@ namespace WebApplication.Controllers
 
             if (deliver_start_time == null)
             {
-                deliver_start_time = "2001-01-01";
+                deliver_start_time = "0001-01-01";
             }
             if (deliver_end_time == null)
             {

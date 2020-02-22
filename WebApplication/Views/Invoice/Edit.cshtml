@@ -127,7 +127,7 @@
                                         <div class="form-group">
                                             <label for="example-input-normal" class="col-sm-4 control-label">客户名称</label>
                                             <div class="col-sm-3">
-                                                <select class="selectpicker" data-live-search="true" data-live-search-placeholder="搜索" id="company_name" name="company_name">
+                                                <select class="selectpicker" data-live-search="true" data-live-search-placeholder="搜索" id="company_name" name="company_name" @if (Model != null) { <text> disabled</text>}>
                                                     <option value=""></option>
                                                     @{
                                                         CompanyManager CM = new CompanyManager();
@@ -149,7 +149,7 @@
                                         <div class="form-group">
                                             <label for="example-input-normal" class="col-sm-4 control-label">发票号</label>
                                             <div class="col-sm-4">
-                                                <input type="text" class="form-control" id="invoice_index" name="invoice_index" style="width:220px" value="@if (Model!=null) { @Model.invoice_index; } " />
+                                                <input type="text" class="form-control" id="invoice_index" name="invoice_index" style="width:220px" value="@if (Model!=null) { @Model.invoice_index; }" @if (Model != null) { <text>readonly</text>} />
                                             </div>
                                         </div>
 

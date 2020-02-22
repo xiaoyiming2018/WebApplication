@@ -24,17 +24,15 @@
 
             $(".sidebar ul li:nth-of-type(5) ul li:nth-of-type(@if (ViewBag.flag == null) {<text>2</text> } else { <text>3</text>} )").addClass("active")
             $('#submit').click(function () {
-                    var flag = 0;
-                    var deliver_index = $('#deliver_index').val()
-                var order_index = $('#order_index').val()
-                if (deliver_index == null || order_index == null) {
+                var flag = 0;
+                var deliver_index = $('#deliver_index').val()
+                if (deliver_index == null) {
                         swal("信息不能为空！", "", "error");
                     }
                     else {
                         var inputNum = document.getElementById('inputNum').value;
                         var return_index = document.getElementById('return_index').value;
                         var deliver_index = $('#deliver_index').val()
-                        var order_index = $('#order_index').val()
 
                     var seq_idList = document.getElementsByName("seq_id");
                         var real_numList = document.getElementsByName("real_num");
@@ -83,7 +81,7 @@
                                         $('input:hidden[name="__RequestVerificationToken"]').val());
                                 },
                             data: {
-                                inputNum: inputNum, return_index: return_index, deliver_index: deliver_index, order_index: order_index,
+                                inputNum: inputNum, return_index: return_index, deliver_index: deliver_index,
                                 Seq_Id: Seq_Id, Return_Num: Return_Num, Return_Price: Return_Price, Return_All_Price: Return_All_Price, Remark: Remark
                             },
                             success: function (msg) {
@@ -107,17 +105,33 @@
 
         function getDeliverList() {
             var deliver_index = $('#deliver_index').val()
-            var order_index = $('#order_index').val()
-            if (deliver_index != "" && order_index!="") {
+            $.ajax({
+                type: "POST",
+                url: "/SaleReturn/GetDeliverList",
+                data: { deliver_index: deliver_index },
+                success: function (msg) {
+                    $('#deliver_div').html(msg);
+                },
+                error: function (msg) {
+                    swal("获取出货单失败！", "请重新操作！", "error");
+                }
+            });
+        }
+
+        function getProductPrice(id) {
+            var return_num = $('#return_num' + id + '').val()
+            var return_price = $('#return_price' + id + '').val()
+
+            if (return_price >= 0 && return_price >= 0) {
                 $.ajax({
                     type: "POST",
-                    url: "/SaleReturn/GetDeliverList",
-                    data: { deliver_index: deliver_index, order_index: order_index },
+                    url: "/SaleReturn/GetProductPrice",
+                    data: { id: id, return_num: return_num, return_price: return_price },
                     success: function (msg) {
-                        $('#deliver_div').html(msg);
+                        $('#price_div' + id + '').html(msg);
                     },
                     error: function (msg) {
-                        swal("获取出货单失败！","请重新操作！","error");
+                        swal("获取价格失败！", "", "error");
                     }
                 });
             }
@@ -253,26 +267,6 @@
                                             </div>
                                         </div>
 
-                                        <div class="form-group">
-                                            <label for="example-input-normal" class="col-sm-4 control-label">订单号</label>
-                                            <div class="col-sm-4">
-                                                <select class="selectpicker" data-live-search="true" data-live-search-placeholder="搜索" id="order_index" name="order_index" onchange="getDeliverList()">
-                                                    <option value=""></option>
-                                                    @{
-                                                        OrderManager OM = new OrderManager();
-                                                        List<Order> orderList = OM.SelectOrderForSaleReturnAll();
-                                                        if (orderList.Count > 0)
-                                                        {
-                                                            for (int i = 0; i < orderList.Count; i++)
-                                                            {
-                                                                <!option value="@orderList[i].order_index">@orderList[i].order_index</!option>
-                                                            }
-                                                        }
-                                                    }
-                                                </select>
-                                            </div>
-                                        </div>
-
                                         <div class="form-horizontal" id="deliver_div">
 
                                         </div>
@@ -307,7 +301,7 @@
                                         <tr>
                                             <th>序号</th>
                                             <th>送货单号</th>
-                                            <th>订单号</th>
+                                            <th>客户订单号</th>
                                             <th>名称规格</th>
                                             <th>单位</th>
                                             <th>退货数量</th>
@@ -336,7 +330,7 @@
                                         <tr>
                                             <td>@index</td>
                                             <td>@item.deliver_index</td>
-                                            <td>@item.order_index</td>
+                                            <td>@item.company_order_index</td>
                                             <td>@item.order_name</td>
                                             <td>@item.unit</td>
 

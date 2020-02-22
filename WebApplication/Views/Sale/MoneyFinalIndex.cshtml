@@ -1,5 +1,5 @@
 ﻿@{
-    @model IList<Model.SaleReturn>
+    @model IList<Model.Sale>
     @using Model;
     @using BLL;
 
@@ -20,8 +20,9 @@
         $(function () {
             $(".sidebar ul li:nth-of-type(5)").addClass("active open")
             $(".sidebar ul li:nth-of-type(5) ul li").removeClass()
-            $(".sidebar ul li:nth-of-type(5) ul li:nth-of-type(3)").addClass("active")
+            $(".sidebar ul li:nth-of-type(5) ul li:nth-of-type(6)").addClass("active")
         });
+
         function CheckOrCancleAll(obj) {
             if (obj.is(":checked")) {
                 $('input.form-control').prop('checked', false);
@@ -47,9 +48,7 @@
                 document.getElementById("month").value = "0";
                 document.getElementById("year").value = "0";
             }
-
         }
-
     </script>
 </head>
 <body>
@@ -61,7 +60,7 @@
                         <ol class="breadcrumb text-left">
                             <li><a href="/Supplier/Index">主页</a></li>
                             <li><a href="/Sale/Index">销售管理</a></li>
-                            <li class="active">历史退货记录</li>
+                            <li class="active">历史对账记录</li>
                         </ol>
                     </div>
                 </div>
@@ -72,40 +71,76 @@
                 <div class="col-lg-12">
                     <div class="card alert">
                         <div class="card-header">
-                            <form class="form-horizontal" action="/SaleReturn/ReturnHistoryIndex" method="post" id="myfrom">
+                            <form class="form-horizontal" action="/Sale/MoneyFinalIndex" method="post" id="myfrom">
                                 <div class="form-inline">
                                     <div class="form-group">
-                                        <label>退货单号：</label>
-                                        <select class="selectpicker" data-live-search="true" data-live-search-placeholder="搜索" id="return_index" name="return_index" style="padding:6px 50px">
+                                        <label>送货单号：</label>
+                                        <select class="selectpicker" data-live-search="true" data-live-search-placeholder="搜索" id="deliver_index" name="deliver_index" style="padding:6px 50px">
                                             <option value=""></option>
                                             @{
-                                                SaleReturnManager SM = new SaleReturnManager();
-                                                List<SaleReturn> saleList = SM.SelectAll(1, "2001-01-01", "2222-01-01");
+                                                SaleManager SM = new SaleManager();
+                                                List<Sale> saleList = SM.SelectDeliverList();
                                                 if (saleList.Count > 0)
                                                 {
                                                     for (int i = 0; i < saleList.Count; i++)
                                                     {
-                                                        <!option value="@saleList[i].return_index" @if (Model != null) { if (saleList[i].return_index == ViewBag.return_index) { <text> selected</text>}}>@saleList[i].return_index</!option>
+                                                        <!option value="@saleList[i].deliver_index" @if (Model != null) { if (saleList[i].deliver_index == ViewBag.deliver_index) { <text> selected</text>}}>@saleList[i].deliver_index</!option>
                                                     }
                                                 }
                                             }
                                         </select>
                                     </div>
                                     <div class="form-group">
-                                        <label>名称规格：</label>
-                                        <input id="order_name" name="order_name" type="text" class="form-control" value="@ViewBag.order_name" />
+                                        <label>客户名称：</label>
+                                        <select class="selectpicker" data-live-search="true" data-live-search-placeholder="搜索" id="deliver_company_head" name="deliver_company_head" style="padding:6px 50px">
+                                            <option value=""></option>
+                                            @{
+                                                CompanyManager CM = new CompanyManager();
+                                                List<Company> objList = CM.SelectAll(type: 0);
+                                                if (objList.Count > 0)
+                                                {
+                                                    for (int i = 0; i < objList.Count; i++)
+                                                    {
+                                                        <!option value="@objList[i].company_name" @if (Model != null) { if (objList[i].company_name == ViewBag.deliver_company_head) { <text> selected</text>}}>@objList[i].company_name</!option>
+                                                    }
+                                                }
+                                            }
+                                        </select>
                                     </div>
                                     <div class="form-group">
-                                        <label>退货开单开始时间：</label>
+                                        <label>送货开始时间：</label>
                                         <input id="start_time" name="start_time" type="text" class="form-control" style="width:180px" onclick="WdatePicker({ skin: 'whyGreen',dateFmt:'yyyy-MM-dd' })" value="@ViewBag.start_time" />
                                     </div>
                                     <div class="form-group">
-                                        <label>退货开单结束时间：</label>
+                                        <label>送货结束时间：</label>
                                         <input id="end_time" name="end_time" type="text" class="form-control" style="width:180px" onclick="WdatePicker({ skin: 'whyGreen',dateFmt:'yyyy-MM-dd' })" value="@ViewBag.end_time" />
                                     </div>
                                 </div>
                                 <br />
                                 <div class="form-inline">
+                                    <div class="form-group">
+                                        <label>对账单号：</label>
+                                        <input id="dz_index" name="dz_index" type="text" class="form-control" style="width:220px" value="@ViewBag.dz_index" />
+                                    </div>
+                                    <div class="form-group">
+                                        <label>名称规格：</label>
+                                        <input id="order_name" name="order_name" type="text" class="form-control" style="width:220px" value="@ViewBag.order_name" />
+                                    </div>
+                                    <div class="form-group">
+                                        <label>对账开始时间：</label>
+                                        <input id="confirm_start_time" name="confirm_start_time" type="text" class="form-control" style="width:180px" onclick="WdatePicker({ skin: 'whyGreen',dateFmt:'yyyy-MM-dd' })" value="@ViewBag.confirm_start_time" />
+                                    </div>
+                                    <div class="form-group">
+                                        <label>对账结束时间：</label>
+                                        <input id="confirm_end_time" name="confirm_end_time" type="text" class="form-control" style="width:180px" onclick="WdatePicker({ skin: 'whyGreen',dateFmt:'yyyy-MM-dd' })" value="@ViewBag.confirm_end_time" />
+                                    </div>
+                                </div>
+                                <br />
+                                <div class="form-inline">
+                                    <div class="form-group">
+                                        <label>&nbsp;&nbsp;&nbsp;&nbsp;发票号：</label>
+                                        <input id="invoice_index" name="invoice_index" type="text" class="form-control" style="width:220px" value="@ViewBag.invoice_index" />
+                                    </div>
                                     <div class="form-group">
                                         <label>本日</label>
                                         <input id="day" name="day" type="checkbox" class="form-control" onclick="CheckOrCancleAll($(this))" style="width:16px" value="0" @if (ViewBag.day == "1") { <text> checked</text> } />
@@ -117,16 +152,13 @@
                                     <div class="form-group">
                                         <label>本年</label>
                                         <input id="year" name="year" type="checkbox" class="form-control" onclick="CheckOrCancleAll($(this))" style="width:16px" value="0" @if (ViewBag.year == "1") { <text> checked</text> } />
-                                        <label>（退货开单日期）</label>
+                                        <label>（送货开单时间）</label>
                                     </div>
                                     <div class="form-group">
                                         <input type="submit" value="查询" class="btn btn-primary" style="width:80px" />
                                     </div>
                                 </div>
-
                                 <br />
-
-
                             </form>
                         </div>
                         <div class="card-body">
@@ -134,22 +166,26 @@
                                 <thead>
                                     <tr>
                                         <th>编号</th>
-                                        <th>退货单号</th>
+                                        <th>发票号</th>
+                                        <th>对账单号</th>
                                         <th>送货单号</th>
                                         <th>客户名称</th>
                                         <th>客户订单号</th>
+                                        <th>送货开单时间</th>
                                         <th>名称规格</th>
+                                        <th>送货数量</th>
                                         <th>单位</th>
-                                        <th>退货数量</th>
                                         @if (UserManager.Current.GetLevel >= UserLevelEnum.ProductManager)
                                         {
-                                            <th>退货单价</th>
-                                            <th>退货总价</th>
+                                            <th>送货单价</th>
+                                            <th>送货总价</th>
                                         }
-                                        <th>退货开单日期</th>
-                                        <th>退货确认时间</th>
-
-
+                                        @if (UserManager.Current.GetLevel >= UserLevelEnum.ProductManager)
+                                        {
+                                            <th>结款与否</th>
+                                            <th>结款方式</th>
+                                        }
+                                        <th>对账日期</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -159,28 +195,53 @@
                                         {
                                     <tr>
                                         <td>@index</td>
-                                        <td>@item.return_index</td>
+                                        <td>@item.invoice_index</td>
+                                        <td>@item.dz_index</td>
                                         <td>@item.deliver_index</td>
                                         <td>@item.deliver_company_head</td>
                                         <td>@item.company_order_index</td>
+                                        <td>@item.insert_time.ToString("yyyy-MM-dd")</td>
                                         <td>@item.order_name</td>
+                                        <td>@item.real_num</td>
                                         <td>@item.unit</td>
-                                        <td>@item.return_num</td>
                                         @if (UserManager.Current.GetLevel >= UserLevelEnum.ProductManager)
                                         {
-                                            <td>@item.return_price</td>
-                                            <td>@item.return_all_price</td>
-                                        }
+                                            <td>@item.deliver_price</td>
+                                            <td>@item.deliver_all_price</td>
+                                            @if (item.money_onoff == 0)
+                                            {
+                                                <td style="color:red">未结款</td>
+                                            }
+                                            else
+                                            {
+                                                <td style="color:green">已结款</td>
+                                            }
 
-                                        <td>@item.insert_time.ToString("yyyy-MM-dd")</td>
-                                        <td>@item.confirm_time.ToString("yyyy-MM-dd HH:mm:ss")</td>
+                                            @if (item.money_way == 0)
+                                            {
+                                                <td></td>
+                                            }
+                                            else if (item.money_way == 1)
+                                            {
+                                                <td>月结</td>
+                                            }
+                                            else if (item.money_way == 2)
+                                            {
+                                                <td>现金</td>
+                                            }
+                                            else
+                                            {
+                                                <td>小额支付</td>
+                                            }
+                                        }
+                                        <td>@item.confirm_time.ToString("yyyy-MM-dd")</td>
                                     </tr>
                                             index++;
                                         }
                                     }
                                 </tbody>
                             </table>
-                            <div class="page-nav" id="pageIndex">@Html.Raw(PagerHtmlString.Pager(ViewBag.model, "SaleReturn", "ReturnHistoryIndex", true))</div>
+                            <div class="page-nav" id="pageIndex">@Html.Raw(PagerHtmlString.Pager(ViewBag.model, "Sale", "MoneyFinalIndex", true))</div>
                         </div>
                     </div><!-- /# card -->
                 </div><!-- /# column -->

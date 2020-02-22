@@ -14,9 +14,9 @@ namespace BLL
         /// </summary>
         /// <param name="name"></param>
         /// <returns></returns>
-        public List<SaleReturn> SelectAll(int return_status,string start_time, string end_time, string return_index="")
+        public List<SaleReturn> SelectAll(int return_status,string start_time, string end_time, string return_index="", string order_name="")
         {
-            List<SaleReturn> objList = SS.SelectAll(return_status,start_time, end_time, return_index);
+            List<SaleReturn> objList = SS.SelectAll(return_status,start_time, end_time, return_index, order_name);
             return objList;
         }
 
@@ -82,9 +82,9 @@ namespace BLL
         /// </summary>
         /// <param name="obj"></param>
         /// <returns></returns>
-        public int UpdateReturnStatus(string return_index)
+        public int UpdateReturnStatus(string return_index,int seq_id)
         {
-            int count = SS.UpdateReturnStatus(return_index);
+            int count = SS.UpdateReturnStatus(return_index, seq_id);
             return count;
         }
 

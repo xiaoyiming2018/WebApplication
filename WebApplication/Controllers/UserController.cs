@@ -31,7 +31,7 @@ namespace WebApplication.Controllers
         /// <param name="page">分页页码</param>
         /// <param name="size">每页显示数量</param>
         /// <returns></returns>
-        public IActionResult Index(int pageindex = 1, int pagesize = 8)
+        public IActionResult Index(int pageindex = 1, int pagesize = 20)
         {
             string user_name = Request.Query["user_name"];
             if (!string.IsNullOrEmpty(user_name))
@@ -323,6 +323,11 @@ namespace WebApplication.Controllers
             {
                 throw ex;
             }
+        }
+
+        public IActionResult Test()
+        {
+            return View();
         }
 
     }

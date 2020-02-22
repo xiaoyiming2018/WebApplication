@@ -265,9 +265,43 @@
 
             });
 
+            $('#submitDzIndex').click(function () {
+                var dz_index_begin = $('#dz_index_begin').val();
+                if (dz_index_begin == "") {
+                    swal("您输入的内容有误！", "", "error");
+                }
+                else {
+                    $.ajax({
+                        type: "POST",
+                        url: "/Setting/Edit",
+                        beforeSend: function (xhr) {
+                            xhr.setRequestHeader("XSRF-TOKEN",
+                                $('input:hidden[name="__RequestVerificationToken"]').val());
+                        },
+                        data: {
+                            dz_index_begin: dz_index_begin
+                        },
+                        success: function (msg) {
+                            if (msg == "Success") {
+                                swal({ title: "执行成功!", text: "", type: "success" },
+                                    function () { window.location.href = '/Setting/Index'; });
+
+                            }
+                            else {
+                                swal("执行失败！", "", "error");
+                            }
+                        },
+                        error: function (msg) {
+                            swal("数据获取失败！", "", "error");
+                        }
+                    });
+                }
+
+            });
+
         });
-
-
+        
+        
 
         function SelectTipCategory(flag) {
             var TxtObjCategory = document.getElementById("category");
@@ -590,7 +624,7 @@
                 </div><!-- /# column -->
             </div>
 
-            <div class="row">      
+            <div class="row">
                 <div class="col-lg-6">
                     <div class="card alert">
                         <div class="card-header">
@@ -637,7 +671,41 @@
                     </div><!-- /# card -->
                 </div><!-- /# column -->
 
+                <div class="col-lg-6">
+                    <div class="card alert">
+                        <div class="card-header">
+                            <h4>对账单号开头设置</h4>
+                        </div>
+                        <br />
+                        <div class="card-body">
+                            <div class="form-horizontal">
+                                <div class="form-group">
+                                    <label for="example-input-normal" class="col-sm-4 control-label">当前对账单号开头：</label>
+                                    <div class="col-sm-6">
+                                        <input type="text" class="form-control" id="dz_index_old" name="dz_index_old" value="@ViewBag.dz_index_begin" readonly />
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="example-input-normal" class="col-sm-4 control-label">更新为：</label>
+                                    <div class="col-sm-6">
+                                        <input type="text" class="form-control" id="dz_index_begin" name="dz_index_begin" value="" />
+                                    </div>
+                                    <div class="col-sm-2">
+                                        <input type="button" id="submitDzIndex" class="btn btn-primary" style="padding:9px 13px" value="修改" />
+                                    </div>
+                                </div>
 
+                                <div class="form-group">
+                                    <label for="example-input-normal" class="col-sm-4 control-label">对账单号效果预览：</label>
+                                    <div class="col-sm-6">
+                                        <input type="text" class="form-control" id="dz_index_view" name="dz_index_view" value="@ViewBag.dz_index_view" readonly />
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div><!-- /# card -->
+                </div><!-- /# column -->
             </div><!-- /# row -->
         </div>
     </div><!-- /# container-fluid -->

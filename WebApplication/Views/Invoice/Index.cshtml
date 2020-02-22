@@ -22,10 +22,12 @@
             $(".sidebar ul li:nth-of-type(6) ul li:nth-of-type(1)").addClass("active")
         });
 
-        function confirmTiShi(id) {
+        function confirmTiShi() {
             var pay_type = $('#pay_type').val();
-            if (pay_type == "") {
-                swal("请选择付款方式！", "", "error");
+            var confirm_time = $('#confirm_time').val();
+            var id = $('#duizhang_id').val();
+            if (pay_type == "" || confirm_time=="") {
+                swal("信息不能为空！", "", "error");
             }
             else {
                 swal({
@@ -49,7 +51,7 @@
                                         $('input:hidden[name="__RequestVerificationToken"]').val());
                                 },
                                 data: {
-                                    id: id
+                                    id: id, pay_type: pay_type, confirm_time: confirm_time
                                 },
                                 success: function (msg) {
                                     if (msg == "Success") {
@@ -143,6 +145,12 @@
 
         }
 
+        function duiZhang(id)
+        {
+            $("#myModal").modal();
+            document.getElementById("duizhang_id").value = id;
+        }
+
     </script>
 </head>
 <body>
@@ -190,7 +198,7 @@
                                             <option value=""></option>
                                             @{
                                                 InvoiceManager IM = new InvoiceManager();
-                                                List<Invoice> invoiceList = IM.SelectAll(0,"2001-01-01","2222-01-01","0001-01-01","2222-01-01");
+                                                List<Invoice> invoiceList = IM.SelectAll(0, "2001-01-01", "2222-01-01", "0001-01-01", "2222-01-01");
                                                 if (invoiceList.Count > 0)
                                                 {
                                                     for (int i = 0; i < invoiceList.Count; i++)
@@ -210,7 +218,7 @@
                                         <input id="end_time" name="end_time" type="text" class="form-control" onclick="WdatePicker({ skin: 'whyGreen',dateFmt:'yyyy-MM-dd' })" value="@ViewBag.end_time" />
                                     </div>
                                 </div>
-                                <br/>
+                                <br />
                                 <div class="form-inline">
                                     <div class="form-group">
                                         <label>本日</label>
@@ -236,11 +244,11 @@
                                     }
 
                                 </div>
-                                
+
                             </form>
-                            
+
                         </div>
-                    <br/>
+                        <br />
                         <div class="card-body">
                             <table class="table table-responsive table-hover ">
                                 <thead>
@@ -258,7 +266,6 @@
                                         @if (UserManager.Current.GetLevel >= UserLevelEnum.ProductManager)
                                         {
                                             <th>编辑</th>
-                                            <th>付款方式</th>
                                         }
 
                                         @if (UserManager.Current.GetLevel >= UserLevelEnum.Boss)
@@ -273,52 +280,45 @@
                                         int index = 1;
                                         foreach (var item in Model)
                                         {
-                                    <tr>
-                                        <td>@index</td>
-                                        <td>@item.company_name</td>
+                                            <tr>
+                                                <td>@index</td>
+                                                <td>@item.company_name</td>
 
-                                        <td>@item.invoice_index</td>
-                                        @if (item.invoice_type == 0)
-                                        {
-                                            <td>普通发票</td>
-                                        }
-                                        else
-                                        {
-                                            <td>增值税专用发票</td>
-                                        }
-                                        <td>@item.invoice_time.ToString("yyyy-MM-dd")</td>
+                                                <td>@item.invoice_index</td>
+                                                @if (item.invoice_type == 0)
+                                                {
+                                                    <td>普通发票</td>
+                                                }
+                                                else
+                                                {
+                                                    <td>增值税专用发票</td>
+                                                }
+                                                <td>@item.invoice_time.ToString("yyyy-MM-dd")</td>
 
-                                        <td>@item.invoice_price</td>
-                                        <td>@item.invoice_ratio</td>
-                                        <td>@item.invoice_all_price</td>
+                                                <td>@item.invoice_price</td>
+                                                <td>@item.invoice_ratio</td>
+                                                <td>@item.invoice_all_price</td>
 
-                                        <td>@item.remark</td>
-                                        @if (UserManager.Current.GetLevel >= UserLevelEnum.ProductManager)
-                                        {
-                                            <td>
-                                                <input type="button" class="btn btn-primary" onclick="window.location.href = '/Invoice/Edit?id=@item.id'" value="编辑" />
-                                            </td>
-                                            <td>
-                                                <select class="form-control" id="pay_type" name="pay_type">
-                                                    <option value=""></option>
-                                                    <!option value="0">转账</!option>
-                                                    <!option value="1">现金</!option>
-                                                </select>
-                                            </td>
-                                        }
+                                                <td>@item.remark</td>
+                                                @if (UserManager.Current.GetLevel >= UserLevelEnum.ProductManager)
+                                                {
+                                                    <td>
+                                                        <input type="button" class="btn btn-primary" onclick="window.location.href = '/Invoice/Edit?id=@item.id'" value="编辑" />
+                                                    </td>                            
+                                                }
 
-                                        @if (UserManager.Current.GetLevel >= UserLevelEnum.Boss)
-                                        {
-                                            <td>
-                                                <input type="button" class="btn btn-primary" onclick="confirmTiShi(@item.id)" value="确认对账" />
-                                            </td>
+                                                @if (UserManager.Current.GetLevel >= UserLevelEnum.Boss)
+                                                {
+                                                    <td>
+                                                        <input type="button" class="btn btn-primary" onclick="duiZhang(@item.id)" value="确认对账" />
+                                                    </td>
 
-                                            <td>
-                                                <input type="button" class="btn btn-primary" onclick="deleteTiShi(@item.id)" value="删除" />
-                                            </td>
+                                                    <td>
+                                                        <input type="button" class="btn btn-primary" onclick="deleteTiShi(@item.id)" value="删除" />
+                                                    </td>
 
-                                        }
-                                    </tr>
+                                                }
+                                            </tr>
                                             index++;
                                         }
                                     }
@@ -331,6 +331,36 @@
             </div><!-- /# row -->
         </div>
     </div><!-- /# container-fluid -->
+
+    <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog" role="document" style="width:30%">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="myModalLabel">对账</h4>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" class="form-control" id="duizhang_id">
+                    <div class="form-group">
+                        <label for="txt_departmentname">付款方式</label>
+                        <select class="form-control" id="pay_type" name="pay_type">
+                            <option value=""></option>
+                            <option value="0">转账</option>
+                            <option value="1">现金</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="txt_parentdepartment">对账时间</label>
+                        <input type="text" id="confirm_time" name="confirm_time" class="form-control"  onclick="WdatePicker({ skin: 'whyGreen',dateFmt:'yyyy-MM-dd' })">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                    <button type="button" id="btn_submit" class="btn btn-primary" data-dismiss="modal" onclick="confirmTiShi()">确认</button>
+                </div>
+            </div>
+        </div>
+    </div>
 </body>
 </html>
 

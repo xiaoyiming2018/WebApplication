@@ -23,7 +23,7 @@
             $(".sidebar ul li:nth-of-type(5) ul li:nth-of-type(2)").addClass("active")
         });
 
-        function confirmTiShi(return_index) {
+        function confirmTiShi(return_index, seq_id) {
             swal({
                 title: "是否确认?",
                 text: "确认后将无法恢复 !",
@@ -39,13 +39,13 @@
                     if (isConfirm) {
                         $.ajax({
                             type: "POST",
-                            url: "/SaleReturn/Confirm?return_index=" + return_index + "",
+                            url: "/SaleReturn/Confirm",
                             beforeSend: function (xhr) {
                                 xhr.setRequestHeader("XSRF-TOKEN",
                                     $('input:hidden[name="__RequestVerificationToken"]').val());
                             },
                             data: {
-                                return_index: return_index
+                                return_index: return_index, seq_id: seq_id
                             },
                             success: function (msg) {
                                 if (msg == "Success") {
@@ -96,7 +96,7 @@
                                             <option value=""></option>
                                             @{
                                                 SaleReturnManager SM = new SaleReturnManager();
-                                                List<SaleReturn> saleList = SM.SelectAll(0,"2001-01-01", "2222-01-01");
+                                                List<SaleReturn> saleList = SM.SelectAll(0, "2001-01-01", "2222-01-01");
                                                 if (saleList.Count > 0)
                                                 {
                                                     for (int i = 0; i < saleList.Count; i++)
@@ -106,6 +106,10 @@
                                                 }
                                             }
                                         </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>名称规格：</label>
+                                        <input id="order_name" name="order_name" type="text" class="form-control" value="@ViewBag.order_name" />
                                     </div>
                                     <div class="form-group">
                                         <label>开始时间：</label>
@@ -141,18 +145,23 @@
                                     <tr>
                                         <th>编号</th>
                                         <th>退货单号</th>
-                                        <th>退货总数</th>
+                                        <th>送货单号</th>
+                                        <th>客户名称</th>
+                                        <th>客户订单号</th>
+                                        <th>名称规格</th>
+                                        <th>单位</th>
+                                        <th>退货数量</th>
                                         @if (UserManager.Current.GetLevel >= UserLevelEnum.ProductManager)
                                         {
+                                            <th>退货单价</th>
                                             <th>退货总价</th>
                                         }
-
                                         <th>退货开单日期</th>
-                                        @if (UserManager.Current.GetLevel >= UserLevelEnum.Boss)
+                                        @if (UserManager.Current.GetLevel >= UserLevelEnum.ProductManager)
                                         {
-                                            <th>退货详情</th>
+                                            <th>退货单确认</th>
                                         }
-                                        <th>退货单确认</th>
+
 
                                     </tr>
                                 </thead>
@@ -164,10 +173,15 @@
                                     <tr>
                                         <td>@index</td>
                                         <td>@item.return_index</td>
-
+                                        <td>@item.deliver_index</td>
+                                        <td>@item.deliver_company_head</td>
+                                        <td>@item.company_order_index</td>
+                                        <td>@item.order_name</td>
+                                        <td>@item.unit</td>
                                         <td>@item.return_num</td>
                                         @if (UserManager.Current.GetLevel >= UserLevelEnum.ProductManager)
                                         {
+                                            <td>@item.return_price</td>
                                             <td>@item.return_all_price</td>
                                         }
 
@@ -175,13 +189,7 @@
                                         @if (UserManager.Current.GetLevel >= UserLevelEnum.ProductManager)
                                         {
                                             <td>
-                                                <button class="btn btn-primary" onclick="window.location.href='/SaleReturn/Edit?return_index=@item.return_index'">退货详情</button>
-                                            </td>
-                                        }
-                                        @if (UserManager.Current.GetLevel >= UserLevelEnum.ProductManager)
-                                        {
-                                            <td>
-                                                <button class="btn btn-primary" onclick="confirmTiShi('@item.return_index')">确认</button>
+                                                <button class="btn btn-primary" onclick="confirmTiShi('@item.return_index',@item.seq_id)">确认</button>
                                             </td>
                                         }
 

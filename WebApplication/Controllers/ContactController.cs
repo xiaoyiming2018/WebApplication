@@ -21,7 +21,7 @@ namespace WebApplication.Controllers
         /// <param name="page">分页页码</param>
         /// <param name="size">每页显示数量</param>
         /// <returns></returns>
-        public IActionResult Index(string name,int pageindex = 1, int pagesize = 3)
+        public IActionResult Index(string name,int pageindex = 1, int pagesize = 5)
         {          
             int type = Convert.ToInt32(Request.Query["type"]);
 

@@ -92,8 +92,92 @@
                 document.getElementById("month").value = "0";
                 document.getElementById("year").value = "0";
             }
-
         }
+
+        function getPickerList()
+        {
+            var duizhangList = document.getElementsByName("duizhang");
+            var duizhang = new Array();
+            for (var i = 0; i < duizhangList.length; i++) {
+                var flag = duizhangList[i].checked;
+                if (flag) {
+                    duizhang.push(duizhangList[i].value);
+                }
+            }
+            var Dui_Zhang = duizhang.join(',');
+            $.ajax({
+                type: "POST",
+                url: "/Sale/GetPickerList",
+                data: { Dui_Zhang: Dui_Zhang },
+                success: function (msg) {
+                    $('#picker_list').html(msg);
+                    $('#myModalList').modal();
+                },
+                error: function (msg) {
+                    swal("您暂无勾选！", "请重新操作！", "error");
+                }
+            });
+        }
+
+        function getInvoice() {
+            $('#myModal').modal();
+        }
+
+        function putInvoice() {
+            var duizhangList = document.getElementsByName("duizhang");
+            var invoice_index = document.getElementById("invoice_index").value;
+            var duizhang = new Array();
+            for (var i = 0; i < duizhangList.length; i++) {
+                var flag = duizhangList[i].checked;
+                if (flag) {
+                    duizhang.push(duizhangList[i].value);
+                }
+            }
+            var Dui_Zhang = duizhang.join(',');
+            swal({
+                title: "是否关联此发票?",
+                text: "",
+                type: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#DD6B55",
+                confirmButtonText: "是",
+                cancelButtonText: "否",
+                closeOnConfirm: false,//true表示不需要点击确认,fasle需要点击确认后再关闭对话框
+                closeOnCancel: false //true表示不需要点击确认,fasle需要点击确认后再关闭对话框
+            },
+                function (isConfirm) {
+                    if (isConfirm) {
+                        $.ajax({
+                            type: "POST",
+                            url: "/Sale/PutInvoice",
+                            beforeSend: function (xhr) {
+                                xhr.setRequestHeader("XSRF-TOKEN",
+                                    $('input:hidden[name="__RequestVerificationToken"]').val());
+                            },
+                            data: {
+                                Dui_Zhang: Dui_Zhang, invoice_index: invoice_index
+                            },
+                            success: function (msg) {
+                                if (msg == "Success") {
+                                    swal({ title: "执行成功!", text: "", type: "success" },
+                                        function () { window.location.href = '/Sale/MoneyHistoryIndex'; });
+
+                                }
+                                else {
+                                    swal("执行失败！", "", "error");
+                                }
+                            },
+                            error: function (msg) {
+                                swal("数据获取失败！", "", "error");
+                            }
+                        });
+                    }
+                    else {
+                        swal("操作已终止 !", "该记录已保留 !", "error");
+                    }
+                });
+        }
+
     </script>
 </head>
 <body>
@@ -105,7 +189,7 @@
                         <ol class="breadcrumb text-left">
                             <li><a href="/Supplier/Index">主页</a></li>
                             <li><a href="/Sale/Index">销售管理</a></li>
-                            <li class="active">历史结款记录</li>
+                            <li class="active">销售发票对账</li>
                         </ol>
                     </div>
                 </div>
@@ -124,7 +208,7 @@
                                             <option value=""></option>
                                             @{
                                                 SaleManager SM = new SaleManager();
-                                                List<Sale> saleList = SM.SelectMoneyAll(1, "2001-01-01", "2222-01-01");
+                                                List<Sale> saleList = SM.SelectDeliverList();
                                                 if (saleList.Count > 0)
                                                 {
                                                     for (int i = 0; i < saleList.Count; i++)
@@ -153,12 +237,31 @@
                                         </select>
                                     </div>
                                     <div class="form-group">
-                                        <label>开始时间：</label>
-                                        <input id="start_time" name="start_time" type="text" class="form-control" onclick="WdatePicker({ skin: 'whyGreen',dateFmt:'yyyy-MM-dd' })" value="@ViewBag.start_time" />
+                                        <label>送货开始时间：</label>
+                                        <input id="start_time" name="start_time" type="text" class="form-control" style="width:180px" onclick="WdatePicker({ skin: 'whyGreen',dateFmt:'yyyy-MM-dd' })" value="@ViewBag.start_time" />
                                     </div>
                                     <div class="form-group">
-                                        <label>结束时间：</label>
-                                        <input id="end_time" name="end_time" type="text" class="form-control" onclick="WdatePicker({ skin: 'whyGreen',dateFmt:'yyyy-MM-dd' })" value="@ViewBag.end_time" />
+                                        <label>送货结束时间：</label>
+                                        <input id="end_time" name="end_time" type="text" class="form-control" style="width:180px" onclick="WdatePicker({ skin: 'whyGreen',dateFmt:'yyyy-MM-dd' })" value="@ViewBag.end_time" />
+                                    </div>
+                                </div>
+                                <br />
+                                <div class="form-inline">
+                                    <div class="form-group">
+                                        <label>对账单号：</label>
+                                        <input id="dz_index" name="dz_index" type="text" class="form-control" style="width:220px" value="@ViewBag.dz_index" />
+                                    </div>
+                                    <div class="form-group">
+                                        <label>名称规格：</label>
+                                        <input id="order_name" name="order_name" type="text" class="form-control" style="width:220px" value="@ViewBag.order_name" />
+                                    </div>
+                                    <div class="form-group">
+                                        <label>对账开始时间：</label>
+                                        <input id="confirm_start_time" name="confirm_start_time" type="text" class="form-control" style="width:180px" onclick="WdatePicker({ skin: 'whyGreen',dateFmt:'yyyy-MM-dd' })" value="@ViewBag.confirm_start_time" />
+                                    </div>
+                                    <div class="form-group">
+                                        <label>对账结束时间：</label>
+                                        <input id="confirm_end_time" name="confirm_end_time" type="text" class="form-control" style="width:180px" onclick="WdatePicker({ skin: 'whyGreen',dateFmt:'yyyy-MM-dd' })" value="@ViewBag.confirm_end_time" />
                                     </div>
                                 </div>
                                 <br />
@@ -174,9 +277,13 @@
                                     <div class="form-group">
                                         <label>本年</label>
                                         <input id="year" name="year" type="checkbox" class="form-control" onclick="CheckOrCancleAll($(this))" style="width:16px" value="0" @if (ViewBag.year == "1") { <text> checked</text> } />
+                                        <label>（送货开单时间）</label>
                                     </div>
                                     <div class="form-group">
                                         <input type="submit" value="查询" class="btn btn-primary" style="width:80px" />
+                                    </div>
+                                    <div class="form-group">
+                                        <input type="button" value="关联发票" class="btn btn-primary" style="width:80px" onclick="getPickerList()" />
                                     </div>
                                 </div>
                                 <br />
@@ -187,20 +294,28 @@
                                 <thead>
                                     <tr>
                                         <th>编号</th>
+                                        <th>对账单号</th>
                                         <th>送货单号</th>
                                         <th>客户名称</th>
-                                        <th>送货总数</th>
+                                        <th>客户订单号</th>
+                                        <th>送货开单时间</th>
+                                        <th>名称规格</th>
+                                        <th>送货数量</th>
+                                        <th>单位</th>
                                         @if (UserManager.Current.GetLevel >= UserLevelEnum.ProductManager)
                                         {
+                                            <th>送货单价</th>
                                             <th>送货总价</th>
+                                        }
+                                        @if (UserManager.Current.GetLevel >= UserLevelEnum.ProductManager)
+                                        {
                                             <th>结款与否</th>
                                             <th>结款方式</th>
                                         }
-                                        <th>确认结款时间</th>
-                                        <th>送货详情</th>
+                                        <th>对账日期</th>
                                         @if (UserManager.Current.GetLevel >= UserLevelEnum.Boss)
                                         {
-                                            <th>取消确认</th>
+                                            <th>关联发票</th>
                                         }
                                     </tr>
                                 </thead>
@@ -209,54 +324,55 @@
                                         int index = 1;
                                         foreach (var item in Model)
                                         {
-                                    <tr>
-                                        <td>@index</td>
-                                        <td>@item.deliver_index</td>
-                                        <td>@item.deliver_company_head</td>
-                                        <td>@item.real_num</td>
-                                        @if (UserManager.Current.GetLevel >= UserLevelEnum.ProductManager)
-                                        {
-                                            <td>@item.deliver_all_price</td>
-                                            @if (item.money_onoff == 0)
-                                            {
-                                                <td style="color:red">未结款</td>
-                                            }
-                                            else
-                                            {
-                                                <td style="color:green">已结款</td>
-                                            }
+                                            <tr>
+                                                <td>@index</td>
+                                                <td>@item.dz_index</td>
+                                                <td>@item.deliver_index</td>
+                                                <td>@item.deliver_company_head</td>
+                                                <td>@item.company_order_index</td>
+                                                <td>@item.insert_time.ToString("yyyy-MM-dd")</td>
+                                                <td>@item.order_name</td>
+                                                <td>@item.real_num</td>
+                                                <td>@item.unit</td>
+                                                @if (UserManager.Current.GetLevel >= UserLevelEnum.ProductManager)
+                                                {
+                                                    <td>@item.deliver_price</td>
+                                                    <td>@item.deliver_all_price</td>
+                                                    @if (item.money_onoff == 0)
+                                                    {
+                                                        <td style="color:red">未结款</td>
+                                                    }
+                                                    else
+                                                    {
+                                                        <td style="color:green">已结款</td>
+                                                    }
 
-                                            @if (item.money_way == 0)
-                                            {
-                                                <td></td>
-                                            }
-                                            else if (item.money_way == 1)
-                                            {
-                                                <td>月结</td>
-                                            }
-                                            else if (item.money_way == 2)
-                                            {
-                                                <td>现金</td>
-                                            }
-                                            else
-                                            {
-                                                <td>小额支付</td>
-                                            }
-                                        }
+                                                    @if (item.money_way == 0)
+                                                    {
+                                                        <td></td>
+                                                    }
+                                                    else if (item.money_way == 1)
+                                                    {
+                                                        <td>月结</td>
+                                                    }
+                                                    else if (item.money_way == 2)
+                                                    {
+                                                        <td>现金</td>
+                                                    }
+                                                    else
+                                                    {
+                                                        <td>小额支付</td>
+                                                    }
+                                                }
+                                                <td>@item.confirm_time.ToString("yyyy-MM-dd")</td>
+                                                @if (UserManager.Current.GetLevel >= UserLevelEnum.Boss)
+                                                {
 
-                                        <td>@item.confirm_time</td>
-                                        <td>
-                                            <button class="btn btn-primary" onclick="window.location.href = '/Sale/MoneySeqIndex?deliver_index=@item.deliver_index&deliver_status=1'">送货详情</button>
-                                        </td>
-                                        @if (UserManager.Current.GetLevel >= UserLevelEnum.Boss)
-                                        {
-
-                                            <td>
-                                                <input type="button" class="btn btn-default" onclick="confirmTiShi('@item.deliver_index')" value="取消确认" />
-
-                                            </td>
-                                        }
-                                    </tr>
+                                                    <td>
+                                                        <input name="duizhang" type="checkbox" style="width:18px;height:18px;" value="@item.deliver_index+@item.seq_id" />
+                                                    </td>
+                                                }
+                                            </tr>
                                             index++;
                                         }
                                     }
@@ -269,6 +385,61 @@
             </div><!-- /# row -->
         </div>
     </div><!-- /# container-fluid -->
+
+    <div class="modal fade" id="myModalList" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="myModalLabel">已勾选列表</h4>
+                </div>
+                <div class="modal-body" id="picker_list">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                    <button type="button" class="btn btn-primary" data-dismiss="modal" onclick="getInvoice()">关联发票</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog" role="document" style="width:20%">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="myModalLabel">关联发票</h4>
+                </div>
+                <div class="modal-body" id="picker_list">
+                    <div class="form-group">
+                        <label for="txt_departmentname">发票号</label>
+                    </div>
+                    <div class="form-group">
+                        <select class="selectpicker" data-live-search="true" data-live-search-placeholder="搜索" id="invoice_index" name="invoice_index" style="padding:6px 50px">
+                            <option value=""></option>
+                            @{
+                                InvoiceManager IM = new InvoiceManager();
+                                List<Invoice> invoices = IM.SelectAllInvoice();
+                                if (invoices.Count > 0)
+                                {
+                                    for (int i = 0; i < invoices.Count; i++)
+                                    {
+                                        <!option value="@invoices[i].invoice_index">@invoices[i].invoice_index</!option>
+                                    }
+                                }
+                            }
+                        </select>
+                    </div>
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                    <button type="button" class="btn btn-primary" data-dismiss="modal" onclick="putInvoice()">保存</button>
+                </div>
+            </div>
+        </div>
+    </div>
 </body>
 </html>
 

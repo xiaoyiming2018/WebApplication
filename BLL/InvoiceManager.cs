@@ -21,6 +21,17 @@ namespace BLL
         }
 
         /// <summary>
+        /// 查询所有
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
+        public List<Invoice> SelectAllInvoice()
+        {
+            List<Invoice> objList = IS.SelectAllInvoice();
+            return objList;
+        }
+
+        /// <summary>
         /// 模糊查询结果为一笔或多笔数据
         /// </summary>
         /// <param name="name"></param>
@@ -58,9 +69,9 @@ namespace BLL
         /// </summary>
         /// <param name="obj"></param>
         /// <returns></returns>
-        public int UpdateStatus(int id, int pay_type)
+        public int UpdateStatus(int id, string confirm_time, int pay_type)
         {
-            int count = IS.UpdateStatus(id, pay_type);
+            int count = IS.UpdateStatus(id, confirm_time, pay_type);
             return count;
         }
 

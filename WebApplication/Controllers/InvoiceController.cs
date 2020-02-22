@@ -21,7 +21,7 @@ namespace WebApplication.Controllers
         /// <param name="size">每页显示数量</param>
         /// <returns></returns>
         public IActionResult Index(string start_time, string end_time,string invoice_index, string company_name,
-            string day, string month, string year, int pageindex = 1, int pagesize = 8)
+            string day, string month, string year, int pageindex = 1, int pagesize = 20)
         {
             ViewBag.start_time = start_time;
             ViewBag.end_time = end_time;
@@ -30,7 +30,7 @@ namespace WebApplication.Controllers
             
             if (start_time == null)
             {
-                start_time = "2001-01-01";
+                start_time = "0001-01-01";
             }
             if (end_time == null)
             {
@@ -154,7 +154,8 @@ namespace WebApplication.Controllers
             {
                 int id = Convert.ToInt32(Request.Query["id"]);
                 int pay_type = Convert.ToInt32(Request.Query["pay_type"]);
-                int count = IM.UpdateStatus(id, pay_type);
+                string confirm_time = Convert.ToDateTime(HttpContext.Request.Form["confirm_time"]).ToString("yyyy-MM-dd HH:mm:ss");
+                int count = IM.UpdateStatus(id, confirm_time, pay_type);
                 if (count>0)
                 {
                     return Json("Success");
@@ -214,7 +215,7 @@ namespace WebApplication.Controllers
         /// <param name="size">每页显示数量</param>
         /// <returns></returns>
         public IActionResult HistoryIndex(string start_time, string end_time, string confirm_start_time, string confirm_end_time, string invoice_index, string company_name, 
-            string day, string month, string year, int pageindex = 1, int pagesize = 8)
+            string day, string month, string year, int pageindex = 1, int pagesize = 20)
         {
 
             ViewBag.start_time = start_time;
@@ -226,7 +227,7 @@ namespace WebApplication.Controllers
 
             if (start_time == null)
             {
-                start_time = "2001-01-01";
+                start_time = "0001-01-01";
             }
             if (end_time == null)
             {
@@ -235,7 +236,7 @@ namespace WebApplication.Controllers
 
             if (confirm_start_time == null)
             {
-                confirm_start_time = "2001-01-01";
+                confirm_start_time = "0001-01-01";
             }
             if (confirm_end_time == null)
             {

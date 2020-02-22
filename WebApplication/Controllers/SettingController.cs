@@ -26,6 +26,7 @@ namespace WebApplication.Controllers
             Setting settingPurchase = SM.SelectInUse(4);
             Setting settingDeliver = SM.SelectInUse(5);
             Setting settingReturn = SM.SelectInUse(7);
+            Setting settingDz = SM.SelectInUse(8);
             //订单开头
             ViewBag.order_index_begin = settingOrder.index_begin;
             ViewBag.order_index_view = settingOrder.index_begin + "20190101001";
@@ -38,6 +39,9 @@ namespace WebApplication.Controllers
             //退货单开头
             ViewBag.return_index_begin = settingReturn.index_begin;
             ViewBag.return_index_view = settingReturn.index_begin + "20190101001";
+            //对账单号开头
+            ViewBag.dz_index_begin = settingDz.index_begin;
+            ViewBag.dz_index_view = settingDz.index_begin + "000001";
             return View();
             
         }
@@ -47,7 +51,7 @@ namespace WebApplication.Controllers
         /// </summary>
         /// <returns></returns>
         public IActionResult Edit(string material_unit,string category, string order_index_begin, string purchase_index_begin, 
-            string deliver_index_begin, string deliver_company_head,string return_index_begin)
+            string deliver_index_begin, string deliver_company_head,string return_index_begin,string dz_index_begin)
         {
             try
             {
@@ -56,8 +60,8 @@ namespace WebApplication.Controllers
                 {
                     res.config_list = material_unit;
                     res.all_type = 1;
-                    int count=SM.Insert(res);
-                    if (count>0)
+                    int count = SM.Insert(res);
+                    if (count > 0)
                     {
                         return Json("Success");
                     }
@@ -65,7 +69,7 @@ namespace WebApplication.Controllers
                     {
                         return Json("Fail");
                     }
-                    
+
                 }
                 else if (!string.IsNullOrEmpty(category))
                 {
@@ -126,7 +130,7 @@ namespace WebApplication.Controllers
                         return Json("Fail");
                     }
                 }
-                else if(!string.IsNullOrEmpty(deliver_company_head))
+                else if (!string.IsNullOrEmpty(deliver_company_head))
                 {
                     res.config_list = deliver_company_head;
                     res.all_type = 6;
@@ -140,10 +144,25 @@ namespace WebApplication.Controllers
                         return Json("Fail");
                     }
                 }
-                else
+                else if (!string.IsNullOrEmpty(return_index_begin))
                 {
                     res.index_begin = return_index_begin;
                     res.all_type = 7;
+                    res.in_use = 1;
+                    int count = SM.Update(res);
+                    if (count > 0)
+                    {
+                        return Json("Success");
+                    }
+                    else
+                    {
+                        return Json("Fail");
+                    }
+                }
+                else
+                {
+                    res.index_begin = dz_index_begin;
+                    res.all_type = 8;
                     res.in_use = 1;
                     int count = SM.Update(res);
                     if (count > 0)

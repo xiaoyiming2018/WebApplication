@@ -106,22 +106,25 @@
             });
         });
 
-    function getOrderList() {
-    var order_id = $('#order_id').val();
-    if (order_id > 0) {
-        $.ajax({
-            type: "POST",
-            url: "/Sale/GetOrderList",
-            data: { order_id: order_id },
-            success: function (msg) {
-                $('#order_div').html(msg);
-            },
-            error: function (msg) {
-                swal("获取订单失败！", "请重新操作！", "error");
-                }
-            });
+
+        function getOrderList() {
+            var order_id = $('#order_id').val();
+            if (order_id == null || order_id=="" ) { order_id = 0; }
+            var deliver_company_head = $('#deliver_company_head').val();
+            if (order_id >= 0) {
+            $.ajax({
+                type: "POST",
+                url: "/Sale/GetOrderList",
+                data: { order_id: order_id, deliver_company_head:deliver_company_head },
+                success: function (msg) {
+                    $('#order_div').html(msg);
+                },
+                error: function (msg) {
+                    swal("获取订单失败！", "请重新操作！", "error");
+                    }
+                });
+            }
         }
-    }
 
         function doPrint() {
             
@@ -133,8 +136,7 @@
                 $("#deliver_head").html(company_head);
                 window.print();
                 return false;
-            }
-            
+            }            
         };
 
     window.onbeforeprint = function () {
@@ -258,7 +260,8 @@
                                         <div class="form-group">
                                             <label for="example-input-normal" class="col-sm-4 control-label">客户名称</label>
                                             <div class="col-sm-3">
-                                                <select class="selectpicker" data-live-search="true" data-live-search-placeholder="搜索" data-size="5" id="deliver_company_head" name="deliver_company_head" @if (Model != null) { <text> disabled</text>}>
+                                                <select class="selectpicker" data-live-search="true" data-live-search-placeholder="搜索" data-size="5" 
+                                                        id="deliver_company_head" name="deliver_company_head" @if (Model != null) { <text> disabled</text>} onchange="getOrderList()" >
                                                     <option value=""></option>
                                                     @{
                                                         CompanyManager CM = new CompanyManager();
@@ -277,7 +280,7 @@
                                         </div>
 
                                         <div class="form-group">
-                                            <label for="example-input-normal" class="col-sm-4 control-label">订单号</label>
+                                            <label for="example-input-normal" class="col-sm-4 control-label">客户订单号</label>
                                             <div class="col-sm-3">
                                                 <select class="selectpicker" data-live-search="true" data-live-search-placeholder="搜索" id="order_id" name="order_id" onchange="getOrderList();">
                                                     <option value=""></option>
@@ -288,7 +291,7 @@
                                                         {
                                                             for (int i = 0; i < objList.Count; i++)
                                                             {
-                                                                <!option value="@objList[i].order_id">@objList[i].order_index</!option>
+                                                                <!option value="@objList[i].order_id">@objList[i].company_order_index</!option>
                                                             }
                                                         }
                                                     }
@@ -341,20 +344,20 @@
                             <input type="hidden" value="@ViewBag.deliver_index" id="deliver_index" name="deliver_index" />
                             
                             <hr />
-                            <form class="form-inline" action="/Sale/Edit?deliver_index=@ViewBag.deliver_index" method="post" id="myfrom">
+                            @*<form class="form-inline" action="/Sale/Edit?deliver_index=@ViewBag.deliver_index" method="post" id="myfrom">
                                 <div class="form-group">
-                                    <label>订单号：</label>
-                                    <input id="order_index" name="order_index" type="text" class="form-control" style="height:36px" value="@ViewBag.order_index" />
+                                    <label>客户订单号：</label>
+                                    <input id="company_order_index" name="company_order_index" type="text" class="form-control" style="height:36px" value="@ViewBag.company_order_index" />
                                     <label>名称规格：</label>
                                     <input id="order_name" name="order_name" type="text" class="form-control" style="height:36px" value="@ViewBag.order_name" />
                                 </div>
                                 <div class="form-group">
                                     <input type="submit" value="查询" class="btn btn-primary" />
                                 </div>
-                            </form>
+                            </form>*@
 
                         </div>
-
+                    <br />
                         <div class="card-body">
                             
                             @if (Model != null)
@@ -391,7 +394,7 @@
                                             {
                                                 <tr>
                                                     <td>@index</td>
-                                                    <td>@item.order_index</td>
+                                                    <td>@item.company_order_index</td>
                                                     <td>@item.order_name</td>
                                                     <td>@item.unit</td>
 
@@ -438,10 +441,16 @@
                 <table class="table" border="0" cellspacing="0" cellpadding="0">
                     <tbody>
                         <tr style="font-weight:bold">
-                            <td style="font-size:30px;text-align:center;padding:2px;border:0;" colspan="6"><span id="deliver_head">昆山市欧锐吉五金商行</span></td>
+                            <td style="font-size:26px;text-align:center;padding:2px;border:0;" colspan="6"><span id="deliver_head">昆山市欧锐吉五金商行</span></td>
                         </tr>
                         <tr style="font-weight:bold">
-                            <td style="font-size:25px;text-align:center;padding:2px;border:0;" colspan="6">送货单</td>
+                            <td style="font-size:24px;text-align:center;padding:2px;border:0;" colspan="6"></td>
+                        </tr>
+                        <tr style="font-weight:bold">
+                            <td style="font-size:24px;text-align:center;padding:2px;border:0;" colspan="6"></td>
+                        </tr>
+                        <tr style="font-weight:bold">
+                            <td style="font-size:24px;text-align:center;padding:2px;border:0;" colspan="6">送货单</td>
                         </tr>
                         <tr>
                             <td style="padding:2px;border:0;text-align:left;width:100px">客户名称：</td>
@@ -483,7 +492,7 @@
                             {
                                 <tr>
                                     <td>@index1</td>
-                                    <td>@item.order_index</td>
+                                    <td>@item.company_order_index</td>
                                     <td>@item.order_name</td>
                                     <td>@item.unit</td>
                                     <td>@item.real_num</td>

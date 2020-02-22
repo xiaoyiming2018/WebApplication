@@ -55,7 +55,7 @@ namespace BLL
         
 
         /// <summary>
-        /// 根据id查询
+        /// 查询某一订单涉及的送货单
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
@@ -92,15 +92,48 @@ namespace BLL
         /// </summary>
         /// <param name="name"></param>
         /// <returns></returns>
+        public List<Sale> SelectDeliverList()
+        {
+            List<Sale> objList = SS.SelectDeliverList();
+            return objList;
+        }
+
+        /// <summary>
+        /// 模糊查询结果为一笔或多笔数据
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
         public List<Sale> SelectForReturnIndex()
         {
             List<Sale> objList = SS.SelectForReturnIndex();
             return objList;
         }
 
-        public List<Sale> SelectMoneyAll(int deliver_status,string start_time, string end_time, string deliver_index="", string deliver_company_head="")
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="deliver_status">0：未对账，1：已对账但未绑定发票，2：历史（已对账+已绑定发票）</param>
+        /// <param name="start_time"></param>
+        /// <param name="end_time"></param>
+        /// <param name="deliver_index"></param>
+        /// <param name="deliver_company_head"></param>
+        /// <returns></returns>
+        public List<Sale> SelectMoneyAll(int deliver_status,string start_time, string end_time, string confirm_start_time, string confirm_end_time, 
+            string deliver_index="", string deliver_company_head="", string order_name="", string dz_index="", string invoice_index="")
         {
-            List<Sale> objList = SS.SelectMoneyAll(deliver_status,start_time, end_time, deliver_index, deliver_company_head);
+            List<Sale> objList = SS.SelectMoneyAll(deliver_status,start_time, end_time, confirm_start_time, confirm_end_time, deliver_index, 
+                deliver_company_head, order_name, dz_index, invoice_index);
+            return objList;
+        }
+
+        /// <summary>
+        /// 查询目前对账单的个数
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
+        public List<Sale> SelectForDzIndex()
+        {
+            List<Sale> objList = SS.SelectForDzIndex();
             return objList;
         }
 
@@ -136,7 +169,28 @@ namespace BLL
             int count = SS.UpdateDeliverHead(deliver_company_head, deliver_index);
             return count;
         }
+        /// <summary>
+        /// 更新
+        /// </summary>
+        /// <param name="obj"></param>
+        /// <returns></returns>
+        public int UpdateDzIndex(string dz_index, string deliver_index, int seq_id)
+        {
+            int count = SS.UpdateDzIndex(dz_index, deliver_index, seq_id);
+            return count;
+        }
 
+        /// <summary>
+        /// 更新
+        /// </summary>
+        /// <param name="obj"></param>
+        /// <returns></returns>
+        public int UpdateInvoiceIndex(string invoice_index, string deliver_index, int seq_id)
+        {
+            int count = SS.UpdateInvoiceIndex(invoice_index, deliver_index, seq_id);
+            return count;
+        }
+        
         /// <summary>
         /// 更新
         /// </summary>
@@ -145,6 +199,17 @@ namespace BLL
         public int UpdateDeliverStatus(Sale obj)
         {
             int count = SS.UpdateDeliverStatus(obj);
+            return count;
+        }
+
+        /// <summary>
+        /// 更新
+        /// </summary>
+        /// <param name="obj"></param>
+        /// <returns></returns>
+        public int UpdateDeliverStatusInvoice(Sale obj)
+        {
+            int count = SS.UpdateDeliverStatusInvoice(obj);
             return count;
         }
 

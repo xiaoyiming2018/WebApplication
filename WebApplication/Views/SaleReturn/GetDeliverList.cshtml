@@ -35,12 +35,12 @@
             <td>@item.purchase_person</td>
             <td hidden><input type="text" name="real_num" style="width:100px" value="@item.real_num" /></td>
             <td>
-                <input type="text" name="return_num" style="width:80px;border-left-style:none;border-top-style:none;border-right-style:none;" />
+                <input type="text" id="return_num@{@item.seq_id}" name="return_num" style="width:80px;border-left-style:none;border-top-style:none;border-right-style:none;" onchange="getProductPrice(@item.seq_id)"/>
             </td>
             <td>
-                <input type="text" name="return_price" style="width:80px;border-left-style:none;border-top-style:none;border-right-style:none;" />
+                <input type="text" id="return_price@{@item.seq_id}" name="return_price" style="width:80px;border-left-style:none;border-top-style:none;border-right-style:none;" onchange="getProductPrice(@item.seq_id)"/>
             </td>
-            <td>
+            <td id="price_div@{@item.seq_id}">
                 <input type="text" name="return_all_price" style="width:80px;border-left-style:none;border-top-style:none;border-right-style:none;" />
             </td>
             <td>

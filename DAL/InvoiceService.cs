@@ -26,8 +26,35 @@ namespace DAL
                     "from jinchen.invoice_info a " +
                     "where a.invoice_index ~* '{0}' and a.company_name ~* '{1}' and a.status={2} and to_char(invoice_time,'yyyy-MM-dd')>='{3}' " +
                     "and to_char(invoice_time,'yyyy-MM-dd')<='{4}' and to_char(confirm_time,'yyyy-MM-dd')>='{5}' and to_char(confirm_time,'yyyy-MM-dd')<='{6}' " +
-                    "order by a.invoice_time desc";
+                    "order by a.invoice_index";
                 sql = string.Format(sql, invoice_index, company_name, status,start_time,end_time, confirm_start_time, confirm_end_time);
+
+                objList = PostgreHelper.GetEntityList<Invoice>(sql);
+
+                return objList;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        /// <summary>
+        /// 查询所有
+        /// </summary>
+        /// <param name="invoice_name"></param>
+        /// <param name="company_name"></param>
+        /// <returns></returns>
+        public List<Invoice> SelectAllInvoice()
+        {
+            try
+            {
+                List<Invoice> objList = new List<Invoice>();
+                string sql = null;
+                sql = "select a.invoice_index from jinchen.invoice_info a " +
+                    "group by a.invoice_index " +
+                    "order by a.invoice_index";
+                sql = string.Format(sql);
 
                 objList = PostgreHelper.GetEntityList<Invoice>(sql);
 
@@ -120,13 +147,13 @@ namespace DAL
         /// </summary>
         /// <param name="obj"></param>
         /// <returns></returns>
-        public int UpdateStatus(int id,int pay_type)
+        public int UpdateStatus(int id,string confirm_time, int pay_type)
         {
             try
             {
                 int count = 0;
                 string sql = "update jinchen.invoice_info set status=1,confirm_time='{0}',pay_type={1} where id={2}";
-                sql = string.Format(sql,DateTime.Now.ToLocalTime().ToString("yyyy-MM-dd HH:mm:ss"),pay_type, id);
+                sql = string.Format(sql, confirm_time, pay_type, id);
                 count = PostgreHelper.ExecuteNonQuery(sql);
                 return count;
             }

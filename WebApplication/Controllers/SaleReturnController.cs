@@ -23,23 +23,24 @@ namespace WebApplication.Controllers
         /// <param name="page">分页页码</param>
         /// <param name="size">每页显示数量</param>
         /// <returns></returns>
-        public IActionResult Index(string start_time, string end_time, string return_index,int pageindex = 1, int pagesize = 8)
+        public IActionResult Index(string start_time, string end_time, string return_index, string order_name,int pageindex = 1, int pagesize = 20)
         {
             ViewBag.start_time = start_time;
             ViewBag.end_time = end_time;
 
             ViewBag.return_index = return_index;
+            ViewBag.order_name = order_name;
 
             if (start_time == null)
             {
-                start_time = "2001-01-01";
+                start_time = "0001-01-01";
             }
             if (end_time == null)
             {
                 end_time = "2222-01-01";
             }
 
-            var objList = SM.SelectAll(0, start_time, end_time, return_index);
+            var objList = SM.SelectAll(0, start_time, end_time, return_index, order_name);
             var pagedList = PagedList<SaleReturn>.PageList(pageindex, pagesize, objList);
             ViewBag.model = pagedList.Item2;
             return View(pagedList.Item1);
@@ -192,6 +193,17 @@ namespace WebApplication.Controllers
         }
 
         /// <summary>
+        /// 获取价格
+        /// </summary>
+        /// <returns></returns>
+        public IActionResult GetProductPrice(int id, int return_num, double return_price)
+        {
+            ViewBag.return_all_price = return_num * return_price;
+            ViewBag.id = "return_all_price" + id;
+            return View();
+        }
+
+        /// <summary>
         /// 确认数据
         /// </summary>
         /// <returns></returns>
@@ -200,29 +212,27 @@ namespace WebApplication.Controllers
             try
             {
                 //将退单状态改为1，保存到退单历史
-                string return_index = Convert.ToString(Request.Query["return_index"]);
+                string return_index = Convert.ToString(HttpContext.Request.Form["return_index"]);
+                int seq_id = Convert.ToInt32(HttpContext.Request.Form["seq_id"]);
                 //更新退单的状态
-                int count = SM.UpdateReturnStatus(return_index);
+                int count = SM.UpdateReturnStatus(return_index, seq_id);
 
                 //将退单的数量加到对应订单中的剩余数量中，开单数量不变
-                List<SaleReturn> saleReturnList = SM.SelectAllByReturnIndex(return_index);
-                for (int i=0; i<saleReturnList.Count;i++)
-                {
-                    Order orderOld = OM.SelectByOrderSeqId(saleReturnList[i].seq_id);
+                SaleReturn saleReturn = SM.SelectSingleBySeqReturnIndex(seq_id,return_index);
+                Order orderOld = OM.SelectByOrderSeqId(seq_id);
 
-                    Order orderNew = new Order();
-                    orderNew.seq_id = saleReturnList[i].seq_id;
-                    orderNew.remain_num = orderOld.remain_num+saleReturnList[i].return_num;
-                    orderNew.open_num = orderOld.open_num;
-                    orderNew.tui_num = orderOld.tui_num + saleReturnList[i].return_num;
-                    OM.UpdateSeqNum(orderNew);
+                Order orderNew = new Order();
+                orderNew.seq_id = seq_id;
+                orderNew.remain_num = orderOld.remain_num+ saleReturn.return_num;
+                orderNew.open_num = orderOld.open_num;
+                orderNew.tui_num = orderOld.tui_num + saleReturn.return_num;
+                OM.UpdateSeqNum(orderNew);
 
-                    //退单确认后更新订单的状态（不管原来订单是否完成，全部改为0）
-                    Order order = new Order();
-                    order.seq_id = Convert.ToInt32(saleReturnList[i].seq_id);
-                    order.order_status = 0;
-                    OM.UpdateOrderStatus(order);
-                }
+                //退单确认后更新订单的状态（不管原来订单是否完成，全部改为0）
+                Order order = new Order();
+                order.seq_id = seq_id;
+                order.order_status = 0;
+                OM.UpdateOrderStatus(order);
 
                 if (count > 0)
                 {
@@ -245,17 +255,19 @@ namespace WebApplication.Controllers
         /// <param name="page">分页页码</param>
         /// <param name="size">每页显示数量</param>
         /// <returns></returns>
-        public IActionResult ReturnHistoryIndex(string start_time, string end_time, string return_index, string day, string month, string year, 
-            int pageindex = 1, int pagesize = 8)
+        public IActionResult ReturnHistoryIndex(string start_time, string end_time, string return_index,string order_name, string day, string month, string year, 
+            int pageindex = 1, int pagesize = 20)
         {
             ViewBag.start_time = start_time;
             ViewBag.end_time = end_time;
 
             ViewBag.return_index = return_index;
+            ViewBag.order_name = order_name;
+            
 
             if (start_time == null)
             {
-                start_time = "2001-01-01";
+                start_time = "0001-01-01";
             }
             if (end_time == null)
             {
@@ -286,7 +298,7 @@ namespace WebApplication.Controllers
                 ViewBag.year = "1";
             }
 
-            var objList = SM.SelectAll(1, start_time, end_time,  return_index);
+            var objList = SM.SelectAll(1, start_time, end_time,  return_index, order_name);
             var pagedList = PagedList<SaleReturn>.PageList(pageindex, pagesize, objList);
             ViewBag.model = pagedList.Item2;
             return View(pagedList.Item1);
@@ -300,11 +312,6 @@ namespace WebApplication.Controllers
         public IActionResult GetDeliverList(string deliver_index,string order_index)
         {
             List<Sale> sale = SaleM.SelectSeqByDeliverIndex(deliver_index);
-            Sale saleView = SaleM.SelectDeliverByDeliverIndex(deliver_index);
-            ViewBag.order_id = saleView.order_id;
-            ViewBag.order_index = saleView.order_index;
-            ViewBag.company_name = saleView.company_name;
-            ViewBag.company_order_index = saleView.company_order_index;
             return View(sale);
         }
 

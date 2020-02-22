@@ -21,7 +21,8 @@ namespace WebApplication.Controllers
         /// <param name="page">分页页码</param>
         /// <param name="size">每页显示数量</param>
         /// <returns></returns>
-        public IActionResult Index(string start_time, string end_time, string order_name, string unit,string activation, int pageindex = 1, int pagesize = 8)
+        public IActionResult Index(string start_time, string end_time, string order_name, string unit,string activation, 
+            int pageindex = 1, int pagesize = 20)
         {
             
             int order_id = Convert.ToInt32(Request.Query["order_id"]);
@@ -47,7 +48,7 @@ namespace WebApplication.Controllers
 
             if (start_time == null)
             {
-                start_time = "2001-01-01";
+                start_time = "0001-01-01";
             }
             if (end_time == null)
             {
@@ -259,7 +260,7 @@ namespace WebApplication.Controllers
 
             if (start_time == null)
             {
-                start_time = "2001-01-01";
+                start_time = "0001-01-01";
             }
             if (end_time == null)
             {

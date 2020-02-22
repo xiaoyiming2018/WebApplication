@@ -25,7 +25,7 @@ namespace WebApplication.Controllers
         /// <param name="pageindex"></param>
         /// <param name="pagesize"></param>
         /// <returns>返回查询结果</returns>
-        public IActionResult Index(string company_name, string bank, int pageindex = 1, int pagesize = 8)
+        public IActionResult Index(string company_name, string bank, int pageindex = 1, int pagesize = 20)
         {
             
             ViewBag.company_name = company_name;
@@ -223,7 +223,7 @@ namespace WebApplication.Controllers
                         }
                         contact.name = res[6];
                         contact.position = res[7];
-                        contact.telephone = res[8];
+                        contact.telephone = res[20];
                         contact.email = res[9];
                         CM.Insert(contact);
                     }
@@ -240,7 +240,7 @@ namespace WebApplication.Controllers
                     }
                     contact.name = res[6];
                     contact.position = res[7];
-                    contact.telephone = res[8];
+                    contact.telephone = res[20];
                     contact.email = res[9];
                     CM.Insert(contact);
                 }

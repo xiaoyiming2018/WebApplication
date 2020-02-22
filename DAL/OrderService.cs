@@ -26,7 +26,8 @@ namespace DAL
                     " b.company_name ~* '{0}' and c.order_index ~* '{1}' and c.company_order_index ~*'{2}' and to_char(a.order_time,'yyyy-MM-dd')>='{3}' and to_char(a.order_time,'yyyy-MM-dd')<='{4}' and a.order_status={5} " +
                     " and to_char(a.deliver_time,'yyyy-MM-dd')>='{6}' and to_char(a.deliver_time,'yyyy-MM-dd')<='{7}' and purchase_person ~*'{8}' " +
                     " order by a.order_time desc,c.order_index desc,order_name";
-                sql = string.Format(sql, company_name, order_index, company_order_index,start_time,end_time, order_status, deliver_start_time, deliver_end_time,purchase_person);
+                sql = string.Format(sql, company_name, order_index, company_order_index,start_time,end_time, order_status, deliver_start_time, 
+                    deliver_end_time,purchase_person);
 
                 objList = PostgreHelper.GetEntityList<Order>(sql);
 
@@ -39,7 +40,7 @@ namespace DAL
         }
 
         /// <summary>
-        /// 用于订单管理：根据联系人名模糊查询，查询结果为一笔或多笔数据
+        /// 用于查看不同订单状态的订单
         /// </summary>
         /// <param name="name"></param>
         /// <returns></returns>
@@ -49,9 +50,9 @@ namespace DAL
             {
                 List<Order> objList = new List<Order>();
                 string sql = null;
-                sql = "select a.order_id,b.order_index " +
+                sql = "select a.order_id,b.order_index,b.company_order_index " +
                     "from jinchen.orderseq_info a,jinchen.order_info b where a.order_id=b.id and a.order_status={0} " +
-                    "group by b.order_index,a.order_id order by b.order_index ";
+                    "group by b.order_index,a.order_id,b.company_order_index order by b.order_index ";
                 sql = string.Format(sql,order_status);
 
                 objList = PostgreHelper.GetEntityList<Order>(sql);
@@ -97,7 +98,7 @@ namespace DAL
         /// </summary>
         /// <param name="id">用户id</param>
         /// <returns></returns>
-        public List<Order> SelectOrderSeqList(int order_id)
+        public List<Order> SelectOrderSeqList(int order_id, string company_name)
         {
             try
             {
@@ -106,8 +107,8 @@ namespace DAL
                 sql =  "select a.id,a.order_index,b.company_name, c.seq_id,c.order_time,c.order_name,c.unit,c.deliver_time," +
                     "c.order_num,c.open_num,c.tui_num,c.remain_num,c.order_price,c.order_all_price,c.purchase_person " +
                     "from jinchen.order_info a,jinchen.company_info b,jinchen.orderseq_info c " +
-                    "where a.customer_id=b.id and a.id=c.order_id and a.id={0} order by c.order_name";
-                sql = string.Format(sql, order_id);
+                    "where a.customer_id=b.id and a.id=c.order_id and a.id={0} and b.company_name='{1}' order by c.order_name";
+                sql = string.Format(sql, order_id, company_name);
 
                 objList = PostgreHelper.GetEntityList<Order>(sql);
 
@@ -130,7 +131,7 @@ namespace DAL
             {
                 List<Order> objList = new List<Order>();
                 string sql = null;
-                sql = "select order_index " +
+                sql = "select order_index,company_order_index " +
                     "from jinchen.order_info a group by order_index " +
                     " order by a.order_index";
                 sql = string.Format(sql);
@@ -344,8 +345,10 @@ namespace DAL
             try
             {
                 int count = 0;
-                string sql = "update jinchen.orderseq_info set order_name='{0}',deliver_time='{1}',unit='{2}',order_price={3},order_all_price={4},order_picture='{5}' where seq_id={6}";
-                sql = string.Format(sql, obj.order_name, obj.deliver_time, obj.unit,obj.order_price, obj.order_all_price,obj.order_picture, obj.seq_id);
+                string sql = "update jinchen.orderseq_info set order_name='{0}',deliver_time='{1}',unit='{2}',order_price={3}," +
+                    "order_all_price={4},order_picture='{5}',purchase_person='{6}' where seq_id={7}";
+                sql = string.Format(sql, obj.order_name, obj.deliver_time, obj.unit,obj.order_price, obj.order_all_price,
+                    obj.order_picture,obj.purchase_person, obj.seq_id);
                 count = PostgreHelper.ExecuteNonQuery(sql);
                 return count;
 

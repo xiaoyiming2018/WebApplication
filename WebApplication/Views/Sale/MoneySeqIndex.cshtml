@@ -1,6 +1,6 @@
 ﻿
 @{
-    @model IList<Model.Sale>
+    @model Model.Sale;
     @using Model;
     @using BLL;
 
@@ -21,16 +21,17 @@
         $(function () {
             $(".sidebar ul li:nth-of-type(5)").addClass("active open")
             $(".sidebar ul li:nth-of-type(5) ul li").removeClass()
-            $(".sidebar ul li:nth-of-type(5) ul li:nth-of-type(@if (ViewBag.flag == "Return") {<text>4</text> } else {<text>5</text>})").addClass("active")
+            $(".sidebar ul li:nth-of-type(5) ul li:nth-of-type(4)").addClass("active")
         });
 
         function moneySubmit()
         {
             var deliver_index = $('#deliver_index').val();
+            var seq_id = $('#seq_id').val();
             var money_onoff = $('#money_onoff').val();
             var money_way = $('#money_way').val();
 
-            if (money_way < 1) {
+            if (money_way < 1 || money_onoff=="") {
                 swal("请选择结账方式！", "", "error");
             }
             else
@@ -43,7 +44,7 @@
                             $('input:hidden[name="__RequestVerificationToken"]').val());
                     },
                     data: {
-                        deliver_index: deliver_index, money_onoff: money_onoff, money_way: money_way
+                        deliver_index: deliver_index, seq_id: seq_id, money_onoff: money_onoff, money_way: money_way
                     },
                     success: function (msg) {
                         if (msg == "Success") {
@@ -73,16 +74,8 @@
                         <ol class="breadcrumb text-left">
                             <li><a href="/Supplier/Index">主页</a></li>
                             <li><a href="/Sale/Index">销售管理</a></li>
-                            @if (ViewBag.flag == "Return")
-                            {
-                                <li><a href="/SaleReturn/MoneyIndex">销售结款</a></li>
-                            }
-                            else
-                            {
-                                <li><a href="/SaleReturn/MoneyHistoryIndex">历史结款记录</a></li>
-                            }
-
-                            <li class="active">送货详情</li>
+                            <li><a href="/Sale/MoneyIndex">销售对账</a></li>
+                            <li class="active">修改结款</li>
                         </ol>
                     </div>
                 </div>
@@ -93,160 +86,85 @@
                 <div class="col-lg-12">
                     <div class="card alert">
                         <div class="card-header">
-                            <h4>销售结款</h4>
+                            <h4>修改结款</h4>
                         </div>
                         <br />
                         <div class="card-body">
                             <div class="form-horizontal">
                                 <div class="form-group">
-                                    <label class="col-sm-2 control-label">送货单号：</label>
-                                    <div class="col-sm-2">
-                                        <input type="text" class="form-control" id="deliver_index" name="deliver_index" value="@ViewBag.deliver_index" disabled="disabled" />
-                                    </div>
-                                    <label class="col-sm-2 control-label">客户名称：</label>
-                                    <div class="col-sm-2">
-                                        <input type="text" class="form-control" value="@ViewBag.deliver_company_head" disabled="disabled" />
-                                    </div>
-                                    <label class="col-sm-2 control-label">送货开单时间：</label>
-                                    <div class="col-sm-2">
-                                        <input type="text" class="form-control" value="@ViewBag.insert_time.ToString("yyyy-MM-dd")" disabled="disabled" />
+                                    <label for="example-input-normal" class="col-sm-4 control-label">送货单号：</label>
+                                    <div class="col-sm-4">
+                                        <input type="text" class="form-control" id="deliver_index" name="deliver_index" value="@Model.deliver_index" disabled="disabled" />
+                                        <input type="hidden" class="form-control" id="seq_id" name="seq_id" value="@Model.seq_id"/>
                                     </div>
                                 </div>
                                 <div class="form-group">
-                                    <label class="col-sm-2 control-label">送货总数量：</label>
-                                    <div class="col-sm-2">
-                                        <input type="text" class="form-control" value="@ViewBag.real_num" disabled="disabled" />
+                                    <label for="example-input-normal" class="col-sm-4 control-label">客户名称：</label>
+                                    <div class="col-sm-4">
+                                        <input type="text" class="form-control" value="@Model.deliver_company_head" disabled="disabled" />
                                     </div>
-                                    @if (UserManager.Current.GetLevel >= UserLevelEnum.ProductManager)
-                                    {
-                                        <label class="col-sm-2 control-label">送货总金额：</label>
-                                        <div class="col-sm-2">
-                                            <input type="text" class="form-control" value="@ViewBag.deliver_price" disabled="disabled" />
-                                        </div>
-                                    }
+                                </div>
+                                <div class="form-group">
+                                    <label for="example-input-normal" class="col-sm-4 control-label">名称规格：</label>
+                                    <div class="col-sm-4">
+                                        <input type="text" class="form-control" value="@Model.order_name" disabled="disabled" />
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="example-input-normal" class="col-sm-4 control-label">数量：</label>
+                                    <div class="col-sm-4">
+                                        <input type="text" class="form-control" value="@Model.real_num" disabled="disabled" />
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="example-input-normal" class="col-sm-4 control-label">单价：</label>
+                                    <div class="col-sm-4">
+                                        <input type="text" class="form-control" value="@Model.deliver_price" disabled="disabled" />
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="example-input-normal" class="col-sm-4 control-label">总价：</label>
+                                    <div class="col-sm-4">
+                                        <input type="text" class="form-control" value="@Model.deliver_all_price" disabled="disabled" />
+                                    </div>
                                 </div>
                                 @if (UserManager.Current.GetLevel >= UserLevelEnum.ProductManager)
                                 {
                                     <div class="form-group">
                                         <label for="example-input-normal" class="col-sm-4 control-label">是否结账</label>
                                         <div class="col-sm-4">
-                                            @if (UserManager.Current.GetLevel >= UserLevelEnum.Boss && ViewBag.flag=="Return")
-                                            {
-                                                <select class="form-control" id="money_onoff" name="money_onoff" onchange="moneyWay()">
-                                                    <option value=""></option>
-                                                    @{
-                                                        <!option value="0" @if (ViewBag.money_way != null) { if (0 == ViewBag.money_onoff) { <text> selected</text> } } else {<text> selected</text> }>未结账</!option>
-                                                        <!option value="1" @if (ViewBag.money_way != null) { if (1 == ViewBag.money_onoff) { <text> selected</text> } } else {<text> selected</text> }>已结账</!option>
-                                                    }
-                                                </select>
-                                            }
-                                            else
-                                            {
-                                                <input type="text" class="form-control" value="@if (ViewBag.money_way==0) { <text> 未结账</text>} else {<text> 已结账</text> } " readonly />
-                                            }
-
+                                            <select class="form-control" id="money_onoff" name="money_onoff">
+                                                <option value=""></option>
+                                                @{
+                                                    <!option value="0" @if (0 == Model.money_onoff) { <text> selected</text> }>未结账</!option>
+                                                    <!option value="1" @if (1 == Model.money_onoff) { <text> selected</text> }>已结账</!option>
+                                                }
+                                            </select>
                                         </div>
                                     </div>
                                     <div class="form-group">
                                         <label for="example-input-normal" class="col-sm-4 control-label">结账方式</label>
-                                        <div class="col-sm-4">
-                                            @if (UserManager.Current.GetLevel >= UserLevelEnum.Boss && ViewBag.flag == "Return")
-                                            {
-                                                <select class="form-control" id="money_way" name="money_way">
-                                                    <option value=""></option>
-                                                    @{
-                                                    <!option value="1" @if (ViewBag.money_way != null) { if (1 == ViewBag.money_way) { <text> selected</text> } } else {<text> selected</text> }>月结</!option>
-                                                        <!option value="2" @if (ViewBag.money_way != null) { if (2 == ViewBag.money_way) { <text> selected</text> } } else {<text> selected</text> }>现金</!option>
-                                                        <!option value="3" @if (ViewBag.money_way != null) { if (3 == ViewBag.money_way) { <text> selected</text> } } else {<text> selected</text> }>小额支付</!option>
-                                                    }
-                                                </select>
-                                            }
-                                            else
-                                            {
-                                                <input type="text" class="form-control" value="@if (ViewBag.money_way == 1) { <text>月结</text>} else if (ViewBag.money_way == 2) {<text> 现金</text> } else if (ViewBag.money_way == 3) {<text> 小额支付</text> } " readonly />
-                                            }
-
+                                        <div class="form-control">
+                                            <select class="form-control" id="money_way" name="money_way">
+                                                <option value=""></option>
+                                                @{
+                                                    <!option value="1" @if (1 == Model.money_way) { <text> selected</text> }>月结</!option>
+                                                    <!option value="2" @if (2 == Model.money_way) { <text> selected</text> }>现金</!option>
+                                                    <!option value="3" @if (3 == Model.money_way) { <text> selected</text> }>小额支付</!option>
+                                                }
+                                            </select>
                                         </div>
                                     </div>
                                 }
-                                @if (UserManager.Current.GetLevel >= UserLevelEnum.Boss && ViewBag.flag == "Return")
-                                {
-                                    <div class="form-group">
-                                        <div class="col-sm-offset-5">
-                                            <input type="button" class="btn btn-primary" value="提交" onclick="moneySubmit()" />
-                                        </div>
+                                <div class="form-group">
+                                    <div class="col-sm-offset-6">
+                                        <input type="button" class="btn btn-primary" style="width:60px;" value="提交" onclick="moneySubmit()" />
                                     </div>
-                                }
-
+                                </div>
                             </div>
                         </div>
                     </div><!-- /# card -->
                 </div><!-- /# column -->
-                <div class="col-lg-12">
-                    <div class="card alert">
-                        <div class="card-header">
-                            <h4>销售送货明细</h4>
-                            <form class="form-inline" action="/Sale/MoneySeqIndex?deliver_index=@ViewBag.deliver_index&deliver_status=@if (ViewBag.flag == "Return") {<text>0</text>} else { <text>1</text>} " method="post" id="myfrom">
-                                <div class="form-group">
-                                    <label>订单号：</label>
-                                    <input id="order_index" name="order_index" type="text" class="form-control" style="height:36px" value="@ViewBag.order_index" />
-                                    <label>名称规格：</label>
-                                    <input id="order_name" name="order_name" type="text" class="form-control" style="height:36px" value="@ViewBag.order_name" />
-                                </div>
-                                <div class="form-group">
-                                    <input type="submit" value="查询" class="btn btn-primary" />
-                                </div>
-                            </form>
-                        </div>
-                        <div class="card-body">
-                            <table class="table table-responsive table-hover ">
-                                <thead>
-                                    <tr>
-                                        <th>序号</th>
-                                        <th>订单号</th>
-                                        <th>名称规格</th>
-                                        <th>送货数量</th>
-                                        <th>单位</th>
-                                        <th>送货时间</th>
-                                        @if (UserManager.Current.GetLevel >= UserLevelEnum.ProductManager)
-                                        {
-                                            <th>送货单价</th>
-                                            <th>送货总价</th>
-                                            <th>采购人员</th>
-                                        }
-
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @{
-                                        int index = 1;
-                                        foreach (var item in Model)
-                                        {
-                                    <tr>
-                                        <td>@index</td>
-                                        <td>@item.order_index</td>
-                                        <td>@item.order_name</td>
-                                        <td>@item.real_num</td>
-                                        <td>@item.unit</td>
-                                        <td>@item.deliver_time.ToString("yyyy-MM-dd")</td>
-                                        @if (UserManager.Current.GetLevel >= UserLevelEnum.ProductManager)
-                                        {
-                                            <td>@item.deliver_price</td>
-                                            <td>@item.deliver_all_price</td>
-                                            <td>@item.purchase_person</td>
-
-                                        }
-
-                                    </tr>
-                                            index++;
-                                        }
-                                    }
-                                </tbody>
-                            </table>
-                        </div>
-                    </div><!-- /# card -->
-                </div><!-- /# column -->
-
             </div><!-- /# row -->
         </div>
     </div><!-- /# container-fluid -->

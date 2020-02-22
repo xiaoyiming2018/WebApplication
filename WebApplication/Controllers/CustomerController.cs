@@ -22,7 +22,7 @@ namespace WebApplication.Controllers
         /// <param name="page">分页页码</param>
         /// <param name="size">每页显示数量</param>
         /// <returns></returns>
-        public IActionResult Index(string company_name, string bank, int pageindex = 1, int pagesize = 8)
+        public IActionResult Index(string company_name, string bank, int pageindex = 1, int pagesize = 20)
         {
             
             ViewBag.company_name = company_name;

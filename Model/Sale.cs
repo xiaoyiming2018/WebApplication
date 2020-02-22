@@ -83,5 +83,12 @@ namespace Model
 
         // 地址
         public string address { get; set; }
+
+        // 地址
+        public string dz_index { get; set; }
+
+        // 地址
+        public string invoice_index { get; set; }
+
     }
 }

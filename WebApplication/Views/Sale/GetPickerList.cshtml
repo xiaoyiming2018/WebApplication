@@ -1,0 +1,46 @@
+﻿@{
+    Layout = null;
+    @model IList<Model.Sale>;
+}
+<table class="table table-responsive table-bordered">
+    <thead>
+        <tr>
+            <th>序号</th>
+            <th>送货单号</th>
+            <th>客户名称</th>
+            <th>客户订单号</th>
+            <th>名称规格</th>
+            <th>单位</th>
+            @if (UserManager.Current.GetLevel >= UserLevelEnum.ProductManager)
+            {
+            <th>单价</th>
+            <th>总金额</th>
+            }
+            <th>送货数量</th>
+        </tr>
+    </thead>
+    <tbody>
+        @{
+            int index = 1;
+            foreach (var item in Model)
+            {
+        <tr>
+            <td>@index</td>
+            <td>@item.deliver_index</td>
+            <td>@item.deliver_company_head</td>
+            <td>@item.company_order_index</td>
+            <td>@item.order_name</td>
+            <td>@item.unit</td>
+            @if (UserManager.Current.GetLevel >= UserLevelEnum.ProductManager)
+            {
+            <td>@item.deliver_price</td>
+            <td>@item.deliver_all_price</td>
+            }
+            <td>@item.real_num</td>
+
+        </tr>
+                index++;
+            }
+        } 
+    </tbody>
+</table>

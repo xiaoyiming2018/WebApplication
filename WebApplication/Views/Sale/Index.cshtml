@@ -18,10 +18,14 @@
     <script type="text/javascript" src="~/My97DatePicker/WdatePicker.js"></script>
     <script type="text/javascript">
         $(function () {
-            $(".sidebar ul li:nth-of-type(5)").addClass("active open")
-            $(".sidebar ul li:nth-of-type(5) ul li").removeClass()
-            $(".sidebar ul li:nth-of-type(5) ul li:nth-of-type(1)").addClass("active")
+            $(".sidebar ul li:nth-of-type(5)").addClass("active open");
+            $(".sidebar ul li:nth-of-type(5) ul li").removeClass();
+            $(".sidebar ul li:nth-of-type(5) ul li:nth-of-type(1)").addClass("active");
+
+
         });
+
+
 
     </script>
 </head>
@@ -53,7 +57,7 @@
                                             <option value=""></option>
                                             @{
                                                 SaleManager SM = new SaleManager();
-                                                List<Sale> saleList = SM.SelectAll("2001-01-01","2222-01-01");
+                                                List<Sale> saleList = SM.SelectAll("2001-01-01", "2222-01-01");
                                                 if (saleList.Count > 0)
                                                 {
                                                     for (int i = 0; i < saleList.Count; i++)
@@ -93,7 +97,7 @@
                                 <br />
                                 <div class="form-inline">
 
-                                    
+
                                     <div class="form-group">
                                         <input type="submit" value="查询" class="btn btn-primary" style="width:80px" />
                                     </div>
@@ -133,21 +137,21 @@
                                         int index = 1;
                                         foreach (var item in Model)
                                         {
-                                    <tr>
-                                        <td>@index</td>
-                                        <td>@item.deliver_index</td>
-                                        <td>@item.deliver_company_head</td>
-                                        <td>@item.real_num</td>
-                                        @if (UserManager.Current.GetLevel >= UserLevelEnum.ProductManager)
-                                        {
-                                        <td>@item.deliver_all_price</td>
-                                        }
-                                        
-                                        <td>@item.insert_time.ToString("yyyy-MM-dd")</td>
-                                        <td>
-                                            <button class="btn btn-primary" onclick="window.location.href = '/Sale/Edit?deliver_index=@item.deliver_index'">送货详情</button>
-                                        </td>
-                                    </tr>
+                                            <tr>
+                                                <td>@index</td>
+                                                <td>@item.deliver_index</td>
+                                                <td>@item.deliver_company_head</td>
+                                                <td>@item.real_num</td>
+                                                @if (UserManager.Current.GetLevel >= UserLevelEnum.ProductManager)
+                                                {
+                                                    <td>@item.deliver_all_price</td>
+                                                }
+
+                                                <td>@item.insert_time.ToString("yyyy-MM-dd")</td>
+                                                <td>
+                                                    <button class="btn btn-primary" onclick="window.location.href = '/Sale/Edit?deliver_index=@item.deliver_index'">送货详情</button>
+                                                </td>
+                                            </tr>
                                             index++;
                                         }
                                     }
@@ -160,6 +164,8 @@
             </div><!-- /# row -->
         </div>
     </div><!-- /# container-fluid -->
+
+    
 </body>
 </html>
 

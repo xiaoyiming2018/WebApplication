@@ -105,9 +105,9 @@ namespace BLL
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public List<Order> SelectOrderSeqList(int order_id)
+        public List<Order> SelectOrderSeqList(int order_id, string company_name="" )
         {
-            List<Order> objList = OS.SelectOrderSeqList(order_id);
+            List<Order> objList = OS.SelectOrderSeqList(order_id,company_name);
             return objList;
         }
 

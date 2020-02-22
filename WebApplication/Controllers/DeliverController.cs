@@ -21,7 +21,8 @@ namespace WebApplication.Controllers
         /// <param name="page">分页页码</param>
         /// <param name="size">每页显示数量</param>
         /// <returns></returns>
-        public IActionResult Index(string start_time, string end_time, string company_name, string purchase_index, string material_name,string deliver_index, int pageindex = 1, int pagesize = 8)
+        public IActionResult Index(string start_time, string end_time, string company_name, string purchase_index, 
+            string material_name,string deliver_index, int pageindex = 1, int pagesize = 20)
         {
             
 
@@ -35,7 +36,7 @@ namespace WebApplication.Controllers
 
             if (start_time == null)
             {
-                start_time = "2001-01-01";
+                start_time = "0001-01-01";
             }
             if (end_time == null)
             {
@@ -203,7 +204,8 @@ namespace WebApplication.Controllers
         }
 
 
-        public IActionResult SupplierIndex(string start_time, string end_time, string company_name, string purchase_index, string material_name, string deliver_index, int pageindex = 1, int pagesize = 8)
+        public IActionResult SupplierIndex(string start_time, string end_time, string company_name, string purchase_index, 
+            string material_name, string deliver_index, int pageindex = 1, int pagesize = 20)
         {
             
             ViewBag.start_time = start_time;
@@ -216,7 +218,7 @@ namespace WebApplication.Controllers
 
             if (start_time == null)
             {
-                start_time = "2001-01-01";
+                start_time = "0001-01-01";
             }
             if (end_time == null)
             {
@@ -276,7 +278,7 @@ namespace WebApplication.Controllers
 
 
         public IActionResult HistoryIndex(string start_time, string end_time, string confirm_start_time, string confirm_end_time, string company_name, string purchase_index, 
-            string material_name, string deliver_index,string day,string month,string year, int pageindex = 1, int pagesize = 8)
+            string material_name, string deliver_index,string day,string month,string year, int pageindex = 1, int pagesize = 20)
         {
             
             ViewBag.start_time = start_time;
@@ -292,7 +294,7 @@ namespace WebApplication.Controllers
 
             if (start_time == null)
             {
-                start_time = "2001-01-01";
+                start_time = "0001-01-01";
             }
             if (end_time == null)
             {

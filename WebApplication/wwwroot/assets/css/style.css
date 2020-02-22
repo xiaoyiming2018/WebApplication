@@ -2239,7 +2239,7 @@ ul {
 .table > thead > tr > th {
   border-top: 1px solid #e7e7e7;
   line-height: 1.42857;
-  padding: 8px;
+  padding: 4px;
   vertical-align: top; }
 
 @media (max-width: 767px) {
@@ -2404,7 +2404,7 @@ tbody tr td {
 .table > tfoot > tr > th,
 .table > thead > tr > td,
 .table > thead > tr > th {
-  line-height: 32px;
+  line-height: 22px;
   vertical-align: top; }
 
 .table > thead > tr > th {
