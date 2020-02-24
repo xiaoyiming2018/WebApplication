@@ -14,6 +14,7 @@ namespace WebApplication.Controllers
     {
         OrderManager OM = new OrderManager();
         SettingManager SM = new SettingManager();
+        ContactManager CM = new ContactManager();
         /// <summary>
         /// 用户列表首页
         /// </summary>
@@ -68,6 +69,8 @@ namespace WebApplication.Controllers
             try
             {
                 int id = Convert.ToInt32(Request.Query["id"]);
+                List<Contact> contacts = CM.SelectAllContact();
+                ViewBag.contacts = contacts;
                 if (id > 0)
                 {
                     
@@ -102,6 +105,13 @@ namespace WebApplication.Controllers
             {
                 throw ex;
             }
+        }
+
+        public IActionResult GetContacts()
+        {
+            List<Contact> contacts = CM.SelectAllContact();
+            return Json(contacts);
+
         }
 
         /// <summary>

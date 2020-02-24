@@ -355,8 +355,9 @@
                                                 <td>@item.deliver_company_head</td>
                                                 <td>@item.company_order_index</td>
                                                 <td>@item.insert_time.ToString("yyyy-MM-dd")</td>
-                                                <td>@item.order_name</td>
+                                                <td @if (item.return_flag==1) {<text>style = "color:red"</text> }>@item.order_name</td>
                                                 <td>@item.real_num</td>
+                                                
                                                 <td>@item.unit</td>
                                                 @if (UserManager.Current.GetLevel >= UserLevelEnum.ProductManager)
                                                 {

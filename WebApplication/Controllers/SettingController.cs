@@ -27,6 +27,7 @@ namespace WebApplication.Controllers
             Setting settingDeliver = SM.SelectInUse(5);
             Setting settingReturn = SM.SelectInUse(7);
             Setting settingDz = SM.SelectInUse(8);
+            Setting settingInvoiceHead = SM.SelectInUse(9);
             //订单开头
             ViewBag.order_index_begin = settingOrder.index_begin;
             ViewBag.order_index_view = settingOrder.index_begin + "20190101001";
@@ -51,7 +52,7 @@ namespace WebApplication.Controllers
         /// </summary>
         /// <returns></returns>
         public IActionResult Edit(string material_unit,string category, string order_index_begin, string purchase_index_begin, 
-            string deliver_index_begin, string deliver_company_head,string return_index_begin,string dz_index_begin)
+            string deliver_index_begin, string deliver_company_head,string return_index_begin,string dz_index_begin, string invoice_company)
         {
             try
             {
@@ -159,12 +160,25 @@ namespace WebApplication.Controllers
                         return Json("Fail");
                     }
                 }
-                else
+                else if (!string.IsNullOrEmpty(dz_index_begin))
                 {
                     res.index_begin = dz_index_begin;
                     res.all_type = 8;
                     res.in_use = 1;
                     int count = SM.Update(res);
+                    if (count > 0)
+                    {
+                        return Json("Success");
+                    }
+                    else
+                    {
+                        return Json("Fail");
+                    }
+                }
+                else {
+                    res.config_list = invoice_company;
+                    res.all_type = 9;
+                    int count = SM.Insert(res);
                     if (count > 0)
                     {
                         return Json("Success");

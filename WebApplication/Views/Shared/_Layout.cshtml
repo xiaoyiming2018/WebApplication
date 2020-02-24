@@ -10,7 +10,7 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>麦买卖进销存管理系统1.0</title>
+    <title>麦买卖进销存管理系统</title>
 
     <!-- ================= Favicon ================== -->
     <!-- Standard -->
@@ -19,16 +19,17 @@
     <link href="~/assets/css/lib/themify-icons.css" rel="stylesheet">
     <link href="~/assets/css/lib/mmc-chat.css" rel="stylesheet" />
     <link href="~/assets/css/lib/sidebar.css" rel="stylesheet">
+    @*<link href="~/lib/bootstrap/dist/css/bootstrap.css" rel="stylesheet" />*@
     <link href="~/assets/css/lib/bootstrap.min.css" rel="stylesheet">
     <link href="~/assets/css/lib/nixon.css" rel="stylesheet">
     <link href="~/assets/css/style.css" rel="stylesheet">
     <link href="~/assets/css/sweetalert.css" rel="stylesheet">
+    <link href="~/js/dist/css/bootstrap-select.min.css" rel="stylesheet" />
 
     <script src="~/Scripts/jquery-3.3.1.min.js"></script>
+    <script src="~/assets/js/lib/bootstrap.min.js"></script>
     <script src="~/assets/js/sweetalert-dev.js"></script>
     <script src="~/assets/js/lib/sweetalert/sweetalert.min.js"></script>
-    <script src="~/assets/js/lib/bootstrap.min.js"></script>
-
 
     <script language="JavaScript">
         $(document).ready(function () {
@@ -111,10 +112,7 @@
                         <a class="sidebar-sub-toggle"><i class="ti-user"></i> 用户管理 <span class="sidebar-collapse-icon ti-angle-down"></span></a>
                         <ul>
                             <li><a href="/User/Index">用户列表</a></li>
-                            @if (UserManager.Current.GetLevel >= UserLevelEnum.Boss)
-                            {
-                                <li><a href="/User/EditPassWord">修改密码</a></li>
-                            }
+                            <li><a href="/User/EditPassWord">修改密码</a></li>
                             <li><a href="/User/Logout">退出登录</a></li>
                         </ul>
                     </li>
@@ -128,6 +126,10 @@
                             </ul>
                         </li>
                     }
+                    <li>
+                        <hr />
+                        <a class="sidebar-sub-toggle" style="color:#00838F"><i class="ti-write"></i>版本号V1.0.1</a>
+                    </li>
 
 
                 </ul>
@@ -184,13 +186,13 @@
             @RenderBody()
         </div><!-- /# main -->
     </div><!-- /# content wrap -->
-    <script src="~/assets/js/lib/jquery.min.js"></script><!-- jquery vendor -->
+
     <script src="~/assets/js/lib/jquery.nanoscroller.min.js"></script><!-- nano scroller -->
     <script src="~/assets/js/lib/sidebar.js"></script><!-- sidebar -->
     <script src="~/assets/js/lib/bootstrap.min.js"></script><!-- bootstrap -->
     <script src="~/assets/js/lib/mmc-common.js"></script>
     @*<script src="~/assets/js/lib/mmc-chat.js"></script>*@
-    <script src="~/assets/js/scripts.js"></script><!-- scripit init-->
+    @*<script src="~/assets/js/scripts.js"></script><!-- scripit init-->*@
 
 </body>
 

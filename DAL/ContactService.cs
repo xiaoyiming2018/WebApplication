@@ -33,6 +33,30 @@ namespace DAL
         }
 
         /// <summary>
+        /// 根据联系人名模糊查询，查询结果为一笔或多笔数据
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
+        public List<Contact> SelectAllContact()
+        {
+            try
+            {
+                List<Contact> objList = new List<Contact>();
+                string sql = null;
+                sql = "select * from jinchen.customer_info order by name";
+                sql = string.Format(sql);
+
+                objList = PostgreHelper.GetEntityList<Contact>(sql);
+
+                return objList;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        /// <summary>
         /// 查询单笔数
         /// </summary>
         /// <param name="id">用户id</param>

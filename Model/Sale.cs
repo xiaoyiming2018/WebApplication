@@ -32,6 +32,9 @@ namespace Model
         //下单数量
         public Int64 order_num { get; set; }
 
+        //退单数量
+        public Int64 tui_num { get; set; }
+
         //需求出货时间
         public DateTime deliver_time { get; set; }
         //单价
@@ -70,11 +73,13 @@ namespace Model
         //结款方式
         public int money_way { get; set; }
 
-        //出货单状态
+        //出货单状态（0:未对账，1：已对账，2：对账后关联发票）
         public int deliver_status { get; set; }
 
         //退单的状态
         public int return_status { get; set; }
+        //标识某一订单货物是否存在退货
+        public int return_flag { get; set; }
         //实际退货时间
         public DateTime confirm_time { get; set; }
 

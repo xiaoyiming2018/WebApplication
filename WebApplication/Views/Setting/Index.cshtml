@@ -19,6 +19,7 @@
         var TempArrCategory = [];//存储option
         var TempArrUnit = [];//存储option
         var TempArrHead = [];//存储option
+        var TempArrInvoiceCompany = [];//存储option
 
         $(function () {
             $(".sidebar ul li:nth-of-type(8)").addClass("active open")
@@ -299,7 +300,44 @@
 
             });
 
+            $('#submitInvoiceCompany').click(function () {
+                var head_length = $('#invoice_company_id option').length;
+                var invoice_company = $('#invoice_company').val();
+                if (head_length > 1) {
+                    swal("您输入的抬头有误！", "", "error");
+                }
+                else {
+                    $.ajax({
+                        type: "POST",
+                        url: "/Setting/Edit",
+                        beforeSend: function (xhr) {
+                            xhr.setRequestHeader("XSRF-TOKEN",
+                                $('input:hidden[name="__RequestVerificationToken"]').val());
+                        },
+                        data: {
+                            invoice_company: invoice_company
+                        },
+                        success: function (msg) {
+                            if (msg == "Success") {
+                                swal({ title: "执行成功!", text: "", type: "success" },
+                                    function () { window.location.href = '/Setting/Index'; });
+
+                            }
+                            else {
+                                swal("执行失败！", "", "error");
+                            }
+                        },
+                        error: function (msg) {
+                            swal("数据获取失败！", "", "error");
+                        }
+                    });
+                }
+
+            });
+
         });
+
+        
         
         
 
@@ -363,9 +401,29 @@
             for (i = 0; i < length; i++)
                 TempArrHead[i] = [options[i].text, options[i].value]
         }
+
+        function SelectInvoiceCompany(flag) {
+            var TxtInvoiceCompany = document.getElementById("invoice_company");
+            var SelectInvoiceCompany = document.getElementById("invoice_company_id")
+            var Arr = []
+            with (SelectInvoiceCompany) {
+                var SelectHTMLInvoiceCompany = innerHTML.match(/<[^>]*>/)[0]
+                for (i = 0; i < TempArrInvoiceCompany.length; i++)
+                    if (TempArrInvoiceCompany[i][0].indexOf(TxtInvoiceCompany.value, 0) >= 0 || flag)//若找到以txt的内容开头的，添加option。若flag为true，对下拉框初始化
+                        Arr[Arr.length] = "<option value='" + TempArrInvoiceCompany[i][1] + "'>" + TempArrInvoiceCompany[i][0] + "</option>"
+                innerHTML = SelectHTMLInvoiceCompany + Arr.join() + "</SELECT>"
+            }
+        }
+        function InitInvoiceCompany() {
+            var SelectInvoiceCompany = document.getElementById("invoice_company_id");
+            /*先将数据存入数组*/
+            with (SelectInvoiceCompany)
+            for (i = 0; i < length; i++)
+                TempArrInvoiceCompany[i] = [options[i].text, options[i].value]
+        }
     </script>
 </head>
-<body onload="InitCategory(); InitUnit(); InitHead()">
+<body onload="InitCategory(); InitUnit(); InitHead();InitInvoiceCompany()">
     <div class="container-fluid">
         <div class="row">
             <div class="col-lg-12 p-0">
@@ -706,6 +764,55 @@
                         </div>
                     </div><!-- /# card -->
                 </div><!-- /# column -->
+            </div><!-- /# row -->
+
+            <div class="row">
+                <div class="col-lg-6">
+                    <div class="card alert">
+                        <div class="card-header">
+                            <h4>开票公司</h4>
+                        </div>
+                        <br />
+                        <div class="card-body">
+                            <div class="form-horizontal">
+                                <div class="form-group">
+                                    <label for="example-input-normal" class="col-sm-4 control-label">开票公司：</label>
+                                    <div class="col-sm-6">
+                                        <input type="text" class="form-control" id="invoice_company" name="invoice_company" value="" onkeyup="SelectInvoiceCompany(0)" />
+                                    </div>
+                                    <div class="col-sm-2">
+                                        <input type="button" id="submitInvoiceCompany" class="btn btn-primary" style="padding:9px 13px" value="新增" />
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="example-input-normal" class="col-sm-4 control-label">开票公司：</label>
+                                </div>
+
+                                <div class="form-group">
+                                    <div class="col-sm-12" style="padding-left:30px;padding-right:30px">
+                                        <select class="form-control" id="invoice_company_id" name="invoice_company_id" onchange="invoice_company.value=options[selectedIndex].text;" size=8>
+                                            <option value=""></option>
+                                            @{
+                                                SettingManager invoiceCompanyM = new SettingManager();
+                                                List<Setting> invoiceCompanyList = invoiceCompanyM.SelectConfigList(9);
+                                                if (invoiceCompanyList.Count > 0)
+                                                {
+                                                    for (int i = 0; i < invoiceCompanyList.Count; i++)
+                                                    {
+                                                        <!option value="@invoiceCompanyList[i].config_list">@invoiceCompanyList[i].config_list</!option>
+                                                    }
+                                                }
+                                            }
+                                        </select>
+                                    </div>
+
+                                </div>
+                            </div>
+
+                        </div>
+                    </div><!-- /# card -->
+                </div><!-- /# column -->
+
             </div><!-- /# row -->
         </div>
     </div><!-- /# container-fluid -->

@@ -263,7 +263,7 @@ namespace DAL
                 List<Sale> objList = new List<Sale>();
                 string sql = null;
                 sql = "select b.order_index,b.company_order_index,a.deliver_index,a.seq_id,a.deliver_company_head,real_num,deliver_price,deliver_all_price," +
-                    "a.money_way,deliver_status,remark,order_name,unit,purchase_person,a.insert_time,a.seq_id,a.money_onoff,a.confirm_time,a.dz_index,a.invoice_index " +
+                    "a.money_way,deliver_status,remark,order_name,unit,purchase_person,a.insert_time,a.seq_id,a.money_onoff,a.confirm_time,a.dz_index,a.invoice_index,c.tui_num,a.return_flag " +
                     " from jinchen.sale_info a,jinchen.order_info b,jinchen.orderseq_info c " +
                       "where a.order_id=b.id and a.seq_id=c.seq_id and a.order_id=c.order_id and deliver_index ~*'{0}' and deliver_company_head ~*'{1}' and to_char(a.insert_time,'yyyy-MM-dd')>='{2}' and " +
                       "to_char(a.insert_time,'yyyy-MM-dd')<='{3}' and deliver_status={4} and to_char(a.confirm_time,'yyyy-MM-dd')>='{5}' and to_char(a.confirm_time,'yyyy-MM-dd')<='{6}' and " +
@@ -375,6 +375,28 @@ namespace DAL
         }
 
         /// <summary>
+        /// 对账时若货物存在退货则标识一下
+        /// </summary>
+        /// <param name="obj"></param>
+        /// <returns></returns>
+        public int UpdateReturnFlag(string deliver_index, int seq_id)
+        {
+            try
+            {
+                int count = 0;
+                string sql = "update jinchen.sale_info set return_flag=1 where deliver_index='{0}' and seq_id={1}";
+                sql = string.Format(sql, deliver_index, seq_id);
+                count = PostgreHelper.ExecuteNonQuery(sql);
+                return count;
+
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        /// <summary>
         /// 更新对账单号
         /// </summary>
         /// <param name="obj"></param>
@@ -384,7 +406,7 @@ namespace DAL
             try
             {
                 int count = 0;
-                string sql = "update jinchen.sale_info set dz_index='{0}' where deliver_index='{1}' and seq_id='{2}'";
+                string sql = "update jinchen.sale_info set dz_index='{0}' where deliver_index='{1}' and seq_id={2}";
                 sql = string.Format(sql, dz_index, deliver_index, seq_id);
                 count = PostgreHelper.ExecuteNonQuery(sql);
                 return count;

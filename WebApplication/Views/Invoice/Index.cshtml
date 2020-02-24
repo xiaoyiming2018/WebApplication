@@ -162,7 +162,7 @@
                         <ol class="breadcrumb text-left">
                             <li><a href="/Supplier/Index">主页</a></li>
                             <li><a href="/Invoice/Index">财务管理</a></li>
-                            <li class="active">发票管理</li>
+                            <li class="active">已开发票记录</li>
                         </ol>
                     </div>
                 </div>
@@ -304,13 +304,13 @@
                                                 {
                                                     <td>
                                                         <input type="button" class="btn btn-primary" onclick="window.location.href = '/Invoice/Edit?id=@item.id'" value="编辑" />
-                                                    </td>                            
+                                                    </td>
                                                 }
 
                                                 @if (UserManager.Current.GetLevel >= UserLevelEnum.Boss)
                                                 {
                                                     <td>
-                                                        <input type="button" class="btn btn-primary" onclick="duiZhang(@item.id)" value="确认对账" />
+                                                        <input type="button" class="btn btn-primary" onclick="duiZhang(@item.id)" value="确认付款" />
                                                     </td>
 
                                                     <td>
@@ -321,6 +321,20 @@
                                             </tr>
                                             index++;
                                         }
+                                        <tr>
+                                            <td colspan="5"></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td colspan="4"></td>
+                                        </tr>
+                                        <tr>
+                                            <td colspan="5" style="color:green;font:bold">总计</td>
+                                            <td>@ViewBag.money</td>
+                                            <td>@ViewBag.ratio</td>
+                                            <td>@ViewBag.allMoney</td>
+                                            <td colspan="4"></td>
+                                        </tr>
                                     }
                                 </tbody>
                             </table>

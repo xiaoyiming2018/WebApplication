@@ -169,6 +169,19 @@ namespace BLL
             int count = SS.UpdateDeliverHead(deliver_company_head, deliver_index);
             return count;
         }
+
+        /// <summary>
+        /// 更新
+        /// </summary>
+        /// <param name="obj"></param>
+        /// <returns></returns>
+        public int UpdateReturnFlag(string deliver_index, int seq_id)
+        {
+            int count = SS.UpdateReturnFlag(deliver_index, seq_id);
+            return count;
+        }
+
+
         /// <summary>
         /// 更新
         /// </summary>

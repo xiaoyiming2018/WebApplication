@@ -168,43 +168,60 @@
                                 <tbody>
                                     @{
                                         int index = 1;
+
                                         foreach (var item in Model)
                                         {
-                                    <tr>
-                                        <td>@index</td>
-                                        <td>@item.company_name</td>
+                                            <tr>
+                                                <td>@index</td>
+                                                <td>@item.company_name</td>
 
-                                        <td>@item.invoice_index</td>
-                                        @if (item.invoice_type == 0)
-                                        {
-                                            <td>普通发票</td>
-                                        }
-                                        else
-                                        {
-                                            <td>增值税专用发票</td>
-                                        }
-                                        <td>@item.invoice_time.ToString("yyyy-MM-dd")</td>
+                                                <td>@item.invoice_index</td>
+                                                @if (item.invoice_type == 0)
+                                                {
+                                                    <td>普通发票</td>
+                                                }
+                                                else
+                                                {
+                                                    <td>增值税专用发票</td>
+                                                }
+                                                <td>@item.invoice_time.ToString("yyyy-MM-dd")</td>
 
-                                        <td>@item.invoice_price</td>
-                                        <td>@item.invoice_ratio</td>
-                                        <td>@item.invoice_all_price</td>
-                                        @if (item.pay_type == 0)
-                                        {
-                                            <td>转账</td>
-                                        }
-                                        else
-                                        {
-                                            <td>现金</td>
-                                        }
-                                        <td>@item.remark</td>
-                                        <td>@item.confirm_time.ToString("yyyy-MM-dd")</td>
-                                    </tr>
+                                                <td>@item.invoice_price</td>
+                                                <td>@item.invoice_ratio</td>
+                                                <td>@item.invoice_all_price</td>
+                                                @if (item.pay_type == 0)
+                                                {
+                                                    <td>转账</td>
+                                                }
+                                                else
+                                                {
+                                                    <td>现金</td>
+                                                }
+                                                <td>@item.remark</td>
+                                                <td>@item.confirm_time.ToString("yyyy-MM-dd")</td>
+                                            </tr>
                                             index++;
+
                                         }
+                                        <tr>
+                                            <td colspan="5"></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td colspan="4"></td>
+                                        </tr>
+                                        <tr>
+                                            <td colspan="5" style="color:green;font:bold">总计</td>
+                                            <td>@ViewBag.money</td>
+                                            <td>@ViewBag.ratio</td>
+                                            <td>@ViewBag.allMoney</td>
+                                            <td colspan="4"></td>
+                                        </tr>
                                     }
                                 </tbody>
                             </table>
                             <div class="page-nav" id="pageIndex">@Html.Raw(PagerHtmlString.Pager(ViewBag.model, "Invoice", "HistoryIndex", true))</div>
+                            
                         </div>
                     </div><!-- /# card -->
                 </div><!-- /# column -->

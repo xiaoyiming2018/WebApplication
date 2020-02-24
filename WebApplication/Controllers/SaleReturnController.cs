@@ -173,6 +173,7 @@ namespace WebApplication.Controllers
                 objSaleReturn.seq_id = objSaleReturn.seq_id;
                 int count = SM.Insert(objSaleReturn);
 
+                SaleM.UpdateReturnFlag(deliver_index, objSaleReturn.seq_id);
                 if (count <= 0)
                 {
                     flag = false;

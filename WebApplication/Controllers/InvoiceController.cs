@@ -62,6 +62,19 @@ namespace WebApplication.Controllers
             string confirm_end_time = "2222-01-01";
 
             var objList = IM.SelectAll(0, start_time, end_time, confirm_start_time, confirm_end_time, invoice_index, company_name);
+            //显示总金额，税额和总额
+            double money = 0;
+            double ratio = 0;
+            double allMoney = 0;
+            for (int i = 0; i < objList.Count; i++)
+            {
+                money = money + objList[i].invoice_price;
+                ratio = ratio + objList[i].invoice_ratio;
+                allMoney = allMoney + objList[i].invoice_all_price;
+            }
+            ViewBag.money = money;
+            ViewBag.ratio = ratio;
+            ViewBag.allMoney = allMoney;
             var pagedList = PagedList<Invoice>.PageList(pageindex, pagesize, objList);
             ViewBag.model = pagedList.Item2;
             return View(pagedList.Item1);
@@ -266,6 +279,20 @@ namespace WebApplication.Controllers
             }
 
             var objList = IM.SelectAll(1, start_time,end_time,confirm_start_time, confirm_end_time, invoice_index, company_name);
+
+            //显示总金额，税额和总额
+            double money = 0;
+            double ratio = 0;
+            double allMoney = 0;
+            for (int i=0;i< objList.Count;i++) {
+                money = money + objList[i].invoice_price;
+                ratio = ratio + objList[i].invoice_ratio;
+                allMoney = allMoney + objList[i].invoice_all_price;
+            }
+            ViewBag.money = money;
+            ViewBag.ratio = ratio;
+            ViewBag.allMoney = allMoney;
+
             var pagedList = PagedList<Invoice>.PageList(pageindex, pagesize, objList);
             ViewBag.model = pagedList.Item2;
             return View(pagedList.Item1);

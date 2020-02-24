@@ -22,6 +22,17 @@ namespace BLL
         }
 
         /// <summary>
+        /// 查询所有联系人
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
+        public List<Contact> SelectAllContact()
+        {
+            List<Contact> objList = CS.SelectAllContact();
+            return objList;
+        }
+
+        /// <summary>
         /// 根据id查询
         /// </summary>
         /// <param name="id"></param>
