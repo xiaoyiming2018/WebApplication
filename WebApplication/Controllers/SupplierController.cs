@@ -203,7 +203,7 @@ namespace WebApplication.Controllers
                     Company obj = UM.SelectSingleByName(res[1],1);
                     if (obj != null)
                     {
-                        return Json("Fail");
+                        return Json(obj.company_name);
                     }
 
                     count = UM.Insert(objCompany);
@@ -223,7 +223,7 @@ namespace WebApplication.Controllers
                         }
                         contact.name = res[6];
                         contact.position = res[7];
-                        contact.telephone = res[20];
+                        contact.telephone = res[8];
                         contact.email = res[9];
                         CM.Insert(contact);
                     }
@@ -240,7 +240,7 @@ namespace WebApplication.Controllers
                     }
                     contact.name = res[6];
                     contact.position = res[7];
-                    contact.telephone = res[20];
+                    contact.telephone = res[8];
                     contact.email = res[9];
                     CM.Insert(contact);
                 }

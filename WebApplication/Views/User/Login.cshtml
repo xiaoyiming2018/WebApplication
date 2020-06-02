@@ -1,8 +1,6 @@
 ﻿@{
     Layout = null;
 }
-@Html.AntiForgeryToken()
-@{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
 <!DOCTYPE html>
 <html>
 <head>
@@ -10,10 +8,6 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>登录</title>
-
-    <!-- ================= Favicon ================== -->
-    <!-- Standard -->
-    @*<link rel="shortcut icon" href="http://placehold.it/64.png/000/fff">*@
 
     <!-- Styles -->
     <link href="~/assets/fontAwesome/css/fontawesome-all.min.css" rel="stylesheet">
@@ -83,8 +77,8 @@
                 <div class="col-lg-6 col-lg-offset-3">
                     <div class="login-content">
                         <div class="login-form">
-                            <h4 id="login">麦买卖进销存管理系统&nbsp;&nbsp;1.0.1</h4>
-                            <div class="login_FalseHints">麦买卖进销存管理系统1.0.1</div>
+                            <h4 id="login">麦买卖进销存管理系统</h4>
+                            <div class="login_FalseHints">麦买卖进销存管理系统</div>
                             <div class="form-group">
                                 <label>用户名</label>
                                 <input type="text" class="form-control" name="userName" id="userName" placeholder="User Name" />
@@ -107,7 +101,7 @@
                             </div>
                             <h5 id="login_FalseHints" style="color:red"></h5>
                             <input type="submit" id="button" class="btn btn-primary btn-flat m-b-30 m-t-30" value="登录" />
-                            <label style="font-weight:bold">版本号：V1.0.1</label>
+                            <label style="font-weight:bold">版本号：V1.1.2</label>
                         </div>
                     </div>
                 </div>

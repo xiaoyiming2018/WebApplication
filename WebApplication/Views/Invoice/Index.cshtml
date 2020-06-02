@@ -9,18 +9,39 @@
 <html>
 <head>
     <meta name="viewport" content="width=device-width" />
-    <title></title>
-    <link href="~/js/dist/css/bootstrap-select.min.css" rel="stylesheet" />
 
-    <script src="~/assets/js/lib/bootstrap.min.js"></script>
-    <script src="~/js/dist/js/bootstrap-select.min.js"></script>
-    <script type="text/javascript" src="~/Scripts/jquery-1.10.2.min.js"></script>
-    <script type="text/javascript" src="~/My97DatePicker/WdatePicker.js"></script>
     <script type="text/javascript">
         $(function () {
             $(".sidebar ul li:nth-of-type(6)").addClass("active open")
             $(".sidebar ul li:nth-of-type(6) ul li:nth-of-type(1)").addClass("active")
         });
+
+        function Search() {
+            var companyNameList = $("#company_name").val();
+            var company_name = companyNameList.join(',');
+            var invoice_index = $("#invoice_index").val();
+            var start_time = $("#start_time").val();
+            var end_time = $("#end_time").val();
+
+            var day = $("#day").val();
+            var month = $("#month").val();
+            var year = $("#year").val();
+
+            $.ajax({
+                url: "/Invoice/Index",
+                type: "post",
+                data: {
+                    company_name: company_name, invoice_index: invoice_index, start_time: start_time, end_time: end_time,
+                    day: day, month: month, year: year
+                },
+                success: function (msg) {
+                    window.location.href = "/Invoice/Index";
+                },
+                error: function (msg) {
+
+                }
+            });
+        }
 
         function confirmTiShi() {
             var pay_type = $('#pay_type').val();
@@ -173,11 +194,11 @@
                 <div class="col-lg-12">
                     <div class="card alert">
                         <div class="card-header">
-                            <form class="form-horizontal" action="/Invoice/Index" method="post" id="myfrom">
+                            <form class="form-horizontal" action="/Invoice/Index"  method="post">
                                 <div class="form-inline">
                                     <div class="form-group">
                                         <label>客户名称：</label>
-                                        <select class="selectpicker" data-live-search="true" data-live-search-placeholder="搜索" id="company_name" name="company_name" style="padding:6px 50px">
+                                        <select class="selectpicker" data-live-search="true" data-live-search-placeholder="搜索" id="company_name" name="company_name" style="padding:6px 50px" multiple>
                                             <option value=""></option>
                                             @{
                                                 CompanyManager CM = new CompanyManager();
@@ -186,7 +207,8 @@
                                                 {
                                                     for (int i = 0; i < objList.Count; i++)
                                                     {
-                                                        <!option value="@objList[i].company_name" @if (Model != null) { if (objList[i].company_name == ViewBag.company_name) { <text> selected</text>}}>@objList[i].company_name</!option>
+
+                                                        <!option value="@objList[i].company_name" @if (Model != null && ViewBag.company_name.Length>0) { for (int j=0;j<ViewBag.company_name.Length;j++) {if (objList[i].company_name == ViewBag.company_name[j]) { <text> selected</text>}} } >@objList[i].company_name</!option>
                                                     }
                                                 }
                                             }
@@ -211,11 +233,11 @@
                                     </div>
                                     <div class="form-group">
                                         <label>开始时间：</label>
-                                        <input id="start_time" name="start_time" type="text" class="form-control" onclick="WdatePicker({ skin: 'whyGreen',dateFmt:'yyyy-MM-dd' })" value="@ViewBag.start_time" />
+                                        <input id="start_time" name="start_time" type="text" autocomplete="off" class="form-control" onclick="WdatePicker({ skin: 'whyGreen',dateFmt:'yyyy-MM-dd' })" value="@ViewBag.start_time" />
                                     </div>
                                     <div class="form-group">
                                         <label>结束时间：</label>
-                                        <input id="end_time" name="end_time" type="text" class="form-control" onclick="WdatePicker({ skin: 'whyGreen',dateFmt:'yyyy-MM-dd' })" value="@ViewBag.end_time" />
+                                        <input id="end_time" name="end_time" type="text" autocomplete="off" class="form-control" onclick="WdatePicker({ skin: 'whyGreen',dateFmt:'yyyy-MM-dd' })" value="@ViewBag.end_time" />
                                     </div>
                                 </div>
                                 <br />
@@ -255,13 +277,14 @@
                                     <tr>
                                         <th>编号</th>
                                         <th>客户名称</th>
+                                        <th>开票公司</th>
                                         <th>发票号</th>
                                         <th>发票类型</th>
                                         <th>开票日期</th>
-                                        <th>金额</th>
-                                        <th>税额</th>
-                                        <th>价税合计</th>
-
+                                        <th>应付金额</th>
+                                        <th>已付金额</th>
+                                        <th>未付金额</th>
+                                        <th>客户预付款</th>
                                         <th>备注</th>
                                         @if (UserManager.Current.GetLevel >= UserLevelEnum.ProductManager)
                                         {
@@ -280,45 +303,46 @@
                                         int index = 1;
                                         foreach (var item in Model)
                                         {
-                                            <tr>
-                                                <td>@index</td>
-                                                <td>@item.company_name</td>
+                                    <tr>
+                                        <td>@index</td>
+                                        <td>@item.company_name</td>
+                                        <td>@item.invoice_company</td>
+                                        <td>@item.invoice_index</td>
+                                        @if (item.invoice_type == 0)
+                                        {
+                                            <td>普通发票</td>
+                                        }
+                                        else
+                                        {
+                                            <td>增值税专用发票</td>
+                                        }
+                                        <td>@item.invoice_time.ToString("yyyy-MM-dd")</td>
 
-                                                <td>@item.invoice_index</td>
-                                                @if (item.invoice_type == 0)
-                                                {
-                                                    <td>普通发票</td>
-                                                }
-                                                else
-                                                {
-                                                    <td>增值税专用发票</td>
-                                                }
-                                                <td>@item.invoice_time.ToString("yyyy-MM-dd")</td>
+                                        <td>@item.invoice_price</td>
+                                        <td>@item.invoice_real_price</td>
+                                        <td>@(item.invoice_price-item.invoice_real_price)</td>
+                                        <td>@item.invoice_prepay</td>
 
-                                                <td>@item.invoice_price</td>
-                                                <td>@item.invoice_ratio</td>
-                                                <td>@item.invoice_all_price</td>
+                                        <td>@item.remark</td>
+                                        @if (UserManager.Current.GetLevel >= UserLevelEnum.ProductManager)
+                                        {
+                                            <td>
+                                                <input type="button" class="btn btn-primary" onclick="window.location.href = '/Invoice/Edit?id=@item.id'" value="编辑" />
+                                            </td>
+                                        }
 
-                                                <td>@item.remark</td>
-                                                @if (UserManager.Current.GetLevel >= UserLevelEnum.ProductManager)
-                                                {
-                                                    <td>
-                                                        <input type="button" class="btn btn-primary" onclick="window.location.href = '/Invoice/Edit?id=@item.id'" value="编辑" />
-                                                    </td>
-                                                }
+                                        @if (UserManager.Current.GetLevel >= UserLevelEnum.Boss)
+                                        {
+                                            <td>
+                                                <input type="button" class="btn btn-primary" onclick="duiZhang(@item.id)" value="确认付款" @if(item.invoice_price>item.invoice_real_price){<text>disabled</text>} />
+                                            </td>
 
-                                                @if (UserManager.Current.GetLevel >= UserLevelEnum.Boss)
-                                                {
-                                                    <td>
-                                                        <input type="button" class="btn btn-primary" onclick="duiZhang(@item.id)" value="确认付款" />
-                                                    </td>
+                                            <td>
+                                                <input type="button" class="btn btn-primary" onclick="deleteTiShi(@item.id)" value="删除" />
+                                            </td>
 
-                                                    <td>
-                                                        <input type="button" class="btn btn-primary" onclick="deleteTiShi(@item.id)" value="删除" />
-                                                    </td>
-
-                                                }
-                                            </tr>
+                                        }
+                                    </tr>
                                             index++;
                                         }
                                         <tr>
@@ -329,10 +353,11 @@
                                             <td colspan="4"></td>
                                         </tr>
                                         <tr>
-                                            <td colspan="5" style="color:green;font:bold">总计</td>
-                                            <td>@ViewBag.money</td>
-                                            <td>@ViewBag.ratio</td>
-                                            <td>@ViewBag.allMoney</td>
+                                            <td colspan="6" style="color:green;font-weight:bold">总计：</td>
+                                            <td style="font-weight:bold">@ViewBag.allMoney</td>
+                                            <td style="font-weight:bold">@ViewBag.allReal</td>
+                                            <td style="font-weight:bold">@(ViewBag.allMoney-ViewBag.allReal)</td>
+                                            <td style="font-weight:bold">@ViewBag.allPrepay</td>
                                             <td colspan="4"></td>
                                         </tr>
                                     }
@@ -359,12 +384,13 @@
                         <label for="txt_departmentname">付款方式</label>
                         <select class="form-control" id="pay_type" name="pay_type">
                             <option value=""></option>
-                            <option value="0">转账</option>
-                            <option value="1">现金</option>
+                            <option value="0">现金</option>
+                            <option value="1">银行转账</option>
+                            <option value="2">承兑</option>
                         </select>
                     </div>
                     <div class="form-group">
-                        <label for="txt_parentdepartment">对账时间</label>
+                        <label for="txt_parentdepartment">付款时间</label>
                         <input type="text" id="confirm_time" name="confirm_time" class="form-control"  onclick="WdatePicker({ skin: 'whyGreen',dateFmt:'yyyy-MM-dd' })">
                     </div>
                 </div>

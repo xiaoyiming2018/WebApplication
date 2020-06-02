@@ -30,10 +30,10 @@ namespace Model
         //序号
         public int seq_id { get; set; }
         //下单数量
-        public Int64 order_num { get; set; }
+        public double order_num { get; set; }
 
         //退单数量
-        public Int64 tui_num { get; set; }
+        public double tui_num { get; set; }
 
         //需求出货时间
         public DateTime deliver_time { get; set; }
@@ -46,9 +46,9 @@ namespace Model
         //需求单位
         public string unit { get; set; }
         //开单数量
-        public Int64 open_num { get; set; }
+        public double open_num { get; set; }
         //剩余数量
-        public Int64 remain_num { get; set; }
+        public double remain_num { get; set; }
         //图纸
         public string order_picture { get; set; }
 
@@ -57,7 +57,7 @@ namespace Model
         //出货公司抬头
         public string deliver_company_head { get; set; }
         //实际出货数量
-        public Int64 real_num { get; set; }
+        public double real_num { get; set; }
         //实际出货时间
         public DateTime real_time { get; set; }
         //出货单价
@@ -73,9 +73,6 @@ namespace Model
         //结款方式
         public int money_way { get; set; }
 
-        //出货单状态（0:未对账，1：已对账，2：对账后关联发票）
-        public int deliver_status { get; set; }
-
         //退单的状态
         public int return_status { get; set; }
         //标识某一订单货物是否存在退货
@@ -89,10 +86,12 @@ namespace Model
         // 地址
         public string address { get; set; }
 
-        // 地址
+        // 对账单号
         public string dz_index { get; set; }
 
-        // 地址
+        // 已对账数量
+        public int dz_num { get; set; }
+        // 绑定的发票号
         public string invoice_index { get; set; }
 
     }

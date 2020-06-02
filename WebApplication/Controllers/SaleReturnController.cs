@@ -79,7 +79,7 @@ namespace WebApplication.Controllers
                 }
                 else
                 {
-                    List<SaleReturn> listSale = SM.SelectTodayForReturnIndex(DateTime.Now.ToLocalTime().ToString("yyyy-MM-dd"));
+                    List<SaleReturn> listSale = SM.SelectTodayForReturnIndex(DateTime.Now.ToLocalTime().AddHours(8).ToString("yyyy-MM-dd"));
                     string count_num = "";
                     int num = listSale.Count + 1;
                     if (num < 10)
@@ -94,7 +94,7 @@ namespace WebApplication.Controllers
                     {
                         count_num = "" + num;
                     }
-                    ViewBag.return_index = SettingM.SelectInUse(7).index_begin + DateTime.Now.ToLocalTime().ToString("yyyy-MM-dd").Replace("-", "") + count_num;
+                    ViewBag.return_index = SettingM.SelectConfigList(7)[0].config_list + DateTime.Now.ToLocalTime().AddHours(8).ToString("yyyy-MM-dd").Replace("-", "") + count_num;
                     return View();
                 }
             }
@@ -126,7 +126,7 @@ namespace WebApplication.Controllers
             SaleReturn objSaleReturn = new SaleReturn();
             objSaleReturn.return_index = return_index;
             objSaleReturn.deliver_index = deliver_index;
-            objSaleReturn.insert_time = DateTime.Now.ToLocalTime();
+            objSaleReturn.insert_time = DateTime.Now.ToLocalTime().AddHours(8);
 
             Order objOrder = new Order();
             for (int i = 0; i < inputNum; i++)
@@ -146,8 +146,8 @@ namespace WebApplication.Controllers
                     }
                     else
                     {
-                        objSaleReturn.return_num = Convert.ToInt32(return_num[i]);
-                        objOrder.tui_num = Convert.ToInt32(return_num[i]);
+                        objSaleReturn.return_num = Convert.ToDouble(return_num[i]);
+                        objOrder.tui_num = Convert.ToDouble(return_num[i]);
                     }
 
                 }
@@ -197,7 +197,7 @@ namespace WebApplication.Controllers
         /// 获取价格
         /// </summary>
         /// <returns></returns>
-        public IActionResult GetProductPrice(int id, int return_num, double return_price)
+        public IActionResult GetProductPrice(int id, double return_num, double return_price)
         {
             ViewBag.return_all_price = return_num * return_price;
             ViewBag.id = "return_all_price" + id;
@@ -277,13 +277,13 @@ namespace WebApplication.Controllers
 
             ViewBag.flag = 1;
 
-            DateTime dt = DateTime.Now;
+            DateTime dt = DateTime.Now.AddHours(8);
             DateTime dt2 = dt.AddMonths(1);
 
             if (day == "1")
             {
-                start_time = DateTime.Now.ToLocalTime().ToString("yyyy-MM-dd");
-                end_time = DateTime.Now.ToLocalTime().ToString("yyyy-MM-dd");
+                start_time = DateTime.Now.ToLocalTime().AddHours(8).ToString("yyyy-MM-dd");
+                end_time = DateTime.Now.ToLocalTime().AddHours(8).ToString("yyyy-MM-dd");
                 ViewBag.day = "1";
             }
             if (month == "1")
@@ -295,7 +295,7 @@ namespace WebApplication.Controllers
             if (year == "1")
             {
                 start_time = dt.AddMonths(-dt.Month + 1).AddDays(-dt.Day + 1).ToString("yyyy-MM-dd");
-                end_time = new DateTime(DateTime.Now.Year, 12, 31).ToString("yyyy-MM-dd");
+                end_time = new DateTime(DateTime.Now.AddHours(8).Year, 12, 31).ToString("yyyy-MM-dd");
                 ViewBag.year = "1";
             }
 

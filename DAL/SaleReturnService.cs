@@ -19,6 +19,7 @@ namespace DAL
             {
                 List<SaleReturn> objList = new List<SaleReturn>();
                 string sql = null;
+
                 sql = "select a.return_index,a.return_num,a.return_price,a.return_all_price,a.insert_time,b.deliver_index,c.order_name,c.unit," +
                     "d.company_order_index,b.deliver_company_head,a.seq_id,a.confirm_time " +
                     "from jinchen.salereturn_info a,jinchen.sale_info b,jinchen.orderseq_info c,jinchen.order_info d " +
@@ -50,7 +51,7 @@ namespace DAL
             {
                 SaleReturn obj = new SaleReturn();
                 string sql = "select a.deliver_index,a.deliver_company_head,b.order_index,d.company_name,b.company_order_index,a.id," +
-                            "c.order_time,c.order_name,c.order_num,c.order_price,c.purchase_person,c.unit,a.real_num,a.real_time,a.deliver_price,a.deliver_all_price," +
+                            "c.order_time,c.order_name,c.order_num,c.order_price,c.purchase_person,c.unit,a.real_num,a.deliver_price,a.deliver_all_price," +
                             "e.return_num,e.return_time,e.return_price,e.return_all_price,e.remark,e.seq_id,c.open_num,c.tui_num " +
                             "from jinchen.salereturn_info e, jinchen.sale_info a, jinchen.order_info b, jinchen.orderseq_info c, jinchen.company_info d " +
                             "where a.order_id = b.id and b.id = c.order_id and a.seq_id = c.seq_id and e.seq_id=a.seq_id and b.customer_id = d.id and a.seq_id ={0} and e.return_index='{1}' ";

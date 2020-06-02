@@ -30,7 +30,7 @@ namespace Model
         //序号
         public int seq_id { get; set; }
         //下单数量
-        public Int64 order_num { get; set; }
+        public double order_num { get; set; }
 
         //需求出货时间
         public DateTime deliver_time { get; set; }
@@ -43,9 +43,9 @@ namespace Model
         //需求单位
         public string unit { get; set; }
         //开单数量
-        public Int64 open_num { get; set; }
+        public double open_num { get; set; }
         //剩余数量
-        public Int64 remain_num { get; set; }
+        public double remain_num { get; set; }
         //图纸
         public string order_picture { get; set; }
 
@@ -54,7 +54,7 @@ namespace Model
         //出货公司抬头
         public string deliver_company_head { get; set; }
         //实际出货数量
-        public Int64 real_num { get; set; }
+        public double real_num { get; set; }
         //实际出货时间
         public DateTime real_time { get; set; }
         //出货单价
@@ -66,7 +66,7 @@ namespace Model
         public string return_index { get; set; }
 
         //实际退货数量
-        public Int64 return_num { get; set; }
+        public double return_num { get; set; }
         //实际退货时间
         public DateTime return_time { get; set; }
         //退货单价

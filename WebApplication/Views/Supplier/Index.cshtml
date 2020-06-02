@@ -9,11 +9,7 @@
 <html>
 <head>
     <meta name="viewport" content="width=device-width" />
-    <title></title>
-    <link href="~/js/dist/css/bootstrap-select.min.css" rel="stylesheet" />
 
-    <script src="~/assets/js/lib/bootstrap.min.js"></script>
-    <script src="~/js/dist/js/bootstrap-select.min.js"></script>    
     <script type="text/javascript">
         $(function () {
             $(".sidebar ul li:nth-of-type(1)").addClass("active open")
@@ -167,7 +163,7 @@
                                             <td>@item.account</td>
                                             <td>@item.bank</td>
                                             <td>
-                                                <input type="button" class="btn btn-primary" onclick="window.location.href = '/Contact/Index?customer_id=@item.id&type=@item.company_type'" value="查看详情" />
+                                                <a href = '/Contact/Index?customer_id=@item.id&type=@item.company_type' >查看详情</a>
                                             </td>
 
                                         }

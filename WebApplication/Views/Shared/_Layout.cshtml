@@ -19,17 +19,21 @@
     <link href="~/assets/css/lib/themify-icons.css" rel="stylesheet">
     <link href="~/assets/css/lib/mmc-chat.css" rel="stylesheet" />
     <link href="~/assets/css/lib/sidebar.css" rel="stylesheet">
-    @*<link href="~/lib/bootstrap/dist/css/bootstrap.css" rel="stylesheet" />*@
     <link href="~/assets/css/lib/bootstrap.min.css" rel="stylesheet">
     <link href="~/assets/css/lib/nixon.css" rel="stylesheet">
     <link href="~/assets/css/style.css" rel="stylesheet">
     <link href="~/assets/css/sweetalert.css" rel="stylesheet">
     <link href="~/js/dist/css/bootstrap-select.min.css" rel="stylesheet" />
+    <link href="~/lib/bootstrap-table/bootstrap-table.min.css" rel="stylesheet" />
+
 
     <script src="~/Scripts/jquery-3.3.1.min.js"></script>
     <script src="~/assets/js/lib/bootstrap.min.js"></script>
+    <script src="~/js/dist/js/bootstrap-select.min.js"></script>
     <script src="~/assets/js/sweetalert-dev.js"></script>
     <script src="~/assets/js/lib/sweetalert/sweetalert.min.js"></script>
+    <script src="~/lib/vue/vue.min.js"></script>
+    <script type="text/javascript" src="~/My97DatePicker/WdatePicker.js"></script>
 
     <script language="JavaScript">
         $(document).ready(function () {
@@ -94,9 +98,10 @@
                             <li><a href="/Sale/Index">销售送货开单</a></li>
                             <li><a href="/SaleReturn/Index">销售退货开单</a></li>
                             <li><a href="/SaleReturn/ReturnHistoryIndex">历史退货记录</a></li>
+                            <li><a href="/Sale/Payment">销售结款管理</a></li>
                             <li><a href="/Sale/MoneyIndex">销售对账</a></li>
-                            <li><a href="/Sale/MoneyHistoryIndex">销售发票对账</a></li>
-                            <li><a href="/Sale/MoneyFinalIndex">历史对账记录</a></li>
+                            <li><a href="/DuiZhang/Index">销售发票对账</a></li>
+                            <li><a href="/DuiZhang/HistoryIndex">历史对账记录</a></li>
                         </ul>
                     </li>
 
@@ -112,7 +117,8 @@
                         <a class="sidebar-sub-toggle"><i class="ti-user"></i> 用户管理 <span class="sidebar-collapse-icon ti-angle-down"></span></a>
                         <ul>
                             <li><a href="/User/Index">用户列表</a></li>
-                            <li><a href="/User/EditPassWord">修改密码</a></li>
+                            @*<li><a href="/User/EditPassWord">修改密码</a></li>*@
+                                
                             <li><a href="/User/Logout">退出登录</a></li>
                         </ul>
                     </li>
@@ -128,7 +134,7 @@
                     }
                     <li>
                         <hr />
-                        <a class="sidebar-sub-toggle" style="color:#00838F"><i class="ti-write"></i>版本号V1.0.1</a>
+                        <a class="sidebar-sub-toggle" style="color:#00838F"><i class="ti-write"></i>版本号 V1.1.2</a>
                     </li>
 
 
@@ -148,7 +154,7 @@
         <div class="pull-right p-r-15">
             <ul>
                 <li class="header-icon dib">
-                    <img class="avatar-img" src="~/assets/images/avatar/1.jpg" alt="" /> <span class="user-avatar">@UserManager.Current.GetLoginName <i class="ti-angle-down f-s-10"></i></span>
+                    <img class="avatar-img" src="~/assets/images/avatar/1.jpg" alt="" /> <span class="user-avatar">@UserManager.Current.GetLoginName</span>
                     <div class="drop-down dropdown-profile" style="width:127.86px">
                         <div class="dropdown-content-heading">
                             <span class="text-left">用户权限</span>
@@ -189,7 +195,6 @@
 
     <script src="~/assets/js/lib/jquery.nanoscroller.min.js"></script><!-- nano scroller -->
     <script src="~/assets/js/lib/sidebar.js"></script><!-- sidebar -->
-    <script src="~/assets/js/lib/bootstrap.min.js"></script><!-- bootstrap -->
     <script src="~/assets/js/lib/mmc-common.js"></script>
     @*<script src="~/assets/js/lib/mmc-chat.js"></script>*@
     @*<script src="~/assets/js/scripts.js"></script><!-- scripit init-->*@

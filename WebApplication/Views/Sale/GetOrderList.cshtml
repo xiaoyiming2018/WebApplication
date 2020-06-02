@@ -7,6 +7,8 @@
         <tr>
             <th>序号</th>
             <th hidden>实际序号</th>
+            <th hidden>客户订单ID</th>
+            <th>客户订单号</th>
             <th>名称规格</th>
             <th>订单数量</th>
             <th>单位</th>
@@ -32,70 +34,72 @@
             int index = 1;
             foreach (var item in Model)
             {
-        <tr>
-            <td>@index</td>
-            <td hidden><input type="text" name="seq_id" style="width:100px" value="@item.seq_id" /></td>
-            <td>@item.order_name</td>
-            <td>@item.order_num</td>
-            <td>@item.unit</td>
-            @if (UserManager.Current.GetLevel >= UserLevelEnum.ProductManager)
-            {
-                <td>@item.order_price</td>
-                <td>@item.order_all_price</td>
-            }
-
-            <td hidden><input type="text" name="remain_num" style="width:100px" value="@item.remain_num" /></td>
-            <td>@item.remain_num</td>
-
-            <td>
-                @if (item.remain_num == 0)
-                {
-                    <input type="text" id="real_num@{@item.seq_id}" name="real_num" style="width:100px;border:none;outline:none;" value="出货已完成" readonly />
-                }
-                else
-                {
-                    <input type="text" id="real_num@{@item.seq_id}" name="real_num" style="width:100px;border-right-style: none;border-left-style: none;border-top-style: none;" onchange="getProductPrice(@item.seq_id)" />
-                }
-
-            </td>
-            @if (UserManager.Current.GetLevel >= UserLevelEnum.ProductManager)
-            {
-                <td>
-                    @if (item.remain_num == 0)
+                <tr>
+                    <td>@index</td>
+                    <td hidden><input type="text" name="seq_id" style="width:100px" value="@item.seq_id" /></td>
+                    <td hidden><input type="text" name="order_id" style="width:100px" value="@item.order_id" /></td>
+                    <td>@item.order_index</td>
+                    <td>@item.order_name</td>
+                    <td>@item.order_num</td>
+                    <td>@item.unit</td>
+                    @if (UserManager.Current.GetLevel >= UserLevelEnum.ProductManager)
                     {
-                        <input type="text" id="deliver_price@{@item.seq_id}" name="deliver_price" style="width:100px;border:none;outline:none;" value="出货已完成" readonly />
-                    }
-                    else
-                    {
-                        <input type="text" id="deliver_price@{@item.seq_id}" name="deliver_price" style="width:100px;border-right-style: none;border-left-style: none;border-top-style: none;" onchange="getProductPrice(@item.seq_id)" />
+                        <td>@item.order_price</td>
+                        <td>@item.order_all_price</td>
                     }
 
-                </td>
-                <td id="price_div@{@item.seq_id}">
-                    @if (item.remain_num == 0)
+                    <td hidden><input type="text" name="remain_num" style="width:100px" value="@item.remain_num" /></td>
+                    <td>@item.remain_num</td>
+
+                    <td>
+                        @if (item.remain_num == 0)
+                        {
+                            <input type="text" id="real_num@{@item.seq_id}" name="real_num" style="width:100px;border:none;outline:none;" value="出货已完成" readonly />
+                        }
+                        else
+                        {
+                            <input type="text" id="real_num@{@item.seq_id}" name="real_num" style="width:100px;border-right-style: none;border-left-style: none;border-top-style: none;" onchange="getProductPrice(@item.seq_id)" />
+                        }
+
+                    </td>
+                    @if (UserManager.Current.GetLevel >= UserLevelEnum.ProductManager)
                     {
-                        <input type="text" name="deliver_all_price" style="width:100px;border:none;outline:none;" value="出货已完成" readonly />
+                        <td>
+                            @if (item.remain_num == 0)
+                            {
+                                <input type="text" id="deliver_price@{@item.seq_id}" name="deliver_price" style="width:100px;border:none;outline:none;" value="出货已完成" readonly />
+                            }
+                            else
+                            {
+                                <input type="text" id="deliver_price@{@item.seq_id}" name="deliver_price" style="width:100px;border-right-style: none;border-left-style: none;border-top-style: none;" onchange="getProductPrice(@item.seq_id)" />
+                            }
+
+                        </td>
+                        <td id="price_div@{@item.seq_id}">
+                            @if (item.remain_num == 0)
+                            {
+                                <input type="text" name="deliver_all_price" style="width:100px;border:none;outline:none;" value="出货已完成" readonly />
+                            }
+                            else
+                            {
+                                <input type="text" name="deliver_all_price" style="width:100px;border-right-style: none;border-left-style: none;border-top-style: none;" />
+                            }
+
+                        </td>
                     }
-                    else
-                    {
-                        <input type="text" name="deliver_all_price" style="width:100px;border-right-style: none;border-left-style: none;border-top-style: none;" />
-                    }
+                    <td>
+                        @if (item.remain_num == 0)
+                        {
+                            <input type="text" name="remark" style="width:100px;border:none;outline:none;" value="出货已完成" readonly />
+                        }
+                        else
+                        {
+                            <input type="text" name="remark" style="width:100px;border-right-style: none;border-left-style: none;border-top-style: none;" />
+                        }
 
-                </td>
-            }
-            <td>
-                @if (item.remain_num == 0)
-                {
-                    <input type="text" name="remark" style="width:100px;border:none;outline:none;" value="出货已完成" readonly />
-                }
-                else
-                {
-                <input type="text" name="remark" style="width:100px;border-right-style: none;border-left-style: none;border-top-style: none;" />
-                }
+                    </td>
 
-            </td>
-
-            </tr>
+                </tr>
                 index++;
             }
         <tr><td ><input id="inputNum" name="inputNum" value="@(index-1)" hidden/></td></tr>

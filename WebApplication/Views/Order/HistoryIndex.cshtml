@@ -9,13 +9,25 @@
 <html>
 <head>
     <meta name="viewport" content="width=device-width" />
-    <title></title>
-    <link href="~/js/dist/css/bootstrap-select.min.css" rel="stylesheet" />
+    <style>
+        .headstyle {
+            border: 2px solid black;
+        }
 
-    <script src="~/assets/js/lib/bootstrap.min.js"></script>
-    <script src="~/js/dist/js/bootstrap-select.min.js"></script>
-    <script type="text/javascript" src="~/Scripts/jquery-1.10.2.min.js"></script>
-    <script type="text/javascript" src="~/My97DatePicker/WdatePicker.js"></script>
+        .thstyle {
+            border: 2px solid black;
+        }
+
+
+
+        .bodystyle {
+            border: 2px solid black;
+        }
+
+        .tdstyle {
+            border: 2px solid black;
+        }
+    </style>
     <script type="text/javascript">
         $(function () {
             $(".sidebar ul li:nth-of-type(4)").addClass("active open")
@@ -47,10 +59,31 @@
                 document.getElementById("year").value = "0";
             }
         }
+
+        function doPrint() {
+            window.print();
+            return false;
+        };
+
+        window.onbeforeprint = function () {
+
+            $(".sidebar").hide()
+            $(".header").hide()
+            $("#Data1").show()
+            $("#wrap").hide()
+            $(".sidebar.sidebar-shrink ~ .content-wrap").css("margin-left", 0)
+        }
+        window.onafterprint = function () {
+            $("#Data1").hide()
+            $("#wrap").show()
+            $(".sidebar").show()
+            $(".header").show()
+            $(".sidebar.sidebar-shrink ~ .content-wrap").css("margin-left", "250px")
+        }
     </script>
 </head>
 <body>
-    <div class="container-fluid">
+    <div class="container-fluid" id="wrap">
         <div class="row">
             <div class="col-lg-12 p-0">
                 <div class="page-header">
@@ -103,35 +136,39 @@
                                             <option value=""></option>
                                             @{
                                                 ContactManager ConM = new ContactManager();
-                                                List<Contact> obList = ConM.SelectAllContact();
+                                                List<string> obList = ConM.SelectAllContact().GroupBy(s => s.name).Select(s => s.Key).ToList();
                                                 if (obList.Count > 0)
                                                 {
                                                     for (int i = 0; i < obList.Count; i++)
                                                     {
-                                                        <!option value="@obList[i].name" @if (Model != null) { if (obList[i].name == ViewBag.purchase_person) { <text> selected</text>}}>@obList[i].name</!option>
+                                                        <!option value="@obList[i]" @if (Model != null) { if (obList[i] == ViewBag.purchase_person) { <text> selected</text>}}>@obList[i]</!option>
                                                     }
                                                 }
                                             }
                                         </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>&emsp;&emsp;名称规格：</label>
+                                        <input id="order_name" name="order_name" type="text" class="form-control" style="width:160px" value="@ViewBag.order_name" />
                                     </div>
                                 </div>
                                 <br />
                                 <div class="form-inline">
                                     <div class="form-group">
                                         <label>下单开始时间：</label>
-                                        <input id="start_time" name="start_time" type="text" class="form-control" style="width:160px" onclick="WdatePicker({ skin: 'whyGreen',dateFmt:'yyyy-MM-dd' })" value="@ViewBag.start_time" />
+                                        <input id="start_time" name="start_time" type="text" class="form-control" autocomplete="off" style="width:160px" onclick="WdatePicker({ skin: 'whyGreen',dateFmt:'yyyy-MM-dd' })" value="@ViewBag.start_time" />
                                     </div>
                                     <div class="form-group">
                                         <label>下单结束时间：</label>
-                                        <input id="end_time" name="end_time" type="text" class="form-control" style="width:160px" onclick="WdatePicker({ skin: 'whyGreen',dateFmt:'yyyy-MM-dd' })" value="@ViewBag.end_time" />
+                                        <input id="end_time" name="end_time" type="text" class="form-control" autocomplete="off" style="width:160px" onclick="WdatePicker({ skin: 'whyGreen',dateFmt:'yyyy-MM-dd' })" value="@ViewBag.end_time" />
                                     </div>
                                     <div class="form-group">
                                         <label>交货开始时间：</label>
-                                        <input id="deliver_start_time" name="deliver_start_time" type="text" class="form-control" style="width:220px" onclick="WdatePicker({ skin: 'whyGreen',dateFmt:'yyyy-MM-dd' })" value="@ViewBag.deliver_start_time" />
+                                        <input id="deliver_start_time" name="deliver_start_time" type="text" class="form-control" autocomplete="off" style="width:220px" onclick="WdatePicker({ skin: 'whyGreen',dateFmt:'yyyy-MM-dd' })" value="@ViewBag.deliver_start_time" />
                                     </div>
                                     <div class="form-group">
                                         <label>交货结束时间：</label>
-                                        <input id="deliver_end_time" name="deliver_end_time" type="text" class="form-control" style="width:160px" onclick="WdatePicker({ skin: 'whyGreen',dateFmt:'yyyy-MM-dd' })" value="@ViewBag.deliver_end_time" />
+                                        <input id="deliver_end_time" name="deliver_end_time" type="text" class="form-control" autocomplete="off" style="width:160px" onclick="WdatePicker({ skin: 'whyGreen',dateFmt:'yyyy-MM-dd' })" value="@ViewBag.deliver_end_time" />
                                     </div>
                                 </div>
                                 <br />
@@ -151,6 +188,7 @@
                                     </div>
                                     <div class="form-group">
                                         <input type="submit" value="查询" class="btn btn-primary" style="width:80px" />
+                                        <input type="button" value="数据打印" class="btn btn-primary" onclick="doPrint()" style="width:80px" />
                                     </div>
                                 </div>
 
@@ -166,13 +204,13 @@
                                         <th>客户名称</th>
                                         <th>客户订单号</th>
                                         <th>名称规格</th>
-
+                                        <th>数量</th>
                                         @if (UserManager.Current.GetLevel >= UserLevelEnum.ProductManager)
                                         {
                                             <th>单价</th>
                                             <th>金额</th>
                                         }
-                                        <th>数量</th>
+
                                         <th>开单数</th>
                                         <th>退单数</th>
                                         <th>交货日期</th>
@@ -195,13 +233,13 @@
                                                 <td>@item.company_name</td>
                                                 <td>@item.company_order_index</td>
                                                 <td>@item.order_name</td>
-
+                                                <td>@item.order_num</td>
                                                 @if (UserManager.Current.GetLevel >= UserLevelEnum.ProductManager)
                                                 {
                                                     <td>@item.order_price</td>
                                                     <td>@item.order_all_price</td>
                                                 }
-                                                <td>@item.order_num</td>
+
                                                 <td style="color:darkseagreen">@item.open_num</td>
                                                 <td style="color:red">@item.tui_num</td>
                                                 <td>@item.deliver_time.ToString("yyyy-MM-dd")</td>
@@ -223,6 +261,16 @@
                                             </tr>
                                             index++;
                                         }
+                                        <tr>
+                                            <td colspan="6" style="color:green;font-weight:bold">合计</td>
+                                            <td style="font-weight:bold">@ViewBag.allNum</td>
+                                            <td></td>
+                                            <td style="font-weight:bold">@ViewBag.allMoney</td>
+
+                                            <td style="font-weight:bold">@ViewBag.allOpenNum</td>
+                                            <td style="font-weight:bold">@ViewBag.allTuiNum</td>
+                                            <td colspan="5"></td>
+                                        </tr>
                                     }
                                 </tbody>
                             </table>
@@ -233,6 +281,87 @@
             </div><!-- /# row -->
         </div>
     </div><!-- /# container-fluid -->
+    <div class="card alert" id="Data1" style="margin: 30px;display: none">
+
+        <div class="card-body">
+            <table class="table" border="0" cellspacing="0" cellpadding="0">
+                <tbody>
+                    <tr style="font-weight:bold">
+                        <td style="font-size:26px;text-align:center;padding:2px;border:0;" colspan="6"><span id="deliver_head">历史客户订单</span></td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <table class="table table-responsive">
+                <thead class="headstyle">
+                    <tr>
+                        <th class="thstyle">编号</th>
+                        <th class="thstyle">订单序号</th>
+                        <th class="thstyle">下单日期</th>
+                        <th class="thstyle">客户名称</th>
+                        <th class="thstyle">客户订单号</th>
+                        <th class="thstyle">名称规格</th>
+                        <th class="thstyle">数量</th>
+                        @if (UserManager.Current.GetLevel >= UserLevelEnum.ProductManager)
+                        {
+                            <th class="thstyle">单价</th>
+                            <th class="thstyle">金额</th>
+                        }
+
+                        <th class="thstyle">开单数</th>
+                        <th class="thstyle">退单数</th>
+                        <th class="thstyle">交货日期</th>
+                        @if (UserManager.Current.GetLevel >= UserLevelEnum.ProductManager)
+                        {
+                            <th class="thstyle">采购员</th>
+                        }
+                    </tr>
+                </thead>
+                <tbody class="bodystyle">
+                    @{
+                        int index1 = 1;
+                        foreach (var item in Model)
+                        {
+                            <tr>
+                                <td class="tdstyle">@index1</td>
+                                <td class="tdstyle">@item.order_index</td>
+                                <td class="tdstyle">@item.order_time.ToString("yyyy-MM-dd")</td>
+                                <td class="tdstyle">@item.company_name</td>
+                                <td class="tdstyle">@item.company_order_index</td>
+                                <td class="tdstyle">@item.order_name</td>
+                                <td class="tdstyle">@item.order_num</td>
+                                @if (UserManager.Current.GetLevel >= UserLevelEnum.ProductManager)
+                                {
+                                    <td class="tdstyle">@item.order_price</td>
+                                    <td class="tdstyle">@item.order_all_price</td>
+                                }
+
+                                <td class="tdstyle" style="color:darkseagreen">@item.open_num</td>
+                                <td class="tdstyle" style="color:red">@item.tui_num</td>
+                                <td class="tdstyle">@item.deliver_time.ToString("yyyy-MM-dd")</td>
+                                @if (UserManager.Current.GetLevel >= UserLevelEnum.ProductManager)
+                                {
+                                    <td class="tdstyle">@item.purchase_person</td>
+                                }
+
+                            </tr>
+                            index1++;
+                        }
+                        <tr>
+                            <td class="tdstyle" colspan="6" style="color:green;font-weight:bold">合计</td>
+                            <td class="tdstyle" style="font-weight:bold">@ViewBag.allNum</td>
+                            <td class="tdstyle"></td>
+                            <td class="tdstyle" style="font-weight:bold">@ViewBag.allMoney</td>
+
+                            <td class="tdstyle" style="font-weight:bold">@ViewBag.allOpenNum</td>
+                            <td class="tdstyle" style="font-weight:bold">@ViewBag.allTuiNum</td>
+                            <td class="tdstyle" colspan="5"></td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
 </body>
 </html>
 

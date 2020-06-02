@@ -24,11 +24,11 @@ namespace BLL
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public Setting SelectInUse(int all_type)
-        {
-            Setting obj = SS.SelectInUse(all_type);
-            return obj;
-        }
+        //public Setting SelectInUse(int all_type)
+        //{
+        //    Setting obj = SS.SelectInUse(all_type);
+        //    return obj;
+        //}
 
         /// <summary>
         /// 插入
@@ -49,6 +49,12 @@ namespace BLL
         public int Update(Setting obj)
         {
             int count = SS.Update(obj);
+            return count;
+        }
+
+        public int Delete(int id)
+        {
+            int count = SS.Delete(id);
             return count;
         }
 

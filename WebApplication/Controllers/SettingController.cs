@@ -22,27 +22,32 @@ namespace WebApplication.Controllers
         public IActionResult Index()
         {
             
-            Setting settingOrder = SM.SelectInUse(3);
-            Setting settingPurchase = SM.SelectInUse(4);
-            Setting settingDeliver = SM.SelectInUse(5);
-            Setting settingReturn = SM.SelectInUse(7);
-            Setting settingDz = SM.SelectInUse(8);
-            Setting settingInvoiceHead = SM.SelectInUse(9);
+            List<Setting> settingOrder = SM.SelectConfigList(3);
+            List<Setting> settingPurchase = SM.SelectConfigList(4);
+            List<Setting> settingDeliver = SM.SelectConfigList(5);
+            List<Setting> settingReturn = SM.SelectConfigList(7);
+            List<Setting> settingDz = SM.SelectConfigList(8);
+            List<Setting> settingInvoiceHead = SM.SelectConfigList(9);
             //订单开头
-            ViewBag.order_index_begin = settingOrder.index_begin;
-            ViewBag.order_index_view = settingOrder.index_begin + "20190101001";
+            ViewBag.order_index_begin = settingOrder[0].config_list;
+            ViewBag.order_index_id = settingOrder[0].id;
+            ViewBag.order_index_view = settingOrder[0].config_list + "20190101001";
             //采购单开头
-            ViewBag.purchase_index_begin = settingPurchase.index_begin;
-            ViewBag.purchase_index_view = settingPurchase.index_begin + "20190101001";
+            ViewBag.purchase_index_begin = settingPurchase[0].config_list;
+            ViewBag.purchase_index_id = settingPurchase[0].id;
+            ViewBag.purchase_index_view = settingPurchase[0].config_list + "20190101001";
             //出货单开头
-            ViewBag.deliver_index_begin = settingDeliver.index_begin;
-            ViewBag.deliver_index_view = settingDeliver.index_begin + "20190101001";
+            ViewBag.deliver_index_begin = settingDeliver[0].config_list;
+            ViewBag.deliver_index_id = settingDeliver[0].id;
+            ViewBag.deliver_index_view = settingDeliver[0].config_list + "20190101001";
             //退货单开头
-            ViewBag.return_index_begin = settingReturn.index_begin;
-            ViewBag.return_index_view = settingReturn.index_begin + "20190101001";
+            ViewBag.return_index_begin = settingReturn[0].config_list;
+            ViewBag.return_index_id = settingReturn[0].id;
+            ViewBag.return_index_view = settingReturn[0].config_list + "20190101001";
             //对账单号开头
-            ViewBag.dz_index_begin = settingDz.index_begin;
-            ViewBag.dz_index_view = settingDz.index_begin + "000001";
+            ViewBag.dz_index_begin = settingDz[0].config_list;
+            ViewBag.dz_index_id = settingDz[0].id;
+            ViewBag.dz_index_view = settingDz[0].config_list + "000001";
             return View();
             
         }
@@ -51,148 +56,75 @@ namespace WebApplication.Controllers
         /// 插入更新页面
         /// </summary>
         /// <returns></returns>
-        public IActionResult Edit(string material_unit,string category, string order_index_begin, string purchase_index_begin, 
-            string deliver_index_begin, string deliver_company_head,string return_index_begin,string dz_index_begin, string invoice_company)
+        public IActionResult Edit(int id,string name,int type)
         {
             try
             {
                 Setting res = new Setting();
-                if (!string.IsNullOrEmpty(material_unit))
+                List<Setting> settings = SM.SelectConfigList(type);
+                //修改
+                if (id > 0)
                 {
-                    res.config_list = material_unit;
-                    res.all_type = 1;
-                    int count = SM.Insert(res);
-                    if (count > 0)
+                    var result = settings.Where(s => s.id != id &&s.config_list==name).ToList();//查找是否存在重名
+                    if (result.Count > 0)
                     {
-                        return Json("Success");
+                        return Json("Repeat");
                     }
-                    else
-                    {
-                        return Json("Fail");
-                    }
-
-                }
-                else if (!string.IsNullOrEmpty(category))
-                {
-                    res.config_list = category;
-                    res.all_type = 2;
-                    int count = SM.Insert(res);
-                    if (count > 0)
-                    {
-                        return Json("Success");
-                    }
-                    else
-                    {
-                        return Json("Fail");
+                    else {
+                        res.id = id;
+                        res.config_list = name;
+                        res.all_type = type;
+                        res.in_use = 1;
+                        int count = SM.Update(res);
+                        if (count > 0)
+                        {
+                            return Json("Success");
+                        }
+                        else
+                        {
+                            return Json("Fail");
+                        }
                     }
                 }
-                else if (!string.IsNullOrEmpty(order_index_begin))
-                {
-                    res.index_begin = order_index_begin;
-                    res.all_type = 3;
-                    res.in_use = 1;
-                    int count = SM.Update(res);
-                    if (count > 0)
-                    {
-                        return Json("Success");
-                    }
-                    else
-                    {
-                        return Json("Fail");
-                    }
-                }
-                else if (!string.IsNullOrEmpty(purchase_index_begin))
-                {
-                    res.index_begin = purchase_index_begin;
-                    res.all_type = 4;
-                    res.in_use = 1;
-                    int count = SM.Update(res);
-                    if (count > 0)
-                    {
-                        return Json("Success");
-                    }
-                    else
-                    {
-                        return Json("Fail");
-                    }
-                }
-                else if (!string.IsNullOrEmpty(deliver_index_begin))
-                {
-                    res.index_begin = deliver_index_begin;
-                    res.all_type = 5;
-                    res.in_use = 1;
-                    int count = SM.Update(res);
-                    if (count > 0)
-                    {
-                        return Json("Success");
-                    }
-                    else
-                    {
-                        return Json("Fail");
-                    }
-                }
-                else if (!string.IsNullOrEmpty(deliver_company_head))
-                {
-                    res.config_list = deliver_company_head;
-                    res.all_type = 6;
-                    int count = SM.Insert(res);
-                    if (count > 0)
-                    {
-                        return Json("Success");
-                    }
-                    else
-                    {
-                        return Json("Fail");
-                    }
-                }
-                else if (!string.IsNullOrEmpty(return_index_begin))
-                {
-                    res.index_begin = return_index_begin;
-                    res.all_type = 7;
-                    res.in_use = 1;
-                    int count = SM.Update(res);
-                    if (count > 0)
-                    {
-                        return Json("Success");
-                    }
-                    else
-                    {
-                        return Json("Fail");
-                    }
-                }
-                else if (!string.IsNullOrEmpty(dz_index_begin))
-                {
-                    res.index_begin = dz_index_begin;
-                    res.all_type = 8;
-                    res.in_use = 1;
-                    int count = SM.Update(res);
-                    if (count > 0)
-                    {
-                        return Json("Success");
-                    }
-                    else
-                    {
-                        return Json("Fail");
-                    }
-                }
+                //新增
                 else {
-                    res.config_list = invoice_company;
-                    res.all_type = 9;
-                    int count = SM.Insert(res);
-                    if (count > 0)
+                    var result = settings.Where(s => s.config_list == name).ToList();
+                    if (result.Count > 0)
                     {
-                        return Json("Success");
+                        return Json("Repeat");
                     }
-                    else
-                    {
-                        return Json("Fail");
-                    }
+                    else {
+                        res.config_list = name;
+                        res.all_type = type;
+                        res.in_use = 1;
+                        int count = SM.Insert(res);
+                        if (count > 0)
+                        {
+                            return Json("Success");
+                        }
+                        else
+                        {
+                            return Json("Fail");
+                        }
+                    } 
                 }
 
             }
             catch (Exception ex)
             {
                 throw ex;
+            }
+        }
+
+        public IActionResult Delete(int id) {
+            int count = SM.Delete(id);
+            if (count > 0)
+            {
+                return Json("Success");
+            }
+            else
+            {
+                return Json("Fail");
             }
         }
     }

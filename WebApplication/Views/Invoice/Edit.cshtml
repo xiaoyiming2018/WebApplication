@@ -8,12 +8,6 @@
 <html>
 <head>
     <meta name="viewport" content="width=device-width" />
-    <title></title>
-    <link href="~/js/dist/css/bootstrap-select.min.css" rel="stylesheet" />
-
-    <script src="~/assets/js/lib/bootstrap.min.js"></script>
-    <script src="~/js/dist/js/bootstrap-select.min.js"></script>
-    <script type="text/javascript" src="~/My97DatePicker/WdatePicker.js"></script>
 
     <script type="text/javascript">
         var TempArr = [];//存储option
@@ -21,19 +15,24 @@
         $(function () {
             $(".sidebar ul li:nth-of-type(6)").addClass("active open")
             $(".sidebar ul li:nth-of-type(6) ul li:nth-of-type(1)").addClass("active")
+
+
+
             $('#submit').click(function () {
                 var id = $('#id').val();
                 var company_name = $('#company_name').val();
+                var invoice_company = $('#invoice_company').val();
                 var invoice_type = $('#invoice_type').val();
                 var invoice_index = $('#invoice_index').val();
                 var invoice_time = $('#invoice_time').val();
                 var invoice_price = $('#invoice_price').val();
-                var invoice_ratio = $('#invoice_ratio').val();
-                var invoice_all_price = $('#invoice_all_price').val();
+                var invoice_real_price = $('#invoice_real_price').val();
+                var invoice_prepay = $('#invoice_prepay').val();
+
                 var remark = $('#remark').val();
 
-                if (company_name == "" || invoice_type == "" || invoice_index == "" || invoice_time == ""
-                    || invoice_price == "" || invoice_ratio == "" || invoice_all_price == "") {
+                if (company_name == "" || invoice_company == "" || invoice_type == "" || invoice_index == "" || invoice_time == ""
+                    || invoice_price == "") {
                     swal("信息不能为空！", "请将信息填充完整！", "error");
                 }
                 else {
@@ -45,8 +44,8 @@
                                 $('input:hidden[name="__RequestVerificationToken"]').val());
                         },
                         data: {
-                            id: id, company_name:company_name,invoice_type: invoice_type, invoice_index: invoice_index, invoice_time: invoice_time,
-                            invoice_price: invoice_price, invoice_ratio: invoice_ratio, invoice_all_price: invoice_all_price, remark: remark
+                            id: id, company_name: company_name, invoice_company:invoice_company,invoice_type: invoice_type, invoice_index: invoice_index, invoice_time: invoice_time,
+                            invoice_price: invoice_price, invoice_real_price: invoice_real_price, invoice_prepay: invoice_prepay, remark: remark
                         },
                         success: function (msg) {
                             if (msg == "Success") {
@@ -70,23 +69,6 @@
             });
         });
 
-        function getPriceList() {
-            var invoice_price = $('#invoice_price').val()
-            var invoice_ratio = $('#invoice_ratio').val()
-            if (invoice_price >= 0 && invoice_ratio >= 0) {
-                $.ajax({
-                    type: "POST",
-                    url: "/Invoice/GetPriceList",
-                    data: { invoice_price: invoice_price, invoice_ratio: invoice_ratio },
-                    success: function (msg) {
-                        $('#price_div').html(msg);
-                    },
-                    error: function (msg) {
-                        swal("获取规格失败！", "请重新操作！", "error");
-                    }
-                });
-            }
-        }
     </script>
 </head>
 <body>
@@ -144,12 +126,31 @@
 
                                             </div>
                                         </div>
+                                        <div class="form-group">
+                                            <label for="example-input-normal" class="col-sm-4 control-label">开票公司</label>
+                                            <div class="col-sm-3">
+                                                <select class="selectpicker" data-live-search="true" data-live-search-placeholder="搜索" id="invoice_company" name="invoice_company">
+                                                    <option value=""></option>
+                                                    @{
+                                                        SettingManager SettingM = new SettingManager();
+                                                        List<Setting> settings = SettingM.SelectConfigList(9);
+                                                        if (settings.Count > 0)
+                                                        {
+                                                            for (int i = 0; i < settings.Count; i++)
+                                                            {
+                                                                <!option value="@settings[i].config_list" @if (Model != null) { if (settings[i].config_list == Model.invoice_company) { <text> selected</text>} }>@settings[i].config_list</!option>
+                                                            }
+                                                        }
+                                                    }
+                                                </select>
 
+                                            </div>
+                                        </div>
 
                                         <div class="form-group">
                                             <label for="example-input-normal" class="col-sm-4 control-label">发票号</label>
                                             <div class="col-sm-4">
-                                                <input type="text" class="form-control" id="invoice_index" name="invoice_index" style="width:220px" value="@if (Model!=null) { @Model.invoice_index; }" @if (Model != null) { <text>readonly</text>} />
+                                                <input type="text" class="form-control" id="invoice_index" name="invoice_index" style="width:220px" value="@if (Model!=null) { @Model.invoice_index; }" />
                                             </div>
                                         </div>
 
@@ -173,23 +174,21 @@
                                         </div>
 
                                         <div class="form-group">
-                                            <label for="example-input-normal" class="col-sm-4 control-label">金额</label>
+                                            <label for="example-input-normal" class="col-sm-4 control-label">应付金额(发票金额)</label>
                                             <div class="col-sm-4">
-                                                <input type="text" class="form-control" id="invoice_price" name="invoice_price" style="width:220px" value="@if (Model!=null) { @Model.invoice_price; }" placeholder="0" onchange="getPriceList()" />
+                                                <input type="text" class="form-control" id="invoice_price" name="invoice_price" style="width:220px" placeholder="0" value="@if (Model!=null) { @Model.invoice_price; }" />
                                             </div>
                                         </div>
-
                                         <div class="form-group">
-                                            <label for="example-input-normal" class="col-sm-4 control-label">税额</label>
+                                            <label for="example-input-normal" class="col-sm-4 control-label">已付金额</label>
                                             <div class="col-sm-4">
-                                                <input type="text" class="form-control" id="invoice_ratio" name="invoice_ratio" style="width:220px" value="@if (Model!=null) { @Model.invoice_ratio; }" placeholder="0" onchange="getPriceList()" />
+                                                <input type="text" class="form-control" id="invoice_real_price" name="invoice_real_price" style="width:220px" placeholder="0" value="@if (Model!=null) { @Model.invoice_real_price; }" />
                                             </div>
                                         </div>
-
                                         <div class="form-group">
-                                            <label for="example-input-normal" class="col-sm-4 control-label">价税统计</label>
-                                            <div class="col-sm-4" id="price_div">
-                                                <input type="text" class="form-control" id="invoice_all_price" name="invoice_all_price" style="width:220px" placeholder="0" value="@if (Model!=null) { @Model.invoice_all_price; }" readonly />
+                                            <label for="example-input-normal" class="col-sm-4 control-label">客户预付款</label>
+                                            <div class="col-sm-4">
+                                                <input type="text" class="form-control" id="invoice_prepay" name="invoice_prepay" style="width:220px" placeholder="0" value="@if (Model!=null) { @Model.invoice_prepay; }" />
                                             </div>
                                         </div>
 

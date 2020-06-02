@@ -74,7 +74,7 @@ namespace WebApplication.Controllers
                 ViewBag.order_index = order.order_index;
                 ViewBag.company_name = order.company_name;
                 ViewBag.company_order_index = order.company_order_index;
-                ViewBag.order_time = DateTime.Now.ToLocalTime().ToString("yyyy-MM-dd");
+                ViewBag.order_time = DateTime.Now.ToLocalTime().AddHours(8).ToString("yyyy-MM-dd");
 
                 int seq_id = Convert.ToInt32(Request.Query["seq_id"]);
                 if (seq_id > 0)
@@ -115,7 +115,7 @@ namespace WebApplication.Controllers
             string purchase_person = order.purchase_person;
             string unit = order.unit;
 
-            Int64 order_num = order.order_num;
+            double order_num = order.order_num;
             double order_price = order.order_price;
             double order_all_price = order.order_all_price;
             string order_picture = order.order_picture;
@@ -221,7 +221,7 @@ namespace WebApplication.Controllers
         /// 获取材料规格
         /// </summary>
         /// <returns></returns>
-        public IActionResult GetProductPrice(int order_num, double order_price)
+        public IActionResult GetProductPrice(double order_num, double order_price)
         {
             ViewBag.order_all_price = order_num * order_price;
             return View();
@@ -241,7 +241,7 @@ namespace WebApplication.Controllers
             List<Order> orderseqList = OMM.SelectOrderSeqList(order_id);
             ViewBag.orderseqList = orderseqList;
 
-            Int64 order_num = 0;
+            double order_num = 0;
             double order_all_price = 0;
             for (int i=0;i< orderseqList.Count;i++)
             {

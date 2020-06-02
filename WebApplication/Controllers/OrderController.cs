@@ -22,13 +22,14 @@ namespace WebApplication.Controllers
         /// <param name="size">每页显示数量</param>
         /// <returns></returns>
         public IActionResult Index(string start_time, string end_time,string deliver_start_time, string deliver_end_time, string company_name, 
-            string order_index,string company_order_index,string purchase_person, int pageindex = 1, int pagesize = 20)
+            string order_index,string company_order_index,string purchase_person,string order_name, int pageindex = 1, int pagesize = 20)
         {            
                           
             ViewBag.company_name = company_name;
             ViewBag.order_index = order_index;
             ViewBag.company_order_index = company_order_index;
             ViewBag.purchase_person = purchase_person;
+            ViewBag.order_name = order_name;
 
             ViewBag.start_time = start_time;
             ViewBag.end_time = end_time;
@@ -53,7 +54,41 @@ namespace WebApplication.Controllers
             }
 
 
-            var objList = OM.SelectAll(0, start_time, end_time, deliver_start_time, deliver_end_time, company_name, order_index, company_order_index, purchase_person);
+            var objList = OM.SelectAll(0, start_time, end_time, deliver_start_time, deliver_end_time, company_name, order_index, company_order_index, purchase_person, order_name);
+
+            //金额
+            double allMoney = 0;
+            //已完成金额
+            double allFinishMoney = 0;
+            //未完成金额
+            double allUnfinishMoney = 0;
+            //数量
+            double allNum = 0;
+            //开单数
+            double allOpenNum = 0;
+            //退单数
+            double allTuiNum = 0;
+            //剩余数
+            double allRemainNum = 0;
+            
+            for (int i = 0; i < objList.Count; i++)
+            {
+                allMoney = allMoney + objList[i].order_all_price;
+                allFinishMoney = allFinishMoney + objList[i].order_price* objList[i].open_num;
+                allUnfinishMoney = allUnfinishMoney + objList[i].order_price * objList[i].remain_num;
+                allNum = allNum + objList[i].order_num;
+                allOpenNum = allOpenNum + objList[i].open_num;
+                allTuiNum = allTuiNum + objList[i].tui_num;
+                allRemainNum = allRemainNum + objList[i].order_num- objList[i].open_num + objList[i].tui_num;
+            }
+            ViewBag.allMoney = allMoney;
+            ViewBag.allFinishMoney = allFinishMoney;
+            ViewBag.allUnfinishMoney = allUnfinishMoney;
+            ViewBag.allNum = allNum;
+            ViewBag.allOpenNum = allOpenNum;
+            ViewBag.allTuiNum = allTuiNum;
+            ViewBag.allRemainNum = allRemainNum;
+
             var pagedList = PagedList<Order>.PageList(pageindex, pagesize, objList);
             ViewBag.model = pagedList.Item2;
             return View(pagedList.Item1);
@@ -69,18 +104,18 @@ namespace WebApplication.Controllers
             try
             {
                 int id = Convert.ToInt32(Request.Query["id"]);
-                List<Contact> contacts = CM.SelectAllContact();
+                List<string> contacts = CM.SelectAllContact().GroupBy(s=>s.name).Select(s=>s.Key).ToList();
                 ViewBag.contacts = contacts;
                 if (id > 0)
                 {
                     
-                    ViewBag.order_time = DateTime.Now.ToLocalTime().ToString("yyyy-MM-dd").Replace("-", "");
+                    ViewBag.order_time = DateTime.Now.ToLocalTime().AddHours(8).ToString("yyyy-MM-dd").Replace("-", "");
                     var obj = OM.SelectById(id);//只允许修改order_info里面的字段
                     return View(obj);
                 }
                 else
                 {
-                    List<Order> listOrder =OM.SelectTodayForOrderIndex(DateTime.Now.ToLocalTime().ToString("yyyy-MM-dd"));
+                    List<Order> listOrder =OM.SelectTodayForOrderIndex(DateTime.Now.ToLocalTime().AddHours(8).ToString("yyyy-MM-dd"));
                     string count_num = "";
                     int num = listOrder.Count + 1;
                     if (num < 10)
@@ -96,8 +131,8 @@ namespace WebApplication.Controllers
                         count_num = "" + num;
                     }                   
 
-                    ViewBag.order_index = SM.SelectInUse(3).index_begin + DateTime.Now.ToLocalTime().ToString("yyyy-MM-dd").Replace("-", "")+ count_num;
-                    ViewBag.order_time = DateTime.Now.ToLocalTime().ToString("yyyy-MM-dd");
+                    ViewBag.order_index = SM.SelectConfigList(3)[0].config_list + DateTime.Now.ToLocalTime().AddHours(8).ToString("yyyy-MM-dd").Replace("-", "")+ count_num;
+                    ViewBag.order_time = DateTime.Now.ToLocalTime().AddHours(8).ToString("yyyy-MM-dd");
                     return View();
                 }
             }
@@ -109,7 +144,7 @@ namespace WebApplication.Controllers
 
         public IActionResult GetContacts()
         {
-            List<Contact> contacts = CM.SelectAllContact();
+            List<string> contacts = CM.SelectAllContact().GroupBy(s=>s.name).Select(s=>s.Key).ToList();
             return Json(contacts);
 
         }
@@ -174,7 +209,7 @@ namespace WebApplication.Controllers
                         }
                         else
                         {
-                            orderList.order_num = Convert.ToInt32(order_num[i]);
+                            orderList.order_num = Convert.ToDouble(order_num[i]);
                         }
 
                         if (order_price[i] == "")
@@ -221,7 +256,7 @@ namespace WebApplication.Controllers
         /// 获取价格
         /// </summary>
         /// <returns></returns>
-        public IActionResult GetProductPrice(int id, int order_num, double order_price)
+        public IActionResult GetProductPrice(int id, double order_num, double order_price)
         {
             ViewBag.order_all_price = order_num * order_price;
             ViewBag.id = "order_all_price"+id;
@@ -229,13 +264,15 @@ namespace WebApplication.Controllers
         }
 
         public IActionResult HistoryIndex(string start_time, string end_time, string deliver_start_time, string deliver_end_time, 
-            string company_name, string order_index, string company_order_index,string purchase_person, string day, string month, string year, 
+            string company_name, string order_index, string company_order_index,string purchase_person,string order_name, string day, string month, string year, 
             int pageindex = 1, int pagesize = 20)
         {
             ViewBag.company_name = company_name;
             ViewBag.order_index = order_index;
             ViewBag.company_order_index = company_order_index;
             ViewBag.purchase_person = purchase_person;
+            ViewBag.order_name = order_name;
+
             ViewBag.start_time = start_time;
             ViewBag.end_time = end_time;
             ViewBag.deliver_start_time = deliver_start_time;
@@ -259,13 +296,13 @@ namespace WebApplication.Controllers
                 deliver_end_time = "2222-01-01";
             }
 
-            DateTime dt = DateTime.Now;
+            DateTime dt = DateTime.Now.AddHours(8);
             DateTime dt2 = dt.AddMonths(1);
 
             if (day == "1")
             {
-                start_time = DateTime.Now.ToLocalTime().ToString("yyyy-MM-dd");
-                end_time = DateTime.Now.ToLocalTime().ToString("yyyy-MM-dd");
+                start_time = DateTime.Now.ToLocalTime().AddHours(8).ToString("yyyy-MM-dd");
+                end_time = DateTime.Now.ToLocalTime().AddHours(8).ToString("yyyy-MM-dd");
                 ViewBag.day = "1";
             }
             if (month == "1")
@@ -277,11 +314,32 @@ namespace WebApplication.Controllers
             if (year == "1")
             {
                 start_time = dt.AddMonths(-dt.Month + 1).AddDays(-dt.Day + 1).ToString("yyyy-MM-dd");
-                end_time = new DateTime(DateTime.Now.Year, 12, 31).ToString("yyyy-MM-dd");
+                end_time = new DateTime(DateTime.Now.AddHours(8).Year, 12, 31).ToString("yyyy-MM-dd");
                 ViewBag.year = "1";
             }
 
-            var objList = OM.SelectAll(1, start_time, end_time, deliver_start_time, deliver_end_time,  company_name, order_index, company_order_index, purchase_person);
+            var objList = OM.SelectAll(1, start_time, end_time, deliver_start_time, deliver_end_time,  company_name, order_index, company_order_index, purchase_person, order_name);
+
+            //金额
+            double allMoney = 0;
+            //数量
+            double allNum = 0;
+            //开单数
+            double allOpenNum = 0;
+            //退单数
+            double allTuiNum = 0;
+            for (int i = 0; i < objList.Count; i++)
+            {
+                allMoney = allMoney + objList[i].order_all_price;
+                allNum = allNum + objList[i].order_num;
+                allOpenNum = allOpenNum + objList[i].open_num;
+                allTuiNum = allTuiNum + objList[i].tui_num;
+            }
+            ViewBag.allMoney = allMoney;
+            ViewBag.allNum = allNum;
+            ViewBag.allOpenNum = allOpenNum;
+            ViewBag.allTuiNum = allTuiNum;
+
             var pagedList = PagedList<Order>.PageList(pageindex, pagesize, objList);
             ViewBag.model = pagedList.Item2;
             return View(pagedList.Item1);

@@ -20,7 +20,7 @@ namespace WebApplication.Controllers
         /// <param name="page">分页页码</param>
         /// <param name="size">每页显示数量</param>
         /// <returns></returns>
-        public IActionResult Index(string start_time, string end_time,string invoice_index, string company_name,
+        public IActionResult Index(string start_time, string end_time,string invoice_index, string[] company_name,
             string day, string month, string year, int pageindex = 1, int pagesize = 20)
         {
             ViewBag.start_time = start_time;
@@ -37,13 +37,13 @@ namespace WebApplication.Controllers
                 end_time = "2222-01-01";
             }
 
-            DateTime dt = DateTime.Now;
+            DateTime dt = DateTime.Now.AddHours(8);
             DateTime dt2 = dt.AddMonths(1);
 
             if (day == "1")
             {
-                start_time = DateTime.Now.ToLocalTime().ToString("yyyy-MM-dd");
-                end_time = DateTime.Now.ToLocalTime().ToString("yyyy-MM-dd");
+                start_time = DateTime.Now.ToLocalTime().AddHours(8).ToString("yyyy-MM-dd");
+                end_time = DateTime.Now.ToLocalTime().AddHours(8).ToString("yyyy-MM-dd");
                 ViewBag.day = "1";
             }
             if (month == "1")
@@ -55,27 +55,44 @@ namespace WebApplication.Controllers
             if (year == "1")
             {
                 start_time = dt.AddMonths(-dt.Month + 1).AddDays(-dt.Day + 1).ToString("yyyy-MM-dd");
-                end_time = new DateTime(DateTime.Now.Year, 12, 31).ToString("yyyy-MM-dd");
+                end_time = new DateTime(DateTime.Now.AddHours(8).Year, 12, 31).ToString("yyyy-MM-dd");
                 ViewBag.year = "1";
             }
             string confirm_start_time = "0001-01-01";
             string confirm_end_time = "2222-01-01";
 
-            var objList = IM.SelectAll(0, start_time, end_time, confirm_start_time, confirm_end_time, invoice_index, company_name);
-            //显示总金额，税额和总额
-            double money = 0;
-            double ratio = 0;
+            List<Invoice> objList = new List<Invoice>();
+            if (company_name.Length < 1)
+            {
+                List<Invoice> res = IM.SelectAll(0, start_time, end_time, confirm_start_time, confirm_end_time, invoice_index, "");
+                for (int i=0;i<res.Count;i++) {
+                    objList.Add(res[i]);
+                }
+            }
+            else {
+                for (int i=0;i< company_name.Length;i++) {
+                    List<Invoice> res = IM.SelectAll(0, start_time, end_time, confirm_start_time, confirm_end_time, invoice_index, company_name[i]);
+                    for (int j=0;j<res.Count;j++) {
+                        objList.Add(res[j]);
+                    }
+                }
+            }
+            List<Invoice> resList = objList.Distinct<Invoice>(new ListComparer<Invoice>((x, y) => x.id.Equals(y.id))).ToList();
+            //显示总应付金额，实付税额和客户预付款
             double allMoney = 0;
+            double allReal = 0;
+            double allPrepay = 0;
             for (int i = 0; i < objList.Count; i++)
             {
-                money = money + objList[i].invoice_price;
-                ratio = ratio + objList[i].invoice_ratio;
-                allMoney = allMoney + objList[i].invoice_all_price;
+                allMoney = allMoney + objList[i].invoice_price;
+                allReal = allReal + objList[i].invoice_real_price;
+                allPrepay = allPrepay + objList[i].invoice_prepay;
             }
-            ViewBag.money = money;
-            ViewBag.ratio = ratio;
+            
             ViewBag.allMoney = allMoney;
-            var pagedList = PagedList<Invoice>.PageList(pageindex, pagesize, objList);
+            ViewBag.allReal = allReal;
+            ViewBag.allPrepay = allPrepay;
+            var pagedList = PagedList<Invoice>.PageList(pageindex, pagesize, resList);
             ViewBag.model = pagedList.Item2;
             return View(pagedList.Item1);
             
@@ -117,23 +134,25 @@ namespace WebApplication.Controllers
             int count = 0;
             int id = invoice.id;
             string company_name = invoice.company_name;
+            string invoice_company = invoice.invoice_company;
             int invoice_type = invoice.invoice_type;
             string invoice_index = invoice.invoice_index;
             DateTime invoice_time = invoice.invoice_time;
             double invoice_price = invoice.invoice_price;
-            double invoice_ratio = invoice.invoice_ratio;
-            double invoice_all_price = invoice.invoice_all_price;
+            double invoice_real_price = invoice.invoice_real_price;
+            double invoice_prepay = invoice.invoice_prepay;
             string remark = invoice.remark;
             string qq = Convert.ToString(HttpContext.Request.Form["id"]);
 
             Invoice objInvoice = new Invoice();
             objInvoice.company_name = company_name;
+            objInvoice.invoice_company = invoice_company;
             objInvoice.invoice_type = invoice_type;
             objInvoice.invoice_index = invoice_index;
             objInvoice.invoice_time = invoice_time;
             objInvoice.invoice_price = invoice_price;
-            objInvoice.invoice_ratio = invoice_ratio;
-            objInvoice.invoice_all_price = invoice_all_price;
+            objInvoice.invoice_real_price = invoice_real_price;
+            objInvoice.invoice_prepay = invoice_prepay;
             objInvoice.pay_type = 0;
             objInvoice.remark = remark;
             if (id>0)
@@ -212,22 +231,12 @@ namespace WebApplication.Controllers
         }
 
         /// <summary>
-        /// 
-        /// </summary>
-        /// <returns></returns>
-        public IActionResult GetPriceList(double invoice_price,double invoice_ratio)
-        {
-            ViewBag.invoice_all_price = invoice_price + invoice_ratio;
-            return View();
-        }
-
-        /// <summary>
         /// 用户列表首页
         /// </summary>
         /// <param name="page">分页页码</param>
         /// <param name="size">每页显示数量</param>
         /// <returns></returns>
-        public IActionResult HistoryIndex(string start_time, string end_time, string confirm_start_time, string confirm_end_time, string invoice_index, string company_name, 
+        public IActionResult HistoryIndex(string start_time, string end_time, string confirm_start_time, string confirm_end_time, string invoice_index, string[] company_name, 
             string day, string month, string year, int pageindex = 1, int pagesize = 20)
         {
 
@@ -256,13 +265,13 @@ namespace WebApplication.Controllers
                 confirm_end_time = "2222-01-01";
             }
 
-            DateTime dt = DateTime.Now;
+            DateTime dt = DateTime.Now.AddHours(8);
             DateTime dt2 = dt.AddMonths(1);
 
             if (day == "1")
             {
-                confirm_start_time = DateTime.Now.ToLocalTime().ToString("yyyy-MM-dd");
-                confirm_end_time = DateTime.Now.ToLocalTime().ToString("yyyy-MM-dd");
+                confirm_start_time = DateTime.Now.ToLocalTime().AddHours(8).ToString("yyyy-MM-dd");
+                confirm_end_time = DateTime.Now.ToLocalTime().AddHours(8).ToString("yyyy-MM-dd");
                 ViewBag.day = "1";
             }
             if (month == "1")
@@ -274,29 +283,100 @@ namespace WebApplication.Controllers
             if (year == "1")
             {
                 confirm_start_time = dt.AddMonths(-dt.Month + 1).AddDays(-dt.Day + 1).ToString("yyyy-MM-dd");
-                confirm_end_time = new DateTime(DateTime.Now.Year, 12, 31).ToString("yyyy-MM-dd");
+                confirm_end_time = new DateTime(DateTime.Now.AddHours(8).Year, 12, 31).ToString("yyyy-MM-dd");
                 ViewBag.year = "1";
             }
 
-            var objList = IM.SelectAll(1, start_time,end_time,confirm_start_time, confirm_end_time, invoice_index, company_name);
-
-            //显示总金额，税额和总额
-            double money = 0;
-            double ratio = 0;
-            double allMoney = 0;
-            for (int i=0;i< objList.Count;i++) {
-                money = money + objList[i].invoice_price;
-                ratio = ratio + objList[i].invoice_ratio;
-                allMoney = allMoney + objList[i].invoice_all_price;
+            List<Invoice> objList = new List<Invoice>();
+            if (company_name.Length < 1)
+            {
+                List<Invoice> res = IM.SelectAll(1, start_time, end_time, confirm_start_time, confirm_end_time, invoice_index, "");
+                for (int i = 0; i < res.Count; i++)
+                {
+                    objList.Add(res[i]);
+                }
             }
-            ViewBag.money = money;
-            ViewBag.ratio = ratio;
-            ViewBag.allMoney = allMoney;
+            else
+            {
+                for (int i = 0; i < company_name.Length; i++)
+                {
+                    List<Invoice> res = IM.SelectAll(1, start_time, end_time, confirm_start_time, confirm_end_time, invoice_index, company_name[i]);
+                    for (int j = 0; j < res.Count; j++)
+                    {
+                        objList.Add(res[j]);
+                    }
+                }
+            }
+            List<Invoice> resList = objList.Distinct<Invoice>(new ListComparer<Invoice>((x, y) => x.id.Equals(y.id))).ToList();
 
-            var pagedList = PagedList<Invoice>.PageList(pageindex, pagesize, objList);
+            //显示总应付金额，实付税额和客户预付款
+            double allMoney = 0;
+            double allReal = 0;
+            double allPrepay = 0;
+            for (int i=0;i< objList.Count;i++) {
+                allMoney = allMoney + objList[i].invoice_price;
+                allReal = allReal + objList[i].invoice_real_price;
+                allPrepay = allPrepay + objList[i].invoice_prepay;
+            }
+
+            ViewBag.allMoney = allMoney;
+            ViewBag.allReal = allReal;
+            ViewBag.allPrepay = allPrepay;
+
+            var pagedList = PagedList<Invoice>.PageList(pageindex, pagesize, resList);
             ViewBag.model = pagedList.Item2;
             return View(pagedList.Item1);
 
+        }
+
+        /// <summary>
+        /// 用委托实现IEqualityComparer<T>接口
+        /// </summary>
+        /// <typeparam name="T">目标类型</typeparam>
+        public class ListComparer<T> : IEqualityComparer<T>
+        {
+            public Func<T, T, bool> EqualsFunc;
+            public Func<T, int> GetHashCodeFunc;
+
+            public ListComparer(Func<T, T, bool> Equals, Func<T, int> GetHashCode)
+            {
+                this.EqualsFunc = Equals;
+                this.GetHashCodeFunc = GetHashCode;
+            }
+
+            public ListComparer(Func<T, T, bool> Equals) : this(Equals, t => 0)
+            {
+
+            }
+
+            public bool Equals(T x, T y)
+            {
+                if (this.EqualsFunc != null)
+                {
+                    return this.EqualsFunc(x, y);
+                }
+                else
+                {
+                    return false;
+                }
+            }
+
+            /// <summary>
+            /// 获取目标对象的哈希值,只有返回相同的哈希值才能运行Equals方法
+            /// </summary>
+            /// <param name="obj">获取哈希值的目标类型对象</param>
+            /// <returns>返回哈希值</returns>
+            public int GetHashCode(T obj)
+            {
+                if (this.GetHashCodeFunc != null)
+                {
+                    return this.GetHashCodeFunc(obj);
+                }
+                else
+                {
+                    return 0;
+                }
+            }
         }
 
     }

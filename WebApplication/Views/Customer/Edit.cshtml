@@ -7,12 +7,7 @@
 <head>
     <meta name="viewport" content="width=device-width" />
     <title></title>
-    <link href="~/js/dist/css/bootstrap-select.min.css" rel="stylesheet" />
-
-    <script src="~/assets/js/lib/bootstrap.min.js"></script>
-    <script src="~/js/dist/js/bootstrap-select.min.js"></script>
     <script src="~/js/xlsx.core.min.js"></script>
-    <script src="~/assets/js/lib/jquery.min.js"></script>
     <script type="text/javascript">
         var TempArr = [];//存储option
         $(function () {
@@ -64,6 +59,9 @@
                                 swal({ title: "执行成功!", text: "", type: "success" },
                                     function () { window.location.href = '/Customer/Index'; });
                             }
+                            else if (msg == "Fail") {
+                                swal("执行失败！", "", "error");
+                            }
                             else {
                                 swal("客户名称已存在！", "请重新填写客户名称！", "error");
                             }
@@ -101,11 +99,16 @@
                 },
                 success: function (msg) {
                     if (msg == "Success") {
-                        $("#prompt").hide();
-                        window.location.href = '/Customer/Index';
+                        $("#prompt").hide;
+                        swal({ title: "导入成功!", text: "", type: "success" },
+                            function () { window.location.href = '/Customer/Index'; });
+
+                    }
+                    else if (msg == "Fail") {
+                        swal("执行失败！", "", "error"); 
                     }
                     else {
-                        swal("执行失败！", "", "error");
+                        swal(msg+"已存在！", "", "error");
                     }
                 },
                 error: function (msg) {
@@ -150,9 +153,12 @@
         }
 
         function readWorkbook(workbook) {
-            var sheetNames = workbook.SheetNames; // 工作表名称集合
-            var worksheet = workbook.Sheets[sheetNames[0]]; // 这里我们只读取第一张sheet
+            var sheetNames = "";
+            var worksheet = "";
+            sheetNames = workbook.SheetNames; // 工作表名称集合
+            worksheet = workbook.Sheets[sheetNames[0]]; // 这里我们只读取第一张sheet
             var csv = XLSX.utils.sheet_to_csv(worksheet);
+            document.getElementById('result').innerHTML = "";
             document.getElementById('result').innerHTML = csv2table(csv);
             document.getElementById('result').style.display = "block";
         }

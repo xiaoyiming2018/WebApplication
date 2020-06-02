@@ -1,5 +1,5 @@
 ﻿@{
-    @model IList<Model.Sale>
+    @model IList<Model.DuiZhang>
     @using Model;
     @using BLL;
 
@@ -9,63 +9,18 @@
 <html>
 <head>
     <meta name="viewport" content="width=device-width" />
-    <title></title>
-    <link href="~/js/dist/css/bootstrap-select.min.css" rel="stylesheet" />
+    <style>
+        .bootstrap-select {
+            width:100%;
+        }
+    </style>
 
-    <script src="~/assets/js/lib/bootstrap.min.js"></script>
-    <script src="~/js/dist/js/bootstrap-select.min.js"></script>
-    <script type="text/javascript" src="~/Scripts/jquery-1.10.2.min.js"></script>
-    <script type="text/javascript" src="~/My97DatePicker/WdatePicker.js"></script>
     <script type="text/javascript">
         $(function () {
             $(".sidebar ul li:nth-of-type(5)").addClass("active open")
             $(".sidebar ul li:nth-of-type(5) ul li").removeClass()
-            $(".sidebar ul li:nth-of-type(5) ul li:nth-of-type(5)").addClass("active")
+            $(".sidebar ul li:nth-of-type(5) ul li:nth-of-type(6)").addClass("active")
         });
-
-        function confirmTiShi(deliver_index) {
-            swal({
-                title: "是否取消确认 ?",
-                text: "",
-                type: "warning",
-                showCancelButton: true,
-                confirmButtonColor: "#DD6B55",
-                confirmButtonText: "是",
-                cancelButtonText: "否",
-                closeOnConfirm: false,//true表示不需要点击确认,fasle需要点击确认后再关闭对话框
-                closeOnCancel: false //true表示不需要点击确认,fasle需要点击确认后再关闭对话框
-            },
-                function (isConfirm) {
-                    if (isConfirm) {
-                        $.ajax({
-                            type: "POST",
-                            url: "/Sale/DeliverConfirm?deliver_index=" + deliver_index + "",
-                            beforeSend: function (xhr) {
-                                xhr.setRequestHeader("XSRF-TOKEN",
-                                    $('input:hidden[name="__RequestVerificationToken"]').val());
-                            },
-                            data: {
-                                deliver_index: deliver_index
-                            },
-                            success: function (msg) {
-                                if (msg == "Success") {
-                                    swal({ title: "已确认 !", text: "", type: "success" },
-                                        function () { window.location.href = '/Sale/MoneyHistoryIndex'; });
-                                }
-                                else {
-                                    swal("执行失败 !", "", "error");
-                                }
-                            },
-                            error: function (msg) {
-                                swal("数据获取失败 !", "", "error");
-                            }
-                        });
-                    }
-                    else {
-                        swal("操作已终止 !", "该记录已保留 !", "error");
-                    }
-                });
-        }
 
         function CheckOrCancleAll(obj) {
             if (obj.is(":checked")) {
@@ -96,19 +51,19 @@
 
         function getPickerList()
         {
-            var duizhangList = document.getElementsByName("duizhang");
-            var duizhang = new Array();
-            for (var i = 0; i < duizhangList.length; i++) {
-                var flag = duizhangList[i].checked;
+            var duizhangIdList = document.getElementsByName("duizhangId");
+            var duizhangId = new Array();
+            for (var i = 0; i < duizhangIdList.length; i++) {
+                var flag = duizhangIdList[i].checked;
                 if (flag) {
-                    duizhang.push(duizhangList[i].value);
+                    duizhangId.push(duizhangIdList[i].value);
                 }
             }
-            var Dui_Zhang = duizhang.join(',');
+            var DZ_Id = duizhangId.join(',');
             $.ajax({
                 type: "POST",
-                url: "/Sale/GetPickerList",
-                data: { Dui_Zhang: Dui_Zhang },
+                url: "/DuiZhang/GetPickerList",
+                data: { DZ_Id: DZ_Id },
                 success: function (msg) {
                     $('#picker_list').html(msg);
                     $('#myModalList').modal();
@@ -124,16 +79,13 @@
         }
 
         function putInvoice() {
-            var duizhangList = document.getElementsByName("duizhang");
+            var duizhangIdList = document.getElementsByName("id");
             var invoice_index = document.getElementById("invoice_index").value;
-            var duizhang = new Array();
-            for (var i = 0; i < duizhangList.length; i++) {
-                var flag = duizhangList[i].checked;
-                if (flag) {
-                    duizhang.push(duizhangList[i].value);
-                }
+            var duizhangId = new Array();
+            for (var i = 0; i < duizhangIdList.length; i++) {
+                duizhangId.push(duizhangIdList[i].value);
             }
-            var Dui_Zhang = duizhang.join(',');
+            var DZ_Id = duizhangId.join(',');
             swal({
                 title: "是否关联此发票?",
                 text: "",
@@ -149,18 +101,18 @@
                     if (isConfirm) {
                         $.ajax({
                             type: "POST",
-                            url: "/Sale/PutInvoice",
+                            url: "/DuiZhang/PutInvoice",
                             beforeSend: function (xhr) {
                                 xhr.setRequestHeader("XSRF-TOKEN",
                                     $('input:hidden[name="__RequestVerificationToken"]').val());
                             },
                             data: {
-                                Dui_Zhang: Dui_Zhang, invoice_index: invoice_index
+                                DZ_Id: DZ_Id, invoice_index: invoice_index
                             },
                             success: function (msg) {
                                 if (msg == "Success") {
                                     swal({ title: "执行成功!", text: "", type: "success" },
-                                        function () { window.location.href = '/Sale/MoneyHistoryIndex'; });
+                                        function () { window.location.href = '/DuiZhang/Index'; });
 
                                 }
                                 else {
@@ -200,7 +152,7 @@
                 <div class="col-lg-12">
                     <div class="card alert">
                         <div class="card-header">
-                            <form class="form-horizontal" action="/Sale/MoneyHistoryIndex" method="post" id="myfrom">
+                            <form class="form-horizontal" action="/DuiZhang/Index" method="post" id="myfrom">
                                 <div class="form-inline">
                                     <div class="form-group">
                                         <label>送货单号：</label>
@@ -238,11 +190,11 @@
                                     </div>
                                     <div class="form-group">
                                         <label>送货开始时间：</label>
-                                        <input id="start_time" name="start_time" type="text" class="form-control" style="width:180px" onclick="WdatePicker({ skin: 'whyGreen',dateFmt:'yyyy-MM-dd' })" value="@ViewBag.start_time" />
+                                        <input id="start_time" name="deliver_start_time" type="text" autocomplete="off" class="form-control" style="width:180px" onclick="WdatePicker({ skin: 'whyGreen',dateFmt:'yyyy-MM-dd' })" value="@ViewBag.deliver_start_time" />
                                     </div>
                                     <div class="form-group">
                                         <label>送货结束时间：</label>
-                                        <input id="end_time" name="end_time" type="text" class="form-control" style="width:180px" onclick="WdatePicker({ skin: 'whyGreen',dateFmt:'yyyy-MM-dd' })" value="@ViewBag.end_time" />
+                                        <input id="end_time" name="deliver_end_time" type="text" autocomplete="off" class="form-control" style="width:180px" onclick="WdatePicker({ skin: 'whyGreen',dateFmt:'yyyy-MM-dd' })" value="@ViewBag.deliver_end_time" />
                                     </div>
                                 </div>
                                 <br />
@@ -257,11 +209,11 @@
                                     </div>
                                     <div class="form-group">
                                         <label>对账开始时间：</label>
-                                        <input id="confirm_start_time" name="confirm_start_time" type="text" class="form-control" style="width:180px" onclick="WdatePicker({ skin: 'whyGreen',dateFmt:'yyyy-MM-dd' })" value="@ViewBag.confirm_start_time" />
+                                        <input id="confirm_start_time" name="dz_start_time" type="text" autocomplete="off" class="form-control" style="width:180px" onclick="WdatePicker({ skin: 'whyGreen',dateFmt:'yyyy-MM-dd' })" value="@ViewBag.dz_start_time" />
                                     </div>
                                     <div class="form-group">
                                         <label>对账结束时间：</label>
-                                        <input id="confirm_end_time" name="confirm_end_time" type="text" class="form-control" style="width:180px" onclick="WdatePicker({ skin: 'whyGreen',dateFmt:'yyyy-MM-dd' })" value="@ViewBag.confirm_end_time" />
+                                        <input id="confirm_end_time" name="dz_end_time" type="text" autocomplete="off" class="form-control" style="width:180px" onclick="WdatePicker({ skin: 'whyGreen',dateFmt:'yyyy-MM-dd' })" value="@ViewBag.dz_end_time" />
                                     </div>
                                 </div>
                                 <br />
@@ -277,7 +229,7 @@
                                     <div class="form-group">
                                         <label>本年</label>
                                         <input id="year" name="year" type="checkbox" class="form-control" onclick="CheckOrCancleAll($(this))" style="width:16px" value="0" @if (ViewBag.year == "1") { <text> checked</text> } />
-                                        <label>（送货开单时间）</label>
+                                        <label>（对账时间）</label>
                                     </div>
                                     <div class="form-group">
                                         <input type="submit" value="查询" class="btn btn-primary" style="width:80px" />
@@ -299,20 +251,15 @@
                                         <th>客户名称</th>
                                         <th>客户订单号</th>
                                         <th>送货开单时间</th>
+                                        <th>对账时间</th>
                                         <th>名称规格</th>
-                                        <th>送货数量</th>
+                                        <th>数量</th>
                                         <th>单位</th>
                                         @if (UserManager.Current.GetLevel >= UserLevelEnum.ProductManager)
                                         {
-                                            <th>送货单价</th>
-                                            <th>送货总价</th>
+                                            <th>单价</th>
+                                            <th>总价</th>
                                         }
-                                        @if (UserManager.Current.GetLevel >= UserLevelEnum.ProductManager)
-                                        {
-                                            <th>结款与否</th>
-                                            <th>结款方式</th>
-                                        }
-                                        <th>对账日期</th>
                                         @if (UserManager.Current.GetLevel >= UserLevelEnum.Boss)
                                         {
                                             <th>关联发票</th>
@@ -328,57 +275,40 @@
                                                 <td>@index</td>
                                                 <td>@item.dz_index</td>
                                                 <td>@item.deliver_index</td>
-                                                <td>@item.deliver_company_head</td>
+                                                <td>@item.company_name</td>
                                                 <td>@item.company_order_index</td>
-                                                <td>@item.insert_time.ToString("yyyy-MM-dd")</td>
+                                                <td>@item.deliver_time.ToString("yyyy-MM-dd")</td>
+                                                <td>@item.dui_time.ToString("yyyy-MM-dd")</td>
                                                 <td>@item.order_name</td>
-                                                <td>@item.real_num</td>
+                                                <td>@item.dui_num</td>
                                                 <td>@item.unit</td>
                                                 @if (UserManager.Current.GetLevel >= UserLevelEnum.ProductManager)
                                                 {
-                                                    <td>@item.deliver_price</td>
-                                                    <td>@item.deliver_all_price</td>
-                                                    @if (item.money_onoff == 0)
-                                                    {
-                                                        <td style="color:red">未结款</td>
-                                                    }
-                                                    else
-                                                    {
-                                                        <td style="color:green">已结款</td>
-                                                    }
-
-                                                    @if (item.money_way == 0)
-                                                    {
-                                                        <td></td>
-                                                    }
-                                                    else if (item.money_way == 1)
-                                                    {
-                                                        <td>月结</td>
-                                                    }
-                                                    else if (item.money_way == 2)
-                                                    {
-                                                        <td>现金</td>
-                                                    }
-                                                    else
-                                                    {
-                                                        <td>小额支付</td>
-                                                    }
+                                                    <td>@item.dui_price</td>
+                                                    <td>@item.dui_all_price</td>
                                                 }
-                                                <td>@item.confirm_time.ToString("yyyy-MM-dd")</td>
                                                 @if (UserManager.Current.GetLevel >= UserLevelEnum.Boss)
                                                 {
 
                                                     <td>
-                                                        <input name="duizhang" type="checkbox" style="width:18px;height:18px;" value="@item.deliver_index+@item.seq_id" />
+                                                        <input name="duizhangId" type="checkbox" style="width:18px;height:18px;" value="@item.id" />
                                                     </td>
                                                 }
+
                                             </tr>
                                             index++;
                                         }
+                                        <tr>
+                                            <td colspan="8" style="color:green;font-weight:bold">合计</td>
+                                            <td style="font-weight:bold">@ViewBag.allNum</td>
+                                            <td colspan="2"></td>
+                                            <td style="font-weight:bold">@ViewBag.allPrice</td>
+                                            <td></td>
+                                        </tr>
                                     }
                                 </tbody>
                             </table>
-                            <div class="page-nav" id="pageIndex">@Html.Raw(PagerHtmlString.Pager(ViewBag.model, "Sale", "MoneyHistoryIndex", true))</div>
+                            <div class="page-nav" id="pageIndex">@Html.Raw(PagerHtmlString.Pager(ViewBag.model, "DuiZhang", "Index", true))</div>
                         </div>
                     </div><!-- /# card -->
                 </div><!-- /# column -->
@@ -387,7 +317,7 @@
     </div><!-- /# container-fluid -->
 
     <div class="modal fade" id="myModalList" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
-        <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-dialog modal-lg" role="document" style="width:50%">
             <div class="modal-content">
                 <div class="modal-header">
 
@@ -416,7 +346,7 @@
                         <label for="txt_departmentname">发票号</label>
                     </div>
                     <div class="form-group">
-                        <select class="selectpicker" data-live-search="true" data-live-search-placeholder="搜索" id="invoice_index" name="invoice_index" style="padding:6px 50px">
+                        <select class="selectpicker" data-live-search="true" data-live-search-placeholder="搜索" id="invoice_index" name="invoice_index" style="padding:6px 50px;width:100%">
                             <option value=""></option>
                             @{
                                 InvoiceManager IM = new InvoiceManager();

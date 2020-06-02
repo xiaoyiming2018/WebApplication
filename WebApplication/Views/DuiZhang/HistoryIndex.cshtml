@@ -1,0 +1,558 @@
+﻿@{
+    @model IList<Model.DuiZhang>
+    @using Model;
+    @using BLL;
+
+}
+@using AspNetCoreMvcPager;
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <style>
+        .headstyle {
+            border: 2px solid black;
+        }
+
+        .thstyle {
+            border: 2px solid black;
+        }
+
+
+
+        .bodystyle {
+            border: 2px solid black;
+        }
+
+        .tdstyle {
+            border: 2px solid black;
+        }
+    </style>
+    <script src="~/js/xlsx.core.min.js"></script>
+    <script type="text/javascript">
+        $(function () {
+            $(".sidebar ul li:nth-of-type(5)").addClass("active open")
+            $(".sidebar ul li:nth-of-type(5) ul li").removeClass()
+            $(".sidebar ul li:nth-of-type(5) ul li:nth-of-type(7)").addClass("active");
+
+            document.getElementById('file').addEventListener('change', function (e) {
+                var files = e.target.files;
+                if (files.length == 0) return;
+                var f = files[0];
+                if (!/\.xlsx$/g.test(f.name)) {
+                    swal("仅支持读取xlsx格式！", "请重新操作！", "error");
+                    return;
+                }
+                readWorkbookFromLocalFile(f, function (workbook) {
+                    readWorkbook(workbook);
+                });
+            });
+
+            $('#myModalList').on('hide.bs.modal', function () {
+                document.getElementById("result").innerHTML = "";
+                document.getElementById("file").value = "";
+
+            });
+        });
+
+        function CheckOrCancleAll(obj) {
+            if (obj.is(":checked")) {
+                $('input.form-control').prop('checked', false);
+                obj.prop('checked', true);
+                if (obj.attr('name') == "day") {
+                    document.getElementById("day").value = "1";
+                    document.getElementById("month").value = "0";
+                    document.getElementById("year").value = "0";
+                }
+                else if (obj.attr('name') == "month") {
+                    document.getElementById("day").value = "0";
+                    document.getElementById("month").value = "1";
+                    document.getElementById("year").value = "0";
+                }
+                else if (obj.attr('name') == "year") {
+                    document.getElementById("day").value = "0";
+                    document.getElementById("month").value = "0";
+                    document.getElementById("year").value = "1";
+                }
+            }
+            else {
+                document.getElementById("day").value = "0";
+                document.getElementById("month").value = "0";
+                document.getElementById("year").value = "0";
+            }
+        }
+
+        function inputList() {
+            var num = document.getElementById('inputNum').value;
+            var allList = new Array();
+            for (var i = 0; i < num; i++) {
+                var indexList = document.getElementsByName("index" + i + "");
+                for (var j = 0; j < indexList.length; j++) {
+
+                    allList.push(indexList[j].value);
+                }
+            }
+            var AllList = allList.join(',');
+
+            $.ajax({
+                type: "POST",
+                url: "/DuiZhang/EditHandleList",
+                beforeSend: function (xhr) {
+                    xhr.setRequestHeader("XSRF-TOKEN",
+                        $('input:hidden[name="__RequestVerificationToken"]').val());
+                },
+                data: {
+                    AllList: AllList, num: num
+                },
+                success: function (msg) {
+                    swal({ title: "导入完成!", text: msg, type: "success" },
+                        function () { window.location.href = '/DuiZhang/HistoryIndex'; });
+
+                },
+                error: function (msg) {
+                    swal("数据获取失败！", "您提交的文件内容或格式有误!", "error");
+                }
+            });
+        }
+
+        function selectFile() {
+            document.getElementById('file').click();
+        }
+
+        // 读取本地excel文件
+        function readWorkbookFromLocalFile(file, callback) {
+            var reader = new FileReader();
+            reader.onload = function (e) {
+                var data = e.target.result;
+                var workbook = XLSX.read(data, { type: 'binary' });
+                if (callback) callback(workbook);
+            };
+            reader.readAsBinaryString(file);
+        }
+
+        // 读取 excel文件
+        function outputWorkbook(workbook) {
+            var sheetNames = workbook.SheetNames; // 工作表名称集合
+            sheetNames.forEach(name => {
+                var worksheet = workbook.Sheets[name]; // 只能通过工作表名称来获取指定工作表
+                for (var key in worksheet) {
+                    // v是读取单元格的原始值
+                    console.log(key, key[0] === '!' ? worksheet[key] : worksheet[key].v);
+                }
+            });
+        }
+
+        function readWorkbook(workbook) {
+            var sheetNames = workbook.SheetNames; // 工作表名称集合
+            var worksheet = workbook.Sheets[sheetNames[0]]; // 这里我们只读取第一张sheet
+            var csv = XLSX.utils.sheet_to_csv(worksheet);
+            document.getElementById('result').innerHTML = csv2table(csv);
+            $("#myModalList").modal('show');
+        }
+
+        // 将csv转换成表格
+        function csv2table(csv) {
+            var html = '';
+            html += '<table class=\"table table-responsive\">';
+            var rows = csv.split('\n');
+            rows.pop(); // 最后一行没用的
+            console.log("进来");
+            rows.forEach(function (row, idx) {
+                var columns = row.split(',');
+                columns.unshift(idx); // 添加行索引
+                if (idx == 0) { // 添加列索引
+                    html += '<thead> <tr><th>编号</th><th>送货日期</th><th>送货单号</th><th>客户名称</th><th>订单编号</th><th>产品名称</th><th>规格</th><th>单位</th><th>数量</th><th>单价</th><th>金额</th>';
+                    html += '</tr> </thead>';
+                }
+                html += '<tr>';
+                columns.forEach(function (column) {
+                    if (idx >= 1) {
+                        html += '<td ><input type=\"text\" style=\"border:none;outline:none;width:80px\" name=\"index' + idx + '\" value=\"' + column + '\" readonly/></td>';
+                    }
+
+                });
+                html += '</tr>';
+            });
+            html += '</table><input type=\"hidden\" id=\"inputNum\" value=\"' + rows.length + '\"/> </div > ';
+            return html;
+        }
+
+        function table2csv(table) {
+            var csv = [];
+            $(table).find('tr').each(function () {
+                var temp = [];
+                $(this).find('td').each(function () {
+                    temp.push($(this).html());
+                })
+                temp.shift(); // 移除第一个
+                csv.push(temp.join(','));
+            });
+            csv.shift();
+            return csv.join('\n');
+        }
+
+        // csv转sheet对象
+        function csv2sheet(csv) {
+            var sheet = {}; // 将要生成的sheet
+            csv = csv.split('\n');
+            csv.forEach(function (row, i) {
+                row = row.split(',');
+                if (i == 0) sheet['!ref'] = 'A1:' + String.fromCharCode(65 + row.length - 1) + (csv.length - 1);
+                row.forEach(function (col, j) {
+                    sheet[String.fromCharCode(65 + j) + (i + 1)] = { v: col };
+                });
+            });
+            return sheet;
+        }
+
+        // 将一个sheet转成最终的excel文件的blob对象，然后利用URL.createObjectURL下载
+        function sheet2blob(sheet, sheetName) {
+            sheetName = sheetName || 'sheet1';
+            var workbook = {
+                SheetNames: [sheetName],
+                Sheets: {}
+            };
+            workbook.Sheets[sheetName] = sheet;
+            // 生成excel的配置项
+            var wopts = {
+                bookType: 'xlsx', // 要生成的文件类型
+                bookSST: false, // 是否生成Shared String Table，官方解释是，如果开启生成速度会下降，但在低版本IOS设备上有更好的兼容性
+                type: 'binary'
+            };
+            var wbout = XLSX.write(workbook, wopts);
+            var blob = new Blob([s2ab(wbout)], { type: "application/octet-stream" });
+            // 字符串转ArrayBuffer
+            function s2ab(s) {
+                var buf = new ArrayBuffer(s.length);
+                var view = new Uint8Array(buf);
+                for (var i = 0; i != s.length; ++i) view[i] = s.charCodeAt(i) & 0xFF;
+                return buf;
+            }
+            return blob;
+        }
+
+        //url 下载地址，也可以是一个blob对象，必选
+        //saveName 保存文件名，可选
+        function openDownloadDialog(url, saveName) {
+            if (typeof url == 'object' && url instanceof Blob) {
+                url = URL.createObjectURL(url); // 创建blob地址
+            }
+            var aLink = document.createElement('a');
+            aLink.href = url;
+            aLink.download = saveName || ''; // HTML5新增的属性，指定保存文件名，可以不要后缀，注意，file:///模式下不会生效
+            var event;
+            if (window.MouseEvent) event = new MouseEvent('click');
+            else {
+                event = document.createEvent('MouseEvents');
+                event.initMouseEvent('click', true, false, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null);
+            }
+            aLink.dispatchEvent(event);
+        }
+
+        function exportSpecialExcel() {
+            var aoa = [
+                ['送货日期', '送货单号', '客户名称', '订单编号', '产品名称', '规格', '单位', '数量', '单价', '金额']
+            ];
+            var sheet = XLSX.utils.aoa_to_sheet(aoa);
+            openDownloadDialog(sheet2blob(sheet), '对账单.xlsx');
+        }
+
+        function doPrint() {
+            window.print();
+            return false;
+        };
+
+        window.onbeforeprint = function () {
+
+            $(".sidebar").hide()
+            $(".header").hide()
+            $("#Data1").show()
+            $("#wrap").hide()
+            $(".sidebar.sidebar-shrink ~ .content-wrap").css("margin-left", 0)
+        }
+        window.onafterprint = function () {
+            $("#Data1").hide()
+            $("#wrap").show()
+            $(".sidebar").show()
+            $(".header").show()
+            $(".sidebar.sidebar-shrink ~ .content-wrap").css("margin-left", "250px")
+        }
+    </script>
+</head>
+<body>
+    <div class="container-fluid" id="wrap">
+        <div class="row">
+            <div class="col-lg-12 p-0">
+                <div class="page-header">
+                    <div class="page-title">
+                        <ol class="breadcrumb text-left">
+                            <li><a href="/Supplier/Index">主页</a></li>
+                            <li><a href="/Sale/Index">销售管理</a></li>
+                            <li class="active">历史对账记录</li>
+                        </ol>
+                    </div>
+                </div>
+            </div><!-- /# column -->
+        </div><!-- /# row -->
+        <div class="main-content">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="card alert">
+                        <div class="card-header">
+                            <form class="form-horizontal" action="/DuiZhang/HistoryIndex" method="post" id="myfrom">
+                                <div class="form-inline">
+                                    <div class="form-group">
+                                        <label>送货单号：</label>
+                                        <select class="selectpicker" data-live-search="true" data-live-search-placeholder="搜索" id="deliver_index" name="deliver_index" style="padding:6px 50px">
+                                            <option value=""></option>
+                                            @{
+                                                SaleManager SM = new SaleManager();
+                                                List<Sale> saleList = SM.SelectDeliverList();
+                                                if (saleList.Count > 0)
+                                                {
+                                                    for (int i = 0; i < saleList.Count; i++)
+                                                    {
+                                                        <!option value="@saleList[i].deliver_index" @if (Model != null) { if (saleList[i].deliver_index == ViewBag.deliver_index) { <text> selected</text>}}>@saleList[i].deliver_index</!option>
+                                                    }
+                                                }
+                                            }
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>客户名称：</label>
+                                        <select class="selectpicker" data-live-search="true" data-live-search-placeholder="搜索" id="company_name" name="company_name" style="padding:6px 50px">
+                                            <option value=""></option>
+                                            @{
+                                                CompanyManager CM = new CompanyManager();
+                                                List<Company> objList = CM.SelectAll(type: 0);
+                                                if (objList.Count > 0)
+                                                {
+                                                    for (int i = 0; i < objList.Count; i++)
+                                                    {
+                                                        <!option value="@objList[i].company_name" @if (Model != null) { if (objList[i].company_name == ViewBag.company_name) { <text> selected</text>}}>@objList[i].company_name</!option>
+                                                    }
+                                                }
+                                            }
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>发票号：</label>
+                                        <input id="invoice_index" name="invoice_index" type="text" class="form-control" style="width:220px" value="@ViewBag.invoice_index" />
+                                    </div>
+                                    <div class="form-group">
+                                        <label>送货开始时间：</label>
+                                        <input id="deliver_start_time" name="deliver_start_time" autocomplete="off" type="text" class="form-control" style="width:180px" onclick="WdatePicker({ skin: 'whyGreen',dateFmt:'yyyy-MM-dd' })" value="@ViewBag.deliver_start_time" />
+                                    </div>
+                                    <div class="form-group">
+                                        <label>送货结束时间：</label>
+                                        <input id="deliver_end_time" name="deliver_end_time" autocomplete="off" type="text" class="form-control" style="width:180px" onclick="WdatePicker({ skin: 'whyGreen',dateFmt:'yyyy-MM-dd' })" value="@ViewBag.deliver_end_time" />
+                                    </div>
+                                </div>
+                                <br />
+                                <div class="form-inline">
+                                    <div class="form-group">
+                                        <label>对账单号：</label>
+                                        <input id="dz_index" name="dz_index" type="text" class="form-control" style="width:220px" value="@ViewBag.dz_index" />
+                                    </div>
+                                    <div class="form-group">
+                                        <label>名称规格：</label>
+                                        <input id="order_name" name="order_name" type="text" class="form-control" style="width:220px" value="@ViewBag.order_name" />
+                                    </div>
+                                    <div class="form-group">
+                                        <label>对账开始时间：</label>
+                                        <input id="dz_start_time" name="dz_start_time" type="text" autocomplete="off" class="form-control" style="width:180px" onclick="WdatePicker({ skin: 'whyGreen',dateFmt:'yyyy-MM-dd' })" value="@ViewBag.dz_start_time" />
+                                    </div>
+                                    <div class="form-group">
+                                        <label>对账结束时间：</label>
+                                        <input id="dz_end_time" name="dz_end_time" type="text" autocomplete="off" class="form-control" style="width:180px" onclick="WdatePicker({ skin: 'whyGreen',dateFmt:'yyyy-MM-dd' })" value="@ViewBag.dz_end_time" />
+                                    </div>
+                                    <div class="form-group">
+                                        <label>本日</label>
+                                        <input id="day" name="day" type="checkbox" class="form-control" onclick="CheckOrCancleAll($(this))" style="width:16px" value="0" @if (ViewBag.day == "1") { <text> checked</text> } />
+                                    </div>
+                                    <div class="form-group">
+                                        <label>本月</label>
+                                        <input id="month" name="month" type="checkbox" class="form-control" onclick="CheckOrCancleAll($(this))" style="width:16px" value="0" @if (ViewBag.month == "1") { <text> checked</text> } />
+                                    </div>
+                                    <div class="form-group">
+                                        <label>本年</label>
+                                        <input id="year" name="year" type="checkbox" class="form-control" onclick="CheckOrCancleAll($(this))" style="width:16px" value="0" @if (ViewBag.year == "1") { <text> checked</text> } />
+                                        <label>（对账时间）</label>
+                                    </div>
+                                    <div class="form-group">
+                                        <input type="submit" value="查询" class="btn btn-primary" style="width:80px" />
+
+                                    </div>
+                                </div>
+                                <br />
+                            </form>
+                            <div class="form-inline">
+                                <input type="file" id="file" style="display:none;" accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet">
+                                <button class="btn btn-primary" onclick="selectFile()"><i class="ti-download"></i>历史数据导入</button>
+                                <button class="btn btn-primary" onclick="exportSpecialExcel()"><i class="ti-upload"></i>模板导出</button>
+                                <input type="button" value="数据打印" class="btn btn-primary" onclick="doPrint()" style="width:80px" />
+                            </div>
+
+                        </div>
+                        <div class="card-body">
+                            <table class="table table-responsive table-hover ">
+                                <thead>
+                                    <tr>
+                                        <th>编号</th>
+                                        <th>客户名称</th>
+                                        <th>客户订单号</th>
+                                        <th>送货单号</th>
+                                        <th>送货开单时间</th>
+                                        <th>对账单号</th>
+                                        <th>对账日期</th>
+                                        <th>发票号</th>
+                                        <th>名称规格</th>
+                                        <th>数量</th>
+                                        <th>单位</th>
+                                        @if (UserManager.Current.GetLevel >= UserLevelEnum.ProductManager)
+                                        {
+                                            <th>单价</th>
+                                            <th>总价</th>
+                                        }
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @{
+                                        int index = 1;
+                                        foreach (var item in Model)
+                                        {
+                                            <tr>
+                                                <td>@index</td>
+                                                <td>@item.company_name</td>
+                                                <td>@item.company_order_index</td>
+                                                <td>@item.deliver_index</td>
+                                                <td>@item.deliver_time.ToString("yyyy-MM-dd")</td>
+                                                <td>@item.dz_index</td>
+                                                <td>@if (item.dui_time.ToString("yyyy-MM-dd") == "0001-01-01")
+                                                {<text>-</text> }
+                                            else
+                                            { @item.dui_time.ToString("yyyy-MM-dd");
+                                        }</td>
+                                                <td>@item.invoice_index</td>
+                                                <td>@item.order_name</td>
+                                                <td>@item.dui_num</td>
+                                                <td>@item.unit</td>
+                                                @if (UserManager.Current.GetLevel >= UserLevelEnum.ProductManager)
+                                                {
+                                                    <td>@item.dui_price</td>
+                                                    <td>@item.dui_all_price</td>
+                                                }
+                                            </tr>
+                                            index++;
+                                        }
+                                        <tr>
+                                            <td colspan="9" style="color:green;font-weight:bold">合计</td>
+                                            <td style="font-weight:bold">@ViewBag.allNum</td>
+                                            <td colspan="2"></td>
+                                            <td style="font-weight:bold">@ViewBag.allPrice</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                            <div class="page-nav" id="pageIndex">@Html.Raw(PagerHtmlString.Pager(ViewBag.model, "DuiZhang", "HistoryIndex", true))</div>
+                        </div>
+                    </div><!-- /# card -->
+                </div><!-- /# column -->
+            </div><!-- /# row -->
+        </div>
+    </div><!-- /# container-fluid -->
+    <div class="modal fade" id="myModalList" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog modal-lg" role="document" style="width:70%">
+            <div class="modal-content">
+                <div class="modal-header">
+
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="myModalLabel">已导入数据</h4>
+                </div>
+                <div id="result" class="col-lg-12">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                    <button type="button" class="btn btn-primary" data-dismiss="modal" onclick="inputList()">提交</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="card alert" id="Data1" style="margin: 30px;display: none">
+
+        <div class="card-body">
+            <table class="table" border="0" cellspacing="0" cellpadding="0">
+                <tbody>
+                    <tr style="font-weight:bold">
+                        <td style="font-size:26px;text-align:center;padding:2px;border:0;" colspan="6"><span id="deliver_head">历史对账记录</span></td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <table class="table table-responsive">
+                <thead class="headstyle">
+                    <tr>
+                        <th class="thstyle">编号</th>
+                        <th class="thstyle">客户名称</th>
+                        <th class="thstyle">客户订单号</th>
+                        <th class="thstyle">送货单号</th>
+                        <th class="thstyle">送货开单时间</th>
+                        <th class="thstyle">对账单号</th>
+                        <th class="thstyle">对账日期</th>
+                        <th class="thstyle">发票号</th>
+                        <th class="thstyle">名称规格</th>
+                        <th class="thstyle">数量</th>
+                        <th class="thstyle">单位</th>
+                        @if (UserManager.Current.GetLevel >= UserLevelEnum.ProductManager)
+                        {
+                            <th class="thstyle">单价</th>
+                            <th class="thstyle">总价</th>
+                        }
+                    </tr>
+                </thead>
+                <tbody class="bodystyle">
+                    @{
+                        int index1 = 1;
+                        foreach (var item in Model)
+                        {
+                            <tr>
+                                <td class="tdstyle">@index1</td>
+                                <td class="tdstyle">@item.company_name</td>
+                                <td class="tdstyle">@item.company_order_index</td>
+                                <td class="tdstyle">@item.deliver_index</td>
+                                <td class="tdstyle">@item.deliver_time.ToString("yyyy-MM-dd")</td>
+                                <td class="tdstyle">@item.dz_index</td>
+                                <td class="tdstyle">
+                                    @if (item.dui_time.ToString("yyyy-MM-dd") == "0001-01-01")
+                                    {<text>-</text> }
+                                else
+                                { @item.dui_time.ToString("yyyy-MM-dd");
+                            }
+                            </td>
+                            <td class="tdstyle">@item.invoice_index</td>
+                            <td class="tdstyle">@item.order_name</td>
+                            <td class="tdstyle">@item.dui_num</td>
+                            <td class="tdstyle">@item.unit</td>
+                            @if (UserManager.Current.GetLevel >= UserLevelEnum.ProductManager)
+                            {
+                                <td class="tdstyle">@item.dui_price</td>
+                                <td class="tdstyle">@item.dui_all_price</td>
+                            }
+                        </tr>
+                        index1++;
+                    }
+                    <tr>
+                        <td class="tdstyle" colspan="9" style="color:green;font-weight:bold">合计</td>
+                        <td class="tdstyle" style="font-weight:bold">@ViewBag.allNum</td>
+                        <td class="tdstyle" colspan="2"></td>
+                        <td class="tdstyle" style="font-weight:bold">@ViewBag.allPrice</td>
+                    </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</body>
+</html>
+
+

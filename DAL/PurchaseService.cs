@@ -20,9 +20,9 @@ namespace DAL
             {
                 List<Purchase> objList = new List<Purchase>();
                 string sql = null;
-                sql = "SELECT * " +
+                sql = "SELECT a.purchase_index " +
                  "FROM jinchen.purchase_info a, jinchen.company_info b " +
-                   " where a.supplier_id = b.id and to_char(a.purchase_time,'yyyy-MM-dd')='{0}' ";
+                   " where a.supplier_id = b.id and to_char(a.purchase_time,'yyyy-MM-dd')='{0}' group by a.purchase_index ";
                 sql = string.Format(sql, purchase_time);
 
                 objList = PostgreHelper.GetEntityList<Purchase>(sql);
@@ -90,19 +90,23 @@ namespace DAL
         /// </summary>
         /// <param name="name"></param>
         /// <returns></returns>
-        public List<Purchase> SelectDeliverAll(string start_time, string end_time,string company_name, string purchase_index, string material_name,string deliver_index)
+        public List<Purchase> SelectDeliverAll(string start_time, string end_time,string company_name, string purchase_index, string material_name,string deliver_index,string category)
         {
             try
             {
                 List<Purchase> objList = new List<Purchase>();
                 string sql = null;
+                if (!string.IsNullOrEmpty(company_name))
+                {
+                    company_name = company_name.Replace("(", "\\(").Replace(")", "\\)");
+                }
                 sql = "SELECT a.id, b.company_name, a.purchase_index, a.category,a.deliver_index,a.deliver_time, a.material_name, a.material_spec, " +
                 "a.material_num, a.material_unit, a.material_price, a.material_all_price,money_onoff,money_way,status,confirm_time " +
                  "FROM jinchen.purchase_info a, jinchen.company_info b " +
                    " where a.supplier_id = b.id and a.purchase_index ~* '{0}' and b.company_name ~* '{1}' and a.material_name ~* '{2}' and " +
-                   "a.deliver_index ~* '{3}' and a.status =0 and to_char(a.deliver_time,'yyyy-MM-dd')>='{4}' and to_char(a.deliver_time,'yyyy-MM-dd')<='{5}' " +
-                   "order by a.purchase_index ";
-                sql = string.Format(sql, purchase_index, company_name, material_name, deliver_index, start_time, end_time);
+                   "a.deliver_index ~* '{3}' and a.status =0 and to_char(a.deliver_time,'yyyy-MM-dd')>='{4}' and to_char(a.deliver_time,'yyyy-MM-dd')<='{5}' and a.category ~* '{6}' " +
+                   "order by a.purchase_index desc ";
+                sql = string.Format(sql, purchase_index, company_name, material_name, deliver_index, start_time, end_time, category);
 
                 objList = PostgreHelper.GetEntityList<Purchase>(sql);
 
@@ -120,20 +124,24 @@ namespace DAL
         /// <param name="name"></param>
         /// <returns></returns>
         public List<Purchase> SelectHistory(string start_time, string end_time, string confirm_start_time, string confirm_end_time, string company_name, string purchase_index,
-            string material_name, string deliver_index)
+            string material_name, string deliver_index,string category)
         {
             try
             {
                 List<Purchase> objList = new List<Purchase>();
                 string sql = null;
+                if (!string.IsNullOrEmpty(company_name))
+                {
+                    company_name = company_name.Replace("(", "\\(").Replace(")", "\\)");
+                }
                 sql = "SELECT a.id, b.company_name, a.purchase_index, a.category,a.deliver_index,a.deliver_time, a.material_name, a.material_spec, " +
                 "a.material_num, a.material_unit, a.material_price, a.material_all_price,money_onoff,money_way,confirm_time " +
                  "FROM jinchen.purchase_info a, jinchen.company_info b " +
                    " where a.supplier_id = b.id and a.purchase_index ~* '{0}' and b.company_name ~* '{1}' and a.material_name ~* '{2}' and " +
                    "a.deliver_index ~* '{3}' and to_char(a.deliver_time,'yyyy-MM-dd')>='{4}' and to_char(a.deliver_time,'yyyy-MM-dd')<='{5}' and a.status=1 " +
-                   "and to_char(a.confirm_time,'yyyy-MM-dd')>='{6}' and to_char(a.confirm_time,'yyyy-MM-dd')<='{7}' " +
-                   "order by a.purchase_index ";
-                sql = string.Format(sql, purchase_index, company_name, material_name, deliver_index, start_time, end_time, confirm_start_time, confirm_end_time);
+                   "and to_char(a.confirm_time,'yyyy-MM-dd')>='{6}' and to_char(a.confirm_time,'yyyy-MM-dd')<='{7}' and a.category ~* '{8}' " +
+                   "order by a.purchase_index desc ";
+                sql = string.Format(sql, purchase_index, company_name, material_name, deliver_index, start_time, end_time, confirm_start_time, confirm_end_time, category);
 
                 objList = PostgreHelper.GetEntityList<Purchase>(sql);
 
@@ -182,11 +190,10 @@ namespace DAL
             try
             {
                 int count = 0;
-                string sql = "update jinchen.purchase_info set category='{0}',material_name='{1}', material_spec='{2}',material_num={3}," +
-                    "material_unit='{4}',material_price={5},material_all_price={6},supplier_id={7}, deliver_time='{8}', " +
-                    "money_onoff={9},money_way={10} where id={11}";
-                sql = string.Format(sql, obj.category, obj.material_name, obj.material_spec, obj.material_num, obj.material_unit, 
-                    obj.material_price, obj.material_all_price, obj.supplier_id,obj.deliver_time, obj.money_onoff, obj.money_way, obj.id);
+                string sql = "update jinchen.purchase_info set material_name='{0}', material_spec='{1}',material_num={2}," +
+                    "material_unit='{3}',material_price={4},material_all_price={5} where id={6}";
+                sql = string.Format(sql, obj.material_name, obj.material_spec, obj.material_num, obj.material_unit, 
+                    obj.material_price, obj.material_all_price, obj.id);
                 count = PostgreHelper.ExecuteNonQuery(sql);
                 return count;
 
@@ -196,7 +203,28 @@ namespace DAL
                 throw ex;
             }
         }
+        /// <summary>
+        /// 更新公共信息
+        /// </summary>
+        /// <param name="obj"></param>
+        /// <returns></returns>
+        public int UpdateCommonDeliver(Purchase obj)
+        {
+            try
+            {
+                int count = 0;
+                string sql = "update jinchen.purchase_info set category='{0}',supplier_id={1}, deliver_time='{2}', " +
+                    "money_onoff={3},money_way={4} where purchase_index='{5}'";
+                sql = string.Format(sql, obj.category, obj.supplier_id, obj.deliver_time, obj.money_onoff, obj.money_way, obj.purchase_index);
+                count = PostgreHelper.ExecuteNonQuery(sql);
+                return count;
 
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
         /// <summary>
         /// 更新入库单的状态（用于区分是否结款）
         /// </summary>

@@ -9,13 +9,27 @@
 <html>
 <head>
     <meta name="viewport" content="width=device-width" />
-    <title></title>
-    <link href="~/js/dist/css/bootstrap-select.min.css" rel="stylesheet" />
 
-    <script src="~/assets/js/lib/bootstrap.min.js"></script>
-    <script src="~/js/dist/js/bootstrap-select.min.js"></script>
-    <script type="text/javascript" src="~/Scripts/jquery-1.10.2.min.js"></script>
-    <script type="text/javascript" src="~/My97DatePicker/WdatePicker.js"></script>
+    <style>
+        .headstyle {
+            border: 2px solid black;
+        }
+
+        .thstyle {
+            border: 2px solid black;
+        }
+
+
+
+        .bodystyle {
+            border: 2px solid black;
+        }
+
+        .tdstyle {
+            border: 2px solid black;
+        }
+    </style>
+
     <script type="text/javascript">
         $(function () {
             $(".sidebar ul li:nth-of-type(6)").addClass("active open")
@@ -48,10 +62,31 @@
             }
 
         }
+
+        function doPrint() {
+            window.print();
+            return false;
+        };
+
+        window.onbeforeprint = function () {
+
+            $(".sidebar").hide()
+            $(".header").hide()
+            $("#Data1").show()
+            $("#wrap").hide()
+            $(".sidebar.sidebar-shrink ~ .content-wrap").css("margin-left", 0)
+        }
+        window.onafterprint = function () {
+            $("#Data1").hide()
+            $("#wrap").show()
+            $(".sidebar").show()
+            $(".header").show()
+            $(".sidebar.sidebar-shrink ~ .content-wrap").css("margin-left", "250px")
+        }
     </script>
 </head>
 <body>
-    <div class="container-fluid">
+    <div class="container-fluid" id="wrap">
         <div class="row">
             <div class="col-lg-12 p-0">
                 <div class="page-header">
@@ -74,7 +109,7 @@
                                 <div class="form-inline">
                                     <div class="form-group">
                                         <label>客户名称：</label>
-                                        <select class="selectpicker" data-live-search="true" data-live-search-placeholder="搜索" id="company_name" name="company_name" style="padding:6px 50px">
+                                        <select class="selectpicker" data-live-search="true" data-live-search-placeholder="搜索" id="company_name" name="company_name" style="padding:6px 50px" multiple>
                                             <option value=""></option>
                                             @{
                                                 CompanyManager CM = new CompanyManager();
@@ -83,7 +118,8 @@
                                                 {
                                                     for (int i = 0; i < objList.Count; i++)
                                                     {
-                                                        <!option value="@objList[i].company_name" @if (Model != null) { if (objList[i].company_name == ViewBag.company_name) { <text> selected</text>}}>@objList[i].company_name</!option>
+
+                                                        <!option value="@objList[i].company_name" @if (Model != null && ViewBag.company_name.Length > 0) { for (int j = 0; j < ViewBag.company_name.Length; j++) { if (objList[i].company_name == ViewBag.company_name[j]) { <text> selected</text>}} }>@objList[i].company_name</!option>
                                                     }
                                                 }
                                             }
@@ -95,7 +131,7 @@
                                             <option value=""></option>
                                             @{
                                                 InvoiceManager IM = new InvoiceManager();
-                                                List<Invoice> invoiceList = IM.SelectAll(1,"2001-01-01","2222-01-01","0001-01-01","2222-01-01");
+                                                List<Invoice> invoiceList = IM.SelectAll(1, "2001-01-01", "2222-01-01", "0001-01-01", "2222-01-01");
                                                 if (invoiceList.Count > 0)
                                                 {
                                                     for (int i = 0; i < invoiceList.Count; i++)
@@ -108,22 +144,22 @@
                                     </div>
                                     <div class="form-group">
                                         <label>开票开始时间：</label>
-                                        <input id="start_time" name="start_time" type="text" class="form-control" style="width:180px" onclick="WdatePicker({ skin: 'whyGreen',dateFmt:'yyyy-MM-dd' })" value="@ViewBag.start_time" />
+                                        <input id="start_time" name="start_time" type="text" autocomplete="off" class="form-control" style="width:180px" onclick="WdatePicker({ skin: 'whyGreen',dateFmt:'yyyy-MM-dd' })" value="@ViewBag.start_time" />
                                     </div>
                                     <div class="form-group">
                                         <label>开票结束时间：</label>
-                                        <input id="end_time" name="end_time" type="text" class="form-control" style="width:180px" onclick="WdatePicker({ skin: 'whyGreen',dateFmt:'yyyy-MM-dd' })" value="@ViewBag.end_time" />
+                                        <input id="end_time" name="end_time" type="text" autocomplete="off" class="form-control" style="width:180px" onclick="WdatePicker({ skin: 'whyGreen',dateFmt:'yyyy-MM-dd' })" value="@ViewBag.end_time" />
                                     </div>
                                 </div>
                                 <br />
                                 <div class="form-inline">
                                     <div class="form-group">
                                         <label>对账开始时间：</label>
-                                        <input id="confirm_start_time" name="confirm_start_time" type="text" class="form-control" style="width:190px" onclick="WdatePicker({ skin: 'whyGreen',dateFmt:'yyyy-MM-dd' })" value="@ViewBag.confirm_start_time" />
+                                        <input id="confirm_start_time" name="confirm_start_time" autocomplete="off" type="text" class="form-control" style="width:190px" onclick="WdatePicker({ skin: 'whyGreen',dateFmt:'yyyy-MM-dd' })" value="@ViewBag.confirm_start_time" />
                                     </div>
                                     <div class="form-group">
                                         <label>对账结束时间：</label>
-                                        <input id="confirm_end_time" name="confirm_end_time" type="text" class="form-control" style="width:180px" onclick="WdatePicker({ skin: 'whyGreen',dateFmt:'yyyy-MM-dd' })" value="@ViewBag.confirm_end_time" />
+                                        <input id="confirm_end_time" name="confirm_end_time" autocomplete="off" type="text" class="form-control" style="width:180px" onclick="WdatePicker({ skin: 'whyGreen',dateFmt:'yyyy-MM-dd' })" value="@ViewBag.confirm_end_time" />
                                     </div>
                                     <div class="form-group">
                                         <label>本日</label>
@@ -140,6 +176,7 @@
                                     </div>
                                     <div class="form-group">
                                         <input type="submit" value="查询" class="btn btn-primary" style="width:80px" />
+                                        <input type="button" value="数据打印" class="btn btn-primary" onclick="doPrint()" style="width:80px" />
                                     </div>
 
                                 </div>
@@ -154,15 +191,16 @@
                                     <tr>
                                         <th>编号</th>
                                         <th>客户名称</th>
+                                        <th>开票公司</th>
                                         <th>发票号</th>
                                         <th>发票类型</th>
                                         <th>开票日期</th>
-                                        <th>金额</th>
-                                        <th>税额</th>
-                                        <th>价税合计</th>
+                                        <th>应付金额</th>
+                                        <th>已付金额</th>
+                                        <th>客户预付款</th>
                                         <th>付款方式</th>
                                         <th>备注</th>
-                                        <th>对账时间</th>
+                                        <th>付款时间</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -174,7 +212,7 @@
                                             <tr>
                                                 <td>@index</td>
                                                 <td>@item.company_name</td>
-
+                                                <td>@item.invoice_company</td>
                                                 <td>@item.invoice_index</td>
                                                 @if (item.invoice_type == 0)
                                                 {
@@ -185,17 +223,20 @@
                                                     <td>增值税专用发票</td>
                                                 }
                                                 <td>@item.invoice_time.ToString("yyyy-MM-dd")</td>
-
                                                 <td>@item.invoice_price</td>
-                                                <td>@item.invoice_ratio</td>
-                                                <td>@item.invoice_all_price</td>
+                                                <td>@item.invoice_real_price</td>
+                                                <td>@item.invoice_prepay</td>
                                                 @if (item.pay_type == 0)
                                                 {
-                                                    <td>转账</td>
+                                                    <td>现金</td>
+                                                }
+                                                else if (item.pay_type == 1)
+                                                {
+                                                    <td>银行转账</td>
                                                 }
                                                 else
                                                 {
-                                                    <td>现金</td>
+                                                    <td>承兑</td>
                                                 }
                                                 <td>@item.remark</td>
                                                 <td>@item.confirm_time.ToString("yyyy-MM-dd")</td>
@@ -211,23 +252,105 @@
                                             <td colspan="4"></td>
                                         </tr>
                                         <tr>
-                                            <td colspan="5" style="color:green;font:bold">总计</td>
-                                            <td>@ViewBag.money</td>
-                                            <td>@ViewBag.ratio</td>
-                                            <td>@ViewBag.allMoney</td>
+                                            <td colspan="6" style="color:green;font-weight:bold">总计：</td>
+                                            <td style="font-weight:bold">@ViewBag.allMoney</td>
+                                            <td style="font-weight:bold">@ViewBag.allReal</td>
+                                            <td style="font-weight:bold">@ViewBag.allPrepay</td>
                                             <td colspan="4"></td>
                                         </tr>
                                     }
                                 </tbody>
                             </table>
                             <div class="page-nav" id="pageIndex">@Html.Raw(PagerHtmlString.Pager(ViewBag.model, "Invoice", "HistoryIndex", true))</div>
-                            
+
                         </div>
                     </div><!-- /# card -->
                 </div><!-- /# column -->
             </div><!-- /# row -->
         </div>
     </div><!-- /# container-fluid -->
+
+    <div class="card alert" id="Data1" style="margin: 30px;display: none">
+
+        <div class="card-body">
+            <table class="table" border="0" cellspacing="0" cellpadding="0">
+                <tbody>
+                    <tr style="font-weight:bold">
+                        <td style="font-size:26px;text-align:center;padding:2px;border:0;" colspan="6"><span id="deliver_head">已对账发票</span></td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <table class="table table-responsive">
+                <thead class="headstyle">
+                    <tr>
+                        <th class="thstyle">编号</th>
+                        <th class="thstyle">客户名称</th>
+                        <th class="thstyle">开票公司</th>
+                        <th class="thstyle">发票号</th>
+                        <th class="thstyle">发票类型</th>
+                        <th class="thstyle">开票日期</th>
+                        <th class="thstyle">应付金额</th>
+                        <th class="thstyle">已付金额</th>
+                        <th class="thstyle">客户预付款</th>
+                        <th class="thstyle">付款方式</th>
+                        <th class="thstyle">备注</th>
+                        <th class="thstyle">付款时间</th>
+                    </tr>
+                </thead>
+                <tbody class="bodystyle">
+                    @{
+                        int index1 = 1;
+
+                        foreach (var item in Model)
+                        {
+                            <tr>
+                                <td class="tdstyle">@index1</td>
+                                <td class="tdstyle">@item.company_name</td>
+                                <td class="tdstyle">@item.invoice_company</td>
+                                <td class="tdstyle">@item.invoice_index</td>
+                                @if (item.invoice_type == 0)
+                                {
+                                    <td class="tdstyle">普通发票</td>
+                                }
+                                else
+                                {
+                                    <td class="tdstyle">增值税专用发票</td>
+                                }
+                                <td class="tdstyle">@item.invoice_time.ToString("yyyy-MM-dd")</td>
+                                <td class="tdstyle">@item.invoice_price</td>
+                                <td class="tdstyle">@item.invoice_real_price</td>
+                                <td class="tdstyle">@item.invoice_prepay</td>
+                                @if (item.pay_type == 0)
+                                {
+                                    <td class="tdstyle">现金</td>
+                                }
+                                else if (item.pay_type == 1)
+                                {
+                                    <td class="tdstyle">银行转账</td>
+                                }
+                                else
+                                {
+                                    <td class="tdstyle">承兑</td>
+                                }
+                                <td class="tdstyle">@item.remark</td>
+                                <td class="tdstyle">@item.confirm_time.ToString("yyyy-MM-dd")</td>
+                            </tr>
+                            index1++;
+
+                        }
+                        <tr>
+                            <td  class="tdstyle" colspan="6" style="color:green;font-weight:bold">总计：</td>
+                            <td  class="tdstyle" style="font-weight:bold">@ViewBag.allMoney</td>
+                            <td  class="tdstyle" style="font-weight:bold">@ViewBag.allReal</td>
+                            <td class="tdstyle" style="font-weight:bold">@ViewBag.allPrepay</td>
+                            <td class="tdstyle" colspan="4"></td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
 </body>
 </html>
 

@@ -16,7 +16,9 @@
             <th>单价</th>
             <th>总金额</th>
             }
-            <th>送货数量</th>
+            <th>可对账数量</th>
+            <th>对账数量</th>
+            <th>对账金额</th>
         </tr>
     </thead>
     <tbody>
@@ -24,21 +26,24 @@
             int index = 1;
             foreach (var item in Model)
             {
-        <tr>
-            <td>@index</td>
-            <td>@item.deliver_index</td>
-            <td>@item.deliver_company_head</td>
-            <td>@item.company_order_index</td>
-            <td>@item.order_name</td>
-            <td>@item.unit</td>
-            @if (UserManager.Current.GetLevel >= UserLevelEnum.ProductManager)
-            {
-            <td>@item.deliver_price</td>
-            <td>@item.deliver_all_price</td>
-            }
-            <td>@item.real_num</td>
-
-        </tr>
+                <tr>
+                    <td>@index</td>
+                    <td style="display:none"><input name="sale_id" value="@item.id" /></td>
+                    <td>@item.deliver_index</td>
+                    <td>@item.deliver_company_head</td>
+                    <td>@item.company_order_index</td>
+                    <td>@item.order_name</td>
+                    <td>@item.unit</td>
+                    @if (UserManager.Current.GetLevel >= UserLevelEnum.ProductManager)
+                    {
+                        <td>@item.deliver_price</td>
+                        <td>@item.deliver_all_price</td>
+                    }
+                    <td>@(item.real_num-item.dz_num)</td>
+                    <td style="display:none"><input type="hidden" name="judgeTag" value="@(item.real_num-item.dz_num)" /></td>
+                    <td><input type="text" name="dui_num" style="width:80px;outline:none;" value="@(item.real_num-item.dz_num)" /></td>
+                    <td><input type="text" name="dui_price" style="width:80px;outline:none;" value="@item.deliver_all_price" /></td>
+                </tr>
                 index++;
             }
         } 

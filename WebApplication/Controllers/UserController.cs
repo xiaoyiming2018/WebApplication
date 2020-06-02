@@ -286,6 +286,7 @@ namespace WebApplication.Controllers
             }
             else
             {
+                ViewBag.user_name = Convert.ToString(Request.Query["user_name"]);
                 return View();
             }
         }
@@ -298,14 +299,17 @@ namespace WebApplication.Controllers
                 string user_name = HttpContext.Request.Form["user_name"];
                 string oldpassword = HttpContext.Request.Form["oldpassword"];
                 string newpassword = HttpContext.Request.Form["newpassword"];
-                bool result = UM.Login(user_name, oldpassword);
+                bool result = UM.ChangePassword(user_name, oldpassword);
                 if (result)
                 {
                     int count = UM.UpdatePassWord(user_name, newpassword);
                     if (count > 0)
                     {
-                        HttpContext.Session.Remove("user_name");//Session.Remove("user_name");
-                        HttpContext.Session.Remove("user_level");//Session.Remove("user_level");
+                        //if (user_name=="admin") {
+                        //    HttpContext.Session.Remove("user_name");//Session.Remove("user_name");
+                        //    HttpContext.Session.Remove("user_level");//Session.Remove("user_level");
+                        //}
+                        
                         ViewBag.Message = "密码修改成功，请重新登录！";
                         return Json("Success");
                     }

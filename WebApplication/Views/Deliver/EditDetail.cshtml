@@ -1,0 +1,340 @@
+﻿@{
+    @model Model.Purchase;
+    @using Model;
+    @using BLL;
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title></title>
+
+    <script type="text/javascript">
+        var TempArr = [];//存储option
+        var index = 1;
+        $(function () {
+            $(".sidebar ul li:nth-of-type(2)").addClass("active open")
+            $(".sidebar ul li:nth-of-type(2) ul li:nth-of-type(1)").addClass("active")
+            $(".sidebar ul li:nth-of-type(2) ul li:nth-of-type(2)").removeClass("active open")
+
+
+            $('#submit').click(function () {
+                var id = $('#id').val();
+                var purchase_index = $('#purchase_index').val();
+                purchase_index = purchase_index.replace(' ', '');
+                var supplier_id = $('#supplier_id').val();
+                var category = $('#category').val();
+
+                var deliver_index = $('#deliver_index').val();
+                var deliver_time = $('#deliver_time').val();
+                var money_onoff = $('#money_onoff').val();
+                var money_way = $('#money_way').val();
+
+                var material_name = $('#material_name').val();
+                var material_spec = $('#material_spec').val();
+                var material_num = $('#material_num').val();
+                var material_unit = $('#material_unit').val();
+                var material_price = $('#material_price').val();
+                var material_all_price = $('#material_all_price').val();
+
+
+                if (deliver_index == "" || deliver_time == "" || purchase_index == "" || category == "" ) {
+                    swal("信息不能为空！", "请重新填写内容", "error");
+                }
+                else if (supplier_id <= 0) {
+                    swal("供应商不存在！", "请从下拉框中选择相应的供应商！", "error");
+                }
+                else if (money_way < 1) {
+                    swal("请选择结账方式！", "", "error");
+                }
+                else {
+                    $.ajax({
+                        type: "POST",
+                        url: "/Deliver/EditHandleDetail",
+                        beforeSend: function (xhr) {
+                            xhr.setRequestHeader("XSRF-TOKEN",
+                                $('input:hidden[name="__RequestVerificationToken"]').val());
+                        },
+                        data: {
+                            id: id, purchase_index: purchase_index, supplier_id: supplier_id, category: category, material_name: material_name,
+                            material_num: material_num, material_spec: material_spec, material_unit: material_unit, material_price: material_price,
+                            material_all_price: material_all_price, deliver_index: deliver_index, deliver_time: deliver_time, money_onoff: money_onoff, money_way: money_way
+                        },
+                        success: function (msg) {
+                            if (msg == "Success") {
+                                swal({ title: "执行成功!", text: "", type: "success" },
+                                    function () { window.location.href = '/Deliver/Index'; });
+                            }
+                            else {
+                                swal("执行失败！", "", "error");
+                            }
+                        },
+                        error: function (msg) {
+                            swal("数据获取失败！", "请重新提交内容！", "error");
+                        }
+                    });
+                }
+
+            });
+        });
+
+        function getProductPrice(id) {
+            var material_num = $('#material_num'+id+'').val()
+            var material_price = $('#material_price' + id +'').val()
+            if (material_num >= 0 && material_price >= 0) {
+                $.ajax({
+                    type: "POST",
+                    url: "/Deliver/GetProductPrice",
+                    data: {id:id, material_num: material_num, material_price: material_price },
+                    success: function (msg) {
+                        $('#price_div'+id+'').html(msg);
+                    },
+                    error: function (msg) {
+                        swal("获取价格失败！", "", "error");
+                    }
+                });
+            }
+        }
+    </script>
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="page-header">
+                    <div class="page-title">
+                        <ol class="breadcrumb text-left">
+                            <li><a href="/Supplier/Index">主页</a></li>
+                            <li><a href="/Deliver/Index">物料购入管理</a></li>
+                            <li><a href="/Deliver/Index">物料购入流水账</a></li>
+                            <li class="active">
+                                @{ if (Model == null)
+                                    { <text>新增</text>}
+                                else
+                                { <text>编辑</text>}}
+                            </li>
+                        </ol>
+                    </div>
+                </div>
+            </div><!-- /# column -->
+        </div><!-- /# row -->
+        <div class="main-content">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="card alert">
+                        <div class="card-header">
+                            <h4>
+                                @{ if (Model == null)
+                                    { <text>新增</text>}
+                                else
+                                { <text>编辑</text>}}
+                            </h4>
+                        </div>
+                        <div class="card-body">
+                            <div class="basic-form">
+                                <div class="form-horizontal">
+                                    <div class="form-inline">
+                                        <div class="form-group">
+                                            <label for="example-input-normal" class="col-sm-4 control-label">购入单号</label>
+                                            <div class="col-sm-4">
+                                                <input type="text" class="form-control" style="width:220px" id="purchase_index" name="purchase_index" value="@if (Model != null) {@Model.purchase_index } else { @ViewBag.purchase_index} " readonly />
+                                                <input type="hidden" class="form-control" id="id" name="id" value="@if (Model!=null) {@Model.id } " readonly />
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label for="example-input-normal" class="col-sm-4 control-label">供应商</label>
+                                            <div class="col-sm-4">
+                                                <select class="selectpicker" data-live-search="true" data-live-search-placeholder="搜索" id="supplier_id" name="supplier_id" style="padding:6px 50px">
+                                                    <option value=""></option>
+                                                    @{
+                                                        CompanyManager CM = new CompanyManager();
+                                                        List<Company> objList = CM.SelectAll(type: 1);
+                                                        if (objList.Count > 0)
+                                                        {
+                                                            for (int i = 0; i < objList.Count; i++)
+                                                            {
+                                                                <!option value="@objList[i].id" @if (Model != null) { if (objList[i].id == Model.supplier_id) { <text> selected</text>}}>
+                                                                    @objList[i].company_name
+                                                                </!option>
+                                                            }
+                                                        }
+                                                    }
+                                                </select>
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label for="example-input-normal" class="col-sm-4 control-label">分类</label>
+                                            <div class="col-sm-4">
+                                                <select class="selectpicker" data-live-search="true" data-live-search-placeholder="搜索" id="category" name="category">
+                                                    <option value="">-请选择-</option>
+                                                    @{
+                                                        SettingManager SM = new SettingManager();
+                                                        List<Setting> sList = SM.SelectConfigList(2);
+                                                        if (sList.Count > 0)
+                                                        {
+                                                            for (int i = 0; i < sList.Count; i++)
+                                                            {
+                                                                <!option value="@sList[i].config_list" @if (Model != null) { if (sList[i].config_list == Model.category) { <text> selected</text> } }>
+                                                                    @sList[i].config_list
+                                                                </!option>
+                                                            }
+                                                        }
+                                                    }
+                                                </select>
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label for="example-input-normal" class="col-sm-4 control-label">送货单号</label>
+                                            <div class="col-sm-4">
+                                                <input type="text" class="form-control" style="width:220px" id="deliver_index" name="deliver_index" value="@if (Model !=null) { @Model.deliver_index} " />
+                                            </div>
+                                        </div>
+
+
+                                    </div>
+                                    <br />
+                                    <div class="form-inline">
+                                        <div class="form-group">
+                                            <label for="example-input-normal" class="col-sm-4 control-label">送货时间</label>
+                                            <div class="col-sm-4">
+                                                <input type="text" class="form-control" style="width:220px" id="deliver_time" name="deliver_time" onclick="WdatePicker({ skin: 'whyGreen',dateFmt:'yyyy-MM-dd' })" value="@if (Model !=null) { @Model.deliver_time.ToString("yyyy-MM-dd")} " />
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="example-input-normal" class="col-sm-4 control-label">是否结账</label>
+                                            <div class="col-sm-4">
+                                                <select class="form-control" id="money_onoff" name="money_onoff" style="width:220px">
+                                                    <option value="">-请选择-</option>
+                                                    @{
+                                                        <!option value="0" @if (Model != null) { if (0 == Model.money_onoff) { <text> selected</text> } } else {<text> selected</text> }>未结账</!option>
+                                                        <!option value="1" @if (Model != null) { if (1 == Model.money_onoff) { <text> selected</text> } }>已结账</!option>
+                                                    }
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="example-input-normal" class="col-sm-4 control-label">结账方式</label>
+                                            <div class="col-sm-4">
+                                                <select class="form-control" id="money_way" name="money_way" style="width:220px">
+                                                    <option value="">-请选择-</option>
+                                                    @{
+                                                        <!option value="1" @if (Model != null) { if (1 == Model.money_way) { <text> selected</text> } }>月结</!option>
+                                                        <!option value="2" @if (Model != null) { if (2 == Model.money_way) { <text> selected</text> } }>现金</!option>
+                                                        <!option value="3" @if (Model != null) { if (3 == Model.money_way) { <text> selected</text> } }>小额支付</!option>
+
+                                                    }
+                                                </select>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                    <br />
+                                    <div id="addTest1">
+
+                                        <div class="form-inline">
+                                            <div class="form-group">
+                                                <label for="example-input-normal" class="col-sm-4 control-label">物料名称</label>
+                                                <div class="col-sm-4">
+                                                    <select class="selectpicker" data-live-search="true" data-live-search-placeholder="搜索" id="material_name" name="material_name">
+                                                        <option value="">-请选择-</option>
+                                                        @{
+                                                            SettingManager MM = new SettingManager();
+                                                            List<Setting> mList = MM.SelectConfigList(10);
+                                                            if (mList.Count > 0)
+                                                            {
+                                                                for (int i = 0; i < mList.Count; i++)
+                                                                {
+                                                                    <!option value="@mList[i].config_list" @if (Model != null) { if (mList[i].config_list == Model.material_name) { <text> selected</text> } }>
+                                                                        @mList[i].config_list
+                                                                    </!option>
+                                                                }
+                                                            }
+                                                        }
+                                                    </select>
+                                                </div>
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label for="example-input-normal" class="col-sm-4 control-label">物料规格</label>
+                                                <div class="col-sm-4">
+                                                    <input type="text" class="form-control" style="width:220px" id="material_spec" name="material_spec" value="@if (Model!=null) {@Model.material_spec }" />
+                                                </div>
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label for="example-input-normal" class="col-sm-4 control-label">购入数量</label>
+                                                <div class="col-sm-4">
+                                                    <input type="text" class="form-control" style="width:220px" id="material_num" name="material_num" placeholder="0" value="@if (Model!=null) {@Model.material_num }" onchange="getProductPrice(1)" />
+                                                </div>
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label for="example-input-normal" class="col-sm-4 control-label">物料单位</label>
+                                                <div class="col-sm-4">
+                                                    <select class="selectpicker" data-live-search="true" data-live-search-placeholder="搜索" id="material_unit" name="material_unit">
+                                                        <option value="">-请选择-</option>
+                                                        @{
+                                                            SettingManager UM = new SettingManager();
+                                                            List<Setting> uList = UM.SelectConfigList(1);
+                                                            if (uList.Count > 0)
+                                                            {
+                                                                for (int i = 0; i < uList.Count; i++)
+                                                                {
+                                                                    <!option value="@uList[i].config_list" @if (Model != null) { if (uList[i].config_list == Model.material_unit) { <text> selected</text> } }>
+                                                                    @uList[i].config_list
+                                                                    </!option>
+                                                                }
+                                                            }
+                                                        }
+                                                    </select>
+                                                </div>
+                                            </div>
+
+
+                                        </div>
+                                        <br />
+                                        <div class="form-inline">
+                                            <div class="form-group">
+                                                <label for="example-input-normal" class="col-sm-4 control-label">单价</label>
+                                                <div class="col-sm-4">
+                                                    <input type="text" class="form-control" style="width:220px" id="material_price" name="material_price" placeholder="0" value="@if (Model!=null) {@Model.material_price }" onchange="getProductPrice(1)" />
+                                                </div>
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label for="example-input-normal" class="col-sm-4 control-label">总价</label>
+                                                <div class="col-sm-4" id="price_div1">
+                                                    <input type="text" class="form-control" style="width:220px" id="material_all_price" name="material_all_price" placeholder="0" value="@if (Model !=null) { @Model.material_all_price}" readonly />
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <hr />
+                                    </div>
+                         
+                                    <div class="form-group">
+                                        <div class="col-sm-offset-5">
+                                            <input type="button" id="submit" name="submit" class="btn btn-primary" style=" width:12%" value="提交" />
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                            </div>
+                        </div><!-- /# card -->
+                    </div><!-- /# column -->
+                </div><!-- /# row -->
+            </div>
+        </div>
+    </div><!-- /# container-fluid -->
+
+    <script language="javascript">
+
+
+    </script>
+</body>
+</html>
+
+

@@ -22,7 +22,7 @@ namespace WebApplication.Controllers
         /// <param name="size">每页显示数量</param>
         /// <returns></returns>
         public IActionResult Index(string start_time, string end_time, string company_name, string purchase_index, 
-            string material_name,string deliver_index, int pageindex = 1, int pagesize = 20)
+            string material_name,string deliver_index, string category, int pageindex = 1, int pagesize = 20)
         {
             
 
@@ -33,6 +33,7 @@ namespace WebApplication.Controllers
             ViewBag.purchase_index = purchase_index;
             ViewBag.material_name = material_name;
             ViewBag.deliver_index = deliver_index;
+            ViewBag.category = category;
 
             if (start_time == null)
             {
@@ -43,7 +44,21 @@ namespace WebApplication.Controllers
                 end_time = "2222-01-01";
             }
 
-            var objList = PM.SelectDeliverAll(start_time, end_time, company_name, purchase_index, material_name,deliver_index);
+            var objList = PM.SelectDeliverAll(start_time, end_time, company_name, purchase_index, material_name,deliver_index, category);
+
+            //金额
+            double allMoney = 0;
+            //数量
+            double allNum = 0;
+
+            for (int i = 0; i < objList.Count; i++)
+            {
+                allMoney = allMoney + objList[i].material_all_price;
+                allNum = allNum + objList[i].material_num;
+            }
+            ViewBag.allMoney = allMoney;
+            ViewBag.allNum = allNum;
+
             var pagedList = PagedList<Purchase>.PageList(pageindex, pagesize, objList);
             ViewBag.model = pagedList.Item2;
             return View(pagedList.Item1);
@@ -66,7 +81,7 @@ namespace WebApplication.Controllers
                 }
                 else
                 {
-                    List<Purchase> listPurchase = PM.SelectTodayForPurchaseIndex(DateTime.Now.ToLocalTime().ToString("yyyy-MM-dd"));
+                    List<Purchase> listPurchase = PM.SelectTodayForPurchaseIndex(DateTime.Now.ToLocalTime().AddHours(8).ToString("yyyy-MM-dd"));
                     string count_num = "";
                     int num = listPurchase.Count + 1;
                     if (num < 10)
@@ -84,7 +99,7 @@ namespace WebApplication.Controllers
 
                     ViewBag.supplier_id = 0;
 
-                    ViewBag.purchase_index = SM.SelectInUse(4).index_begin + DateTime.Now.ToLocalTime().ToString("yyyy-MM-dd").Replace("-", "") + count_num;
+                    ViewBag.purchase_index = SM.SelectConfigList(4)[0].config_list + DateTime.Now.ToLocalTime().AddHours(8).ToString("yyyy-MM-dd").Replace("-", "") + count_num;
 
                     return View();
                 }
@@ -100,71 +115,87 @@ namespace WebApplication.Controllers
         /// 编辑处理页面
         /// </summary>
         /// <returns></returns>
-        public IActionResult EditHandle(Purchase purchase)
+        public IActionResult EditHandle()
         {
-
             //验证账户是否存在
-            int id = purchase.id;
-            int supplier_id = purchase.supplier_id;
+            int id = 0;
 
-            string purchase_index = purchase.purchase_index;
-            string category = purchase.category;
-            string material_name = purchase.material_name;
-            string material_spec = purchase.material_spec;
-            string material_unit = purchase.material_unit;
+            int supplier_id = Convert.ToInt32(HttpContext.Request.Form["supplier_id"]);
+            string purchase_index = Convert.ToString(HttpContext.Request.Form["purchase_index"]);
+            string category = Convert.ToString(HttpContext.Request.Form["category"]);
 
-            int material_num = purchase.material_num;
+            string[] material_name = Convert.ToString(HttpContext.Request.Form["material_name"]).Split(',');
+            string[] material_spec = Convert.ToString(HttpContext.Request.Form["material_spec"]).Split(',');
+            string[] material_unit = Convert.ToString(HttpContext.Request.Form["material_unit"]).Split(',');
+            string[] material_num = Convert.ToString(HttpContext.Request.Form["material_num"]).Split(',');
+            string[] material_price = Convert.ToString(HttpContext.Request.Form["material_price"]).Split(',');
+            string[] material_all_price = Convert.ToString(HttpContext.Request.Form["material_all_price"]).Split(',');
+            int rowLength = Convert.ToInt32(HttpContext.Request.Form["rowLength"]);
 
-            double material_price = purchase.material_price;
-            double material_all_price = purchase.material_all_price;
-
-            string deliver_index = purchase.deliver_index;
-            DateTime deliver_time = purchase.deliver_time;
-            int money_onoff = purchase.money_onoff;
-            int money_way = purchase.money_way;
-
-            
-
-            int count = 0;
-            Purchase oldPurchase = PM.SelectById(id);//获取现有的入库量
+            int money_onoff = Convert.ToInt32(HttpContext.Request.Form["money_onoff"]);
+            int money_way = Convert.ToInt32(HttpContext.Request.Form["money_way"]);
+            DateTime deliver_time = Convert.ToDateTime(HttpContext.Request.Form["deliver_time"]);
+            string deliver_index = Convert.ToString(HttpContext.Request.Form["deliver_index"]);           
 
             Purchase objPurchase = new Purchase();
 
             objPurchase.supplier_id = supplier_id;
             objPurchase.purchase_index = purchase_index;
             objPurchase.category = category;
-            objPurchase.material_name = material_name;
-            objPurchase.material_spec = material_spec;
-            objPurchase.material_unit = material_unit;
-            objPurchase.material_num = material_num;
-            objPurchase.material_price = material_price;
-            objPurchase.material_all_price = material_all_price;
-            objPurchase.purchase_time = DateTime.Now.ToLocalTime();
 
             objPurchase.deliver_index = deliver_index;
             objPurchase.deliver_time = deliver_time;
             objPurchase.money_onoff = money_onoff;
             objPurchase.money_way = money_way;
-            if (id > 0)
-            {
-                objPurchase.id = id;
-                count = PM.UpdateDeliver(objPurchase);
-            }
-            else
-            {
-                count = PM.Insert(objPurchase);
-            }
-            if (count > 0)
-            {
+            if (material_name[0] != "") {
+                for (int i = 0; i < material_name.Length; i++) {
+                    int count = 0;
+                    objPurchase.material_name = material_name[i];
+                    objPurchase.material_spec = material_spec[i];
+                    objPurchase.material_unit = material_unit[i];
+                    objPurchase.material_num = Convert.ToDouble(material_num[i]);
+                    objPurchase.material_price = Convert.ToDouble(material_price[i]);
+                    objPurchase.material_all_price = Convert.ToDouble(material_all_price[i]);
+                    objPurchase.purchase_time = DateTime.Now.ToLocalTime().AddHours(8);
+                    count = PM.Insert(objPurchase);
+                    if (count < 1) {
+                        return Json("Fail");
+                    }
+                }
                 return Json("Success");
             }
-            else
-            {
+            else {
                 return Json("Fail");
-            }
+            }           
 
         }
 
+        public IActionResult EditDetail() {
+            try
+            {
+                int id = Convert.ToInt32(Request.Query["id"]);
+                Purchase purchase = PM.SelectById(id);
+                return View(purchase);
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+        public IActionResult EditHandleDetail(Purchase purchase) {
+            Purchase newPurchase = purchase;
+            int count1 = PM.UpdateDeliver(newPurchase);
+            int count2 = PM.UpdateCommonDeliver(newPurchase);//更新公共部分
+            if (count1 > 0 && count2 > 0)
+            {
+                return Json("Success");
+            }
+            else {
+                return Json("Fail");
+            }
+
+
+        }
         /// <summary>
         /// 删除数据
         /// </summary>
@@ -193,19 +224,31 @@ namespace WebApplication.Controllers
             }
         }
 
+        public IActionResult GetUnits()
+        {
+            List<Setting> settings = SM.SelectConfigList(1);
+            return Json(settings);
+        }
+        public IActionResult GetMaterials()
+        {
+            List<Setting> settings = SM.SelectConfigList(10);
+            return Json(settings);
+        }
+
         /// <summary>
         /// 获取材料规格
         /// </summary>
         /// <returns></returns>
-        public IActionResult getProductPrice(int material_num, double material_price)
+        public IActionResult GetProductPrice(int id,double material_num, double material_price)
         {
             ViewBag.material_all_price = material_price * material_num;
+            ViewBag.id = "material_all_price" + id;
             return View();
         }
 
 
         public IActionResult SupplierIndex(string start_time, string end_time, string company_name, string purchase_index, 
-            string material_name, string deliver_index, int pageindex = 1, int pagesize = 20)
+            string material_name, string deliver_index,string category, int pageindex = 1, int pagesize = 20)
         {
             
             ViewBag.start_time = start_time;
@@ -215,6 +258,7 @@ namespace WebApplication.Controllers
             ViewBag.purchase_index = purchase_index;
             ViewBag.material_name = material_name;
             ViewBag.deliver_index = deliver_index;
+            ViewBag.category = category;
 
             if (start_time == null)
             {
@@ -225,7 +269,21 @@ namespace WebApplication.Controllers
                 end_time = "2222-01-01";
             }
 
-            var objList = PM.SelectDeliverAll(start_time, end_time, company_name, purchase_index, material_name, deliver_index);
+            var objList = PM.SelectDeliverAll(start_time, end_time, company_name, purchase_index, material_name, deliver_index, category);
+
+            //金额
+            double allMoney = 0;
+            //数量
+            double allNum = 0;
+
+            for (int i = 0; i < objList.Count; i++)
+            {
+                allMoney = allMoney + objList[i].material_all_price;
+                allNum = allNum + objList[i].material_num;
+            }
+            ViewBag.allMoney = allMoney;
+            ViewBag.allNum = allNum;
+
             var pagedList = PagedList<Purchase>.PageList(pageindex, pagesize, objList);
             ViewBag.model = pagedList.Item2;
             return View(pagedList.Item1);
@@ -256,7 +314,7 @@ namespace WebApplication.Controllers
                 else
                 {
                     status = 1;
-                    dt= DateTime.Now.ToLocalTime();
+                    dt= DateTime.Now.ToLocalTime().AddHours(8);
                 }
                 purchase.status = status;
                 purchase.confirm_time = dt;
@@ -278,7 +336,7 @@ namespace WebApplication.Controllers
 
 
         public IActionResult HistoryIndex(string start_time, string end_time, string confirm_start_time, string confirm_end_time, string company_name, string purchase_index, 
-            string material_name, string deliver_index,string day,string month,string year, int pageindex = 1, int pagesize = 20)
+            string material_name, string deliver_index,string category,string day,string month,string year, int pageindex = 1, int pagesize = 20)
         {
             
             ViewBag.start_time = start_time;
@@ -291,6 +349,7 @@ namespace WebApplication.Controllers
             ViewBag.purchase_index = purchase_index;
             ViewBag.material_name = material_name;
             ViewBag.deliver_index = deliver_index;
+            ViewBag.category = category;
 
             if (start_time == null)
             {
@@ -310,13 +369,13 @@ namespace WebApplication.Controllers
                 confirm_end_time = "2222-01-01";
             }
 
-            DateTime dt = DateTime.Now;
+            DateTime dt = DateTime.Now.AddHours(8);
             DateTime dt2 = dt.AddMonths(1);
             
             if (day == "1")
             {
-                confirm_start_time = DateTime.Now.ToLocalTime().ToString("yyyy-MM-dd");
-                confirm_end_time = DateTime.Now.ToLocalTime().ToString("yyyy-MM-dd");
+                confirm_start_time = DateTime.Now.ToLocalTime().AddHours(8).ToString("yyyy-MM-dd");
+                confirm_end_time = DateTime.Now.ToLocalTime().AddHours(8).ToString("yyyy-MM-dd");
                 ViewBag.day = "1";
             }
             if (month == "1")
@@ -328,11 +387,24 @@ namespace WebApplication.Controllers
             if (year == "1")
             {
                 confirm_start_time = dt.AddMonths(-dt.Month + 1).AddDays(-dt.Day + 1).ToString("yyyy-MM-dd");
-                confirm_end_time = new DateTime(DateTime.Now.Year, 12, 31).ToString("yyyy-MM-dd");
+                confirm_end_time = new DateTime(DateTime.Now.AddHours(8).Year, 12, 31).ToString("yyyy-MM-dd");
                 ViewBag.year = "1";
             }
 
-            var objList = PM.SelectHistory(start_time, end_time, confirm_start_time, confirm_end_time, company_name,purchase_index, material_name, deliver_index);
+            var objList = PM.SelectHistory(start_time, end_time, confirm_start_time, confirm_end_time, company_name,purchase_index, material_name, deliver_index, category);
+
+            //金额
+            double allMoney = 0;
+            //数量
+            double allNum = 0;
+
+            for (int i = 0; i < objList.Count; i++)
+            {
+                allMoney = allMoney + objList[i].material_all_price;
+                allNum = allNum + objList[i].material_num;
+            }
+            ViewBag.allMoney = allMoney;
+            ViewBag.allNum = allNum;
             var pagedList = PagedList<Purchase>.PageList(pageindex, pagesize, objList);
             ViewBag.model = pagedList.Item2;
             return View(pagedList.Item1);

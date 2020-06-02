@@ -14,20 +14,24 @@ namespace DAL
         /// <param name="name"></param>
         /// <returns></returns>
         public List<Order> SelectAll(int order_status, string start_time, string end_time, string deliver_start_time, string deliver_end_time,  string company_name,
-            string order_index,string company_order_index,string purchase_person)
+            string order_index,string company_order_index,string purchase_person,string order_name)
         {
             try
             {
                 List<Order> objList = new List<Order>();
                 string sql = null;
+                if (!string.IsNullOrEmpty(company_name))
+                {
+                    company_name = company_name.Replace("(", "\\(").Replace(")", "\\)");
+                }
                 sql = "select c.id,c.company_order_index,c.order_index,b.company_name,a.order_time,a.order_name,a.deliver_time," +
                     " order_num,order_price,order_all_price,tui_num, open_num,remain_num,purchase_person,a.seq_id,a.order_picture " +
                     "from jinchen.orderseq_info a,jinchen.company_info b,jinchen.order_info c where a.order_id=c.id and c.customer_id=b.id and " +
                     " b.company_name ~* '{0}' and c.order_index ~* '{1}' and c.company_order_index ~*'{2}' and to_char(a.order_time,'yyyy-MM-dd')>='{3}' and to_char(a.order_time,'yyyy-MM-dd')<='{4}' and a.order_status={5} " +
-                    " and to_char(a.deliver_time,'yyyy-MM-dd')>='{6}' and to_char(a.deliver_time,'yyyy-MM-dd')<='{7}' and purchase_person ~*'{8}' " +
+                    " and to_char(a.deliver_time,'yyyy-MM-dd')>='{6}' and to_char(a.deliver_time,'yyyy-MM-dd')<='{7}' and purchase_person ~*'{8}' and order_name ~*'{9}' " +
                     " order by a.order_time desc,c.order_index desc,order_name";
                 sql = string.Format(sql, company_name, order_index, company_order_index,start_time,end_time, order_status, deliver_start_time, 
-                    deliver_end_time,purchase_person);
+                    deliver_end_time,purchase_person,order_name);
 
                 objList = PostgreHelper.GetEntityList<Order>(sql);
 
@@ -104,11 +108,23 @@ namespace DAL
             {
                 List<Order> objList = new List<Order>();
                 string sql = null;
-                sql =  "select a.id,a.order_index,b.company_name, c.seq_id,c.order_time,c.order_name,c.unit,c.deliver_time," +
-                    "c.order_num,c.open_num,c.tui_num,c.remain_num,c.order_price,c.order_all_price,c.purchase_person " +
-                    "from jinchen.order_info a,jinchen.company_info b,jinchen.orderseq_info c " +
-                    "where a.customer_id=b.id and a.id=c.order_id and a.id={0} and b.company_name='{1}' order by c.order_name";
-                sql = string.Format(sql, order_id, company_name);
+                if (order_id == 0)
+                {
+                    sql = "select a.id,c.order_id,a.order_index,b.company_name, c.seq_id,c.order_time,c.order_name,c.unit,c.deliver_time," +
+                            "c.order_num,c.open_num,c.tui_num,c.remain_num,c.order_price,c.order_all_price,c.purchase_person " +
+                            "from jinchen.order_info a,jinchen.company_info b,jinchen.orderseq_info c " +
+                            "where a.customer_id=b.id and a.id=c.order_id and b.company_name='{0}' order by c.order_name";
+                    sql = string.Format(sql, company_name);
+                }
+                else {
+                    sql = "select a.id,c.order_id,a.order_index,b.company_name, c.seq_id,c.order_time,c.order_name,c.unit,c.deliver_time," +
+                        "c.order_num,c.open_num,c.tui_num,c.remain_num,c.order_price,c.order_all_price,c.purchase_person " +
+                        "from jinchen.order_info a,jinchen.company_info b,jinchen.orderseq_info c " +
+                        "where a.customer_id=b.id and a.id=c.order_id and a.id={0} and b.company_name='{1}' order by c.order_name";
+                    sql = string.Format(sql, order_id, company_name);
+                }
+                
+                
 
                 objList = PostgreHelper.GetEntityList<Order>(sql);
 
@@ -346,9 +362,9 @@ namespace DAL
             {
                 int count = 0;
                 string sql = "update jinchen.orderseq_info set order_name='{0}',deliver_time='{1}',unit='{2}',order_price={3}," +
-                    "order_all_price={4},order_picture='{5}',purchase_person='{6}' where seq_id={7}";
+                    "order_all_price={4},order_picture='{5}',purchase_person='{6}',order_num={7},order_time='{8}' where seq_id={9}";
                 sql = string.Format(sql, obj.order_name, obj.deliver_time, obj.unit,obj.order_price, obj.order_all_price,
-                    obj.order_picture,obj.purchase_person, obj.seq_id);
+                    obj.order_picture,obj.purchase_person,obj.order_num,obj.order_time, obj.seq_id);
                 count = PostgreHelper.ExecuteNonQuery(sql);
                 return count;
 

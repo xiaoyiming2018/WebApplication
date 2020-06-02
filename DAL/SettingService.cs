@@ -32,26 +32,26 @@ namespace DAL
             }
         }
 
-        /// <summary>
-        /// 查询单笔数
-        /// </summary>
-        /// <param name="id">用户id</param>
-        /// <returns></returns>
-        public Setting SelectInUse(int all_type)
-        {
-            try
-            {
-                Setting obj = new Setting();
-                string sql = "select * from jinchen.setting where in_use=1 and all_type={0}";
-                sql = string.Format(sql, all_type);
-                obj = PostgreHelper.GetSingleEntity<Setting>(sql);
-                return obj;
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
-        }
+        ///// <summary>
+        ///// 查询单笔数
+        ///// </summary>
+        ///// <param name="id">用户id</param>
+        ///// <returns></returns>
+        //public Setting SelectInUse(int all_type)
+        //{
+        //    try
+        //    {
+        //        Setting obj = new Setting();
+        //        string sql = "select * from jinchen.setting where in_use=1 and all_type={0}";
+        //        sql = string.Format(sql, all_type);
+        //        obj = PostgreHelper.GetSingleEntity<Setting>(sql);
+        //        return obj;
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        throw ex;
+        //    }
+        //}
 
         /// <summary>
         /// 插入
@@ -64,7 +64,6 @@ namespace DAL
             {
                 Setting setting = new Setting();
                 setting.config_list = obj.config_list;
-                setting.index_begin = obj.index_begin;
                 setting.all_type = obj.all_type;
                 setting.in_use = obj.in_use;
                 int count = PostgreHelper.InsertSingleEntity<Setting>("jinchen.setting", setting);
@@ -86,11 +85,26 @@ namespace DAL
             try
             {
                 int count = 0;
-                string sql = "update jinchen.setting set index_begin='{0}',in_use='{1}' where all_type={2}";
-                sql = string.Format(sql, obj.index_begin, obj.in_use, obj.all_type);
+                string sql = "update jinchen.setting set config_list='{0}',in_use='{1}' where all_type={2} and id={3}";
+                sql = string.Format(sql, obj.config_list, obj.in_use, obj.all_type,obj.id);
                 count = PostgreHelper.ExecuteNonQuery(sql);
                 return count;
 
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        public int Delete(int id)
+        {
+            try
+            {
+                string sql = "delete from jinchen.setting where id={0}";
+                sql = string.Format(sql, id);
+                int count = PostgreHelper.ExecuteNonQuery(sql);
+                return count;
             }
             catch (Exception ex)
             {

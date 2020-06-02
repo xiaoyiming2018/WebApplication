@@ -37,9 +37,9 @@ namespace BLL
         /// </summary>
         /// <param name="name"></param>
         /// <returns></returns>
-        public List<Purchase> SelectDeliverAll(string start_time, string end_time, string company_name="", string purchase_index="", string material_name="", string deliver_index="")
+        public List<Purchase> SelectDeliverAll(string start_time, string end_time, string company_name="", string purchase_index="", string material_name="", string deliver_index="", string category="")
         {
-            List<Purchase> objList = PS.SelectDeliverAll(start_time,end_time,company_name, purchase_index, material_name, deliver_index);
+            List<Purchase> objList = PS.SelectDeliverAll(start_time,end_time,company_name, purchase_index, material_name, deliver_index, category);
             return objList;
         }
 
@@ -50,9 +50,9 @@ namespace BLL
         /// <param name="name"></param>
         /// <returns></returns>
         public List<Purchase> SelectHistory(string start_time, string end_time, string confirm_start_time, string confirm_end_time, string company_name="" , string purchase_index="",
-            string material_name="", string deliver_index="")
+            string material_name="", string deliver_index="",string category="")
         {
-            List<Purchase> objList = PS.SelectHistory(start_time, end_time, confirm_start_time, confirm_end_time, company_name, purchase_index, material_name, deliver_index);
+            List<Purchase> objList = PS.SelectHistory(start_time, end_time, confirm_start_time, confirm_end_time, company_name, purchase_index, material_name, deliver_index, category);
             return objList;
         }
 
@@ -88,6 +88,17 @@ namespace BLL
         public int UpdateDeliver(Purchase obj)
         {
             int count = PS.UpdateDeliver(obj);
+            return count;
+        }
+
+        /// <summary>
+        /// 更新公共部分
+        /// </summary>
+        /// <param name="obj"></param>
+        /// <returns></returns>
+        public int UpdateCommonDeliver(Purchase obj)
+        {
+            int count = PS.UpdateCommonDeliver(obj);
             return count;
         }
 

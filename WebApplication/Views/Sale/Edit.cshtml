@@ -8,16 +8,25 @@
 <html>
 <head>
     <meta name="viewport" content="width=device-width" />
+    <style>
+        .headstyle {
+            border: 2px solid black;
+        }
 
-    <title></title>
-    @*<link href="~/assets/css/lib/bootstrap.min.css" rel="stylesheet">*@
-    <link href="~/js/dist/css/bootstrap-select.min.css" rel="stylesheet" />
+        .thstyle {
+            border: 2px solid black;
+        }
 
-    <script src="~/Scripts/jquery-3.3.1.min.js"></script>
-    <script src="~/assets/js/lib/bootstrap.min.js"></script>
 
-    <script type="text/javascript" src="~/My97DatePicker/WdatePicker.js"></script>
-    <script src="~/js/dist/js/bootstrap-select.min.js"></script>
+
+        .bodystyle {
+            border: 2px solid black;
+        }
+
+        .tdstyle {
+            border: 2px solid black;
+        }
+    </style>
     <script type="text/javascript">
         var money = 0;
         var index = 1;
@@ -31,16 +40,15 @@
                 var flag = 0;
                 var deliver_index = document.getElementById('deliver_index').value;
                 var deliver_company_head = document.getElementById('deliver_company_head').value;
-                var order_id = document.getElementById('order_id').value;
+                
                 if (deliver_index == "" || deliver_company_head == "") {
                     swal("信息不能为空！", "", "error");
                 }
-                else if (order_id <= 0) {
-                    swal("订单号有误！", "您所填的订单号不存在！", "error");
-                }
                 else {
+                    
                     var inputNum = document.getElementById('inputNum').value;
 
+                    var order_idList = document.getElementsByName('order_id');
                     var seq_idList = document.getElementsByName("seq_id");
                     var remain_numList = document.getElementsByName("remain_num");
                     var real_numList = document.getElementsByName("real_num");
@@ -48,12 +56,14 @@
                     var deliver_all_priceList = document.getElementsByName("deliver_all_price");
                     var remarkList = document.getElementsByName("remark");
 
+                    var order_id = new Array();
                     var seq_id = new Array();
                     var real_num = new Array();
                     var deliver_price = new Array();
                     var deliver_all_price = new Array();
                     var remark = new Array();
                     for (var i = 0; i < real_numList.length; i++) {
+                        order_id.push(order_idList[i].value);
                         seq_id.push(seq_idList[i].value);
                         real_num.push(real_numList[i].value);
                         deliver_price.push(deliver_priceList[i].value);
@@ -64,6 +74,7 @@
                         }
                     }
 
+                    var Order_Id = order_id.join(',');
                     var Seq_Id = seq_id.join(',');
                     var Real_Num = real_num.join(',');
                     var Deliver_Price = deliver_price.join(',');
@@ -83,7 +94,8 @@
                             },
                             data: {
                                 inputNum: inputNum, deliver_index: deliver_index, deliver_company_head: deliver_company_head, order_id: order_id,
-                                Seq_Id: Seq_Id, Real_Num: Real_Num, Deliver_Price: Deliver_Price, Deliver_All_Price: Deliver_All_Price, Remark: Remark
+                                Seq_Id: Seq_Id, Real_Num: Real_Num, Deliver_Price: Deliver_Price, Deliver_All_Price: Deliver_All_Price, Remark: Remark,
+                                Order_Id: Order_Id
                             },
                             success: function (msg) {
                                 if (msg == "Success") {
@@ -108,14 +120,11 @@
 
 
         function getOrderList() {
-            var order_id = $('#order_id').val();
-            if (order_id == null || order_id=="" ) { order_id = 0; }
             var deliver_company_head = $('#deliver_company_head').val();
-            if (order_id >= 0) {
             $.ajax({
                 type: "POST",
                 url: "/Sale/GetOrderList",
-                data: { order_id: order_id, deliver_company_head:deliver_company_head },
+                data: { deliver_company_head:deliver_company_head },
                 success: function (msg) {
                     $('#order_div').html(msg);
                 },
@@ -123,7 +132,6 @@
                     swal("获取订单失败！", "请重新操作！", "error");
                     }
                 });
-            }
         }
 
         function doPrint() {
@@ -276,26 +284,6 @@
                                                     }
                                                 </select>
 
-                                            </div>
-                                        </div>
-
-                                        <div class="form-group">
-                                            <label for="example-input-normal" class="col-sm-4 control-label">客户订单号</label>
-                                            <div class="col-sm-3">
-                                                <select class="selectpicker" data-live-search="true" data-live-search-placeholder="搜索" id="order_id" name="order_id" onchange="getOrderList();">
-                                                    <option value=""></option>
-                                                    @{
-                                                        OrderManager OM = new OrderManager();
-                                                        List<Order> objList = OM.SelectOrderForDropDown(0);
-                                                        if (objList.Count > 0)
-                                                        {
-                                                            for (int i = 0; i < objList.Count; i++)
-                                                            {
-                                                                <!option value="@objList[i].order_id">@objList[i].company_order_index</!option>
-                                                            }
-                                                        }
-                                                    }
-                                                </select>
                                             </div>
                                         </div>
 
@@ -466,39 +454,39 @@
                             <td style="padding:2px;border:0;"></td>
                             <td style="padding:2px;border:0;"></td>
                             <td style="padding:2px;border:0;text-align:right">打印日期：</td>
-                            <td style="padding:2px;border:0;text-align:right">@(DateTime.Now.ToLocalTime().ToString("yyyy-MM-dd HH:ss:mm"))</td>
+                            <td style="padding:2px;border:0;text-align:right">@(DateTime.Now.ToLocalTime().AddHours(8).ToString("yyyy-MM-dd HH:ss:mm"))</td>
                         </tr>
                     </tbody>
                 </table>
 
-                <table class="table table-responsive table-bordered">
-                    <thead>
+                <table class="table table-responsive">
+                    <thead class="headstyle">
                         <tr>
-                            <th>序号</th>
-                            <th>订单号</th>
-                            <th>名称规格</th>
-                            <th>单位</th>
-                            <th>数量</th>
-                            <th>单价</th>
-                            <th>金额</th>
-                            <th>备注</th>
+                            <th class="thstyle">序号</th>
+                            <th class="thstyle">订单号</th>
+                            <th class="thstyle">名称规格</th>
+                            <th class="thstyle">单位</th>
+                            <th class="thstyle">数量</th>
+                            <th class="thstyle">单价</th>
+                            <th class="thstyle">金额</th>
+                            <th class="thstyle">备注</th>
                         </tr>
                     </thead>
-                    <tbody>
+                    <tbody class="bodystyle">
                         @{
                             int index1 = 1;
                             double money = 0;
                             foreach (var item in Model)
                             {
                                 <tr>
-                                    <td>@index1</td>
-                                    <td>@item.company_order_index</td>
-                                    <td>@item.order_name</td>
-                                    <td>@item.unit</td>
-                                    <td>@item.real_num</td>
-                                    <td>@item.deliver_price</td>
-                                    <td>@item.deliver_all_price</td>
-                                    <td>@item.remark</td>
+                                    <td class="tdstyle">@index1</td>
+                                    <td class="tdstyle">@item.company_order_index</td>
+                                    <td class="tdstyle">@item.order_name</td>
+                                    <td class="tdstyle">@item.unit</td>
+                                    <td class="tdstyle">@item.real_num</td>
+                                    <td class="tdstyle">@item.deliver_price</td>
+                                    <td class="tdstyle">@item.deliver_all_price</td>
+                                    <td class="tdstyle">@item.remark</td>
                                 </tr>
                                 money += item.deliver_all_price;
                                 index1++;

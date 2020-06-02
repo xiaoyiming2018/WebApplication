@@ -65,7 +65,7 @@ namespace WebApplication.Controllers
             saleNew.deliver_index = sale.deliver_index;
             saleNew.seq_id= sale.seq_id;
             saleNew.deliver_company_head = saleOld.deliver_company_head;
-            saleNew.insert_time = DateTime.Now.ToLocalTime();
+            saleNew.insert_time = DateTime.Now.ToLocalTime().AddHours(8);
 
             saleNew.real_num = sale.real_num;
             saleNew.deliver_price = sale.deliver_price;
@@ -130,7 +130,7 @@ namespace WebApplication.Controllers
         /// 获取材料规格
         /// </summary>
         /// <returns></returns>
-        public IActionResult GetProductPrice(int order_num, double order_price)
+        public IActionResult GetProductPrice(double order_num, double order_price)
         {
             ViewBag.order_all_price = order_num * order_price;
             return View();

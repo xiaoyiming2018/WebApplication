@@ -1,0 +1,54 @@
+﻿@{
+    Layout = null;
+    @model IList<Model.DuiZhang>;
+}
+<table class="table table-responsive table-bordered">
+    <thead>
+        <tr>
+            <th>序号</th>
+            <th>对账单号</th>
+            <th>送货单号</th>
+            <th>客户名称</th>
+            <th>客户订单号</th>
+            <th>名称规格</th>
+            <th>单位</th>
+            <th>数量</th>
+            @if (UserManager.Current.GetLevel >= UserLevelEnum.ProductManager)
+            {
+                <th>单价</th>
+                <th>金额</th>
+            }
+        </tr>
+    </thead>
+    <tbody>
+        @{
+            int index = 1;
+            foreach (var item in Model)
+            {
+                <tr>
+                    <td>@index</td>
+                    <td style="display:none"><input name="id" value="@item.id" /></td>
+                    <td>@item.dz_index</td>
+                    <td>@item.deliver_index</td>
+                    <td>@item.company_name</td>
+                    <td>@item.company_order_index</td>
+                    <td>@item.order_name</td>
+                    <td>@item.unit</td>
+                    <td>@item.dui_num</td>
+                    @if (UserManager.Current.GetLevel >= UserLevelEnum.ProductManager)
+                    {
+                        <td>@item.dui_price</td>
+                        <td>@item.dui_all_price</td>
+                    }
+                </tr>
+                index++;
+            }
+            <tr>
+                <td colspan="7" style="color:green;font-weight:bold">合计</td>
+                <td style="font-weight:bold">@ViewBag.allNum</td>
+                <td></td>
+                <td style="font-weight:bold">@ViewBag.allPrice</td>
+            </tr>
+        }
+    </tbody>
+</table>

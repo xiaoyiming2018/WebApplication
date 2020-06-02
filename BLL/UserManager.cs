@@ -119,6 +119,19 @@ namespace BLL
             return result;
         }
 
+        /// <summary>
+        /// 登录
+        /// </summary>
+        /// <param name="user_name">用户名称</param>
+        /// <param name="pass_word">用户密码</param>
+        /// <param name="remember">是否需要长时间登录</param>
+        /// <returns></returns>
+        public bool ChangePassword(string user_name, string pass_word)
+        {
+            int user_level = 0;
+            bool result = US.Login(user_name, pass_word, ref user_level);
+            return result;
+        }
 
         /// <summary>
         /// 获取属性值

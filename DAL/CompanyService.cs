@@ -22,6 +22,9 @@ namespace DAL
             {
                 List<Company> objList = new List<Company>();
                 string sql = null;
+                if (!string.IsNullOrEmpty(company_name)) {
+                    company_name = company_name.Replace("(", "\\(").Replace(")", "\\)");
+                }
                 sql = "select * from jinchen.company_info where company_name ~* '{0}' and tax_num ~* '{1}' and account ~* '{2}' " +
                     "and bank ~* '{3}' and company_type={4} order by company_name";
                 sql = string.Format(sql, company_name, tax_number, account, bank, type);

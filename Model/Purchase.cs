@@ -25,7 +25,7 @@ namespace Model
         //物料规格
         public string material_spec { get; set; }
         //物料数量
-        public int material_num { get; set; }
+        public double material_num { get; set; }
         //物料单位
         public string material_unit { get; set; }
         //单价

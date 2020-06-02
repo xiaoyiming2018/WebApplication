@@ -19,6 +19,10 @@ namespace DAL
             {
                 List<Sale> objList = new List<Sale>();
                 string sql = null;
+                if (!string.IsNullOrEmpty(deliver_company_head))
+                {
+                    deliver_company_head = deliver_company_head.Replace("(", "\\(").Replace(")", "\\)");
+                }
                 sql = "select deliver_index,deliver_company_head,sum(real_num) as real_num,sum(deliver_all_price) as deliver_all_price,max(insert_time) as insert_time " +
                       "from jinchen.sale_info a "+
                       "where deliver_index ~*'{0}' and deliver_company_head ~*'{1}' and to_char(insert_time,'yyyy-MM-dd')>='{2}' and to_char(insert_time,'yyyy-MM-dd')<='{3}' " +
@@ -75,8 +79,8 @@ namespace DAL
                 List<Sale> objList = new List<Sale>();
                 string sql = null;
                 sql = "select a.deliver_index,a.deliver_company_head,a.order_id,a.seq_id,b.order_index,d.company_name,b.company_order_index," +
-                        "a.real_num,a.real_time,a.deliver_price,a.deliver_all_price,c.order_price,c.order_all_price," +
-                        "c.order_num,c.remain_num,c.unit,c.purchase_person,c.deliver_time,c.order_name,c.order_time,a.deliver_status,a.confirm_time,a.remark " +
+                        "a.real_num,a.deliver_price,a.deliver_all_price,c.order_price,c.order_all_price," +
+                        "c.order_num,c.remain_num,c.unit,c.purchase_person,c.deliver_time,c.order_name,c.order_time,a.remark " +
                         "from jinchen.sale_info a,jinchen.order_info b, jinchen.orderseq_info c, jinchen.company_info d " +
                         "where a.order_id = b.id and b.id = c.order_id and a.seq_id = c.seq_id and b.customer_id = d.id and a.deliver_index= '{0}' and " +
                         "b.order_index ~*'{1}' and c.order_name ~*'{2}' " +
@@ -157,7 +161,7 @@ namespace DAL
                 Sale obj = new Sale();
                 string sql = "select a.deliver_index,a.deliver_company_head,b.order_index,d.company_name,b.company_order_index,a.id,"+
                             "c.order_time,c.order_name,c.order_num,c.order_price,c.purchase_person,c.unit,c.open_num,c.tui_num," +
-                            "c.remain_num,a.real_num,a.real_time,a.deliver_price,a.deliver_all_price,a.remark,a.money_way,a.seq_id " +
+                            "c.remain_num,a.real_num,a.deliver_price,a.deliver_all_price,a.remark,a.money_way,a.seq_id,a.dz_num " +
                             "from jinchen.sale_info a, jinchen.order_info b, jinchen.orderseq_info c, jinchen.company_info d " +
                             "where a.order_id = b.id and b.id = c.order_id and a.seq_id = c.seq_id and b.customer_id = d.id and a.seq_id ={0} and a.deliver_index='{1}' ";
                 sql = string.Format(sql, seq_id, deliver_index);
@@ -255,22 +259,23 @@ namespace DAL
         /// </summary>
         /// <param name="name"></param>
         /// <returns></returns>
-        public List<Sale> SelectMoneyAll(int deliver_status,string start_time, string end_time, string confirm_start_time, string confirm_end_time, 
-            string deliver_index, string deliver_company_head,string order_name,string dz_index,string invoice_index)
+        public List<Sale> SelectMoneyAll(string start_time, string end_time,string deliver_index, string deliver_company_head,string order_name)
         {
             try
             {
                 List<Sale> objList = new List<Sale>();
                 string sql = null;
-                sql = "select b.order_index,b.company_order_index,a.deliver_index,a.seq_id,a.deliver_company_head,real_num,deliver_price,deliver_all_price," +
-                    "a.money_way,deliver_status,remark,order_name,unit,purchase_person,a.insert_time,a.seq_id,a.money_onoff,a.confirm_time,a.dz_index,a.invoice_index,c.tui_num,a.return_flag " +
+                if (!string.IsNullOrEmpty(deliver_company_head))
+                {
+                    deliver_company_head = deliver_company_head.Replace("(", "\\(").Replace(")", "\\)");
+                }
+                sql = "select a.id, b.company_order_index,a.deliver_index,a.deliver_company_head,real_num,deliver_price,deliver_all_price," +
+                    "a.money_way,order_name,unit,purchase_person,a.insert_time,a.seq_id,a.money_onoff,c.tui_num,a.return_flag,a.dz_num " +
                     " from jinchen.sale_info a,jinchen.order_info b,jinchen.orderseq_info c " +
                       "where a.order_id=b.id and a.seq_id=c.seq_id and a.order_id=c.order_id and deliver_index ~*'{0}' and deliver_company_head ~*'{1}' and to_char(a.insert_time,'yyyy-MM-dd')>='{2}' and " +
-                      "to_char(a.insert_time,'yyyy-MM-dd')<='{3}' and deliver_status={4} and to_char(a.confirm_time,'yyyy-MM-dd')>='{5}' and to_char(a.confirm_time,'yyyy-MM-dd')<='{6}' and " +
-                      "order_name ~* '{7}' and dz_index ~* '{8}' and invoice_index ~* '{9}' " +
+                      "to_char(a.insert_time,'yyyy-MM-dd')<='{3}' and order_name ~* '{4}' " +
                       "order by deliver_index desc,deliver_company_head";
-                sql = string.Format(sql, deliver_index, deliver_company_head, start_time, end_time, deliver_status, confirm_start_time, confirm_end_time,
-                    order_name, dz_index, invoice_index);
+                sql = string.Format(sql, deliver_index, deliver_company_head, start_time, end_time,order_name);
 
                 objList = PostgreHelper.GetEntityList<Sale>(sql);
 
@@ -282,24 +287,21 @@ namespace DAL
             }
         }
 
-        /// <summary>
-        /// 查询目前对账单的个数
-        /// </summary>
-        /// <param name="id">用户id</param>
-        /// <returns></returns>
-        public List<Sale> SelectForDzIndex()
+        public Sale SelectById(int id) 
         {
             try
             {
-                List<Sale> objList = new List<Sale>();
+                Sale obj = new Sale();
                 string sql = null;
-                sql = "select a.dz_index " +
-                    "from jinchen.sale_info a where dz_index !=' ' group by dz_index ";
-                sql = string.Format(sql);
+                sql = "select a.insert_time,a.deliver_company_head,b.company_order_index,c.order_name,a.deliver_price," +
+                    "c.order_name,a.deliver_all_price,c.unit,a.dz_num " +
+                    "from jinchen.sale_info a,jinchen.order_info b,jinchen.orderseq_info c " +
+                    "where a.order_id=b.id and b.id=c.order_id and a.seq_id=c.seq_id and a.id={0} ";
+                sql = string.Format(sql,id);
 
-                objList = PostgreHelper.GetEntityList<Sale>(sql);
+                obj = PostgreHelper.GetSingleEntity<Sale>(sql);
 
-                return objList;
+                return obj;
             }
             catch (Exception ex)
             {
@@ -318,9 +320,9 @@ namespace DAL
             try
             {
                 string sql = "insert into jinchen.sale_info(order_id,seq_id,deliver_index,deliver_company_head,real_num," +
-                    "real_time,deliver_price,deliver_all_price,insert_time,remark) values({0},{1},'{2}','{3}',{4},'{5}',{6},{7},'{8}','{9}')";
+                    "deliver_price,deliver_all_price,insert_time,remark) values({0},{1},'{2}','{3}',{4},{5},{6},'{7}','{8}')";
                 sql = string.Format(sql, obj.order_id, obj.seq_id, obj.deliver_index,
-                    obj.deliver_company_head, obj.real_num, obj.real_time,obj.deliver_price,obj.deliver_all_price,obj.insert_time,obj.remark);
+                    obj.deliver_company_head, obj.real_num, obj.deliver_price,obj.deliver_all_price,obj.insert_time,obj.remark);
                 int count = PostgreHelper.ExecuteNonQuery(sql);
                 return count;
             }
@@ -397,17 +399,17 @@ namespace DAL
         }
 
         /// <summary>
-        /// 更新对账单号
+        /// 更新对账数量
         /// </summary>
         /// <param name="obj"></param>
         /// <returns></returns>
-        public int UpdateDzIndex(string dz_index,string deliver_index, int seq_id)
+        public int UpdateDZNum(double dz_num, int id)
         {
             try
             {
                 int count = 0;
-                string sql = "update jinchen.sale_info set dz_index='{0}' where deliver_index='{1}' and seq_id={2}";
-                sql = string.Format(sql, dz_index, deliver_index, seq_id);
+                string sql = "update jinchen.sale_info set dz_num={0} where id ={1}";
+                sql = string.Format(sql, dz_num, id);
                 count = PostgreHelper.ExecuteNonQuery(sql);
                 return count;
 
@@ -430,50 +432,6 @@ namespace DAL
                 int count = 0;
                 string sql = "update jinchen.sale_info set invoice_index='{0}' where deliver_index='{1}' and seq_id='{2}'";
                 sql = string.Format(sql, invoice_index, deliver_index, seq_id);
-                count = PostgreHelper.ExecuteNonQuery(sql);
-                return count;
-
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
-        }
-
-        /// <summary>
-        /// 更新
-        /// </summary>
-        /// <param name="obj"></param>
-        /// <returns></returns>
-        public int UpdateDeliverStatus(Sale obj)
-        {
-            try
-            {
-                int count = 0;
-                string sql = "update jinchen.sale_info set deliver_status={0},confirm_time='{1}' where seq_id={2} and deliver_index='{3}'";
-                sql = string.Format(sql, obj.deliver_status, obj.confirm_time, obj.seq_id, obj.deliver_index);
-                count = PostgreHelper.ExecuteNonQuery(sql);
-                return count;
-
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
-        }
-
-        /// <summary>
-        /// 更新
-        /// </summary>
-        /// <param name="obj"></param>
-        /// <returns></returns>
-        public int UpdateDeliverStatusInvoice(Sale obj)
-        {
-            try
-            {
-                int count = 0;
-                string sql = "update jinchen.sale_info set deliver_status={0},real_time='{1}',invoice_index='{2}' where seq_id={3} and deliver_index='{4}'";
-                sql = string.Format(sql, obj.deliver_status, obj.real_time, obj.invoice_index, obj.seq_id, obj.deliver_index);
                 count = PostgreHelper.ExecuteNonQuery(sql);
                 return count;
 

@@ -12,19 +12,22 @@ namespace Model
         //公司名称
         public string company_name { get; set; }
 
+        //开票公司
+        public string invoice_company { get; set; }
+
         //发票类型
         public int invoice_type { get; set; }
         //发票号
         public string invoice_index { get; set; }
         //开票时间
         public DateTime invoice_time { get; set; }
-        //金额
+        //应付金额（发票金额）
         public double invoice_price { get; set; }
-        //税额
-        public double invoice_ratio { get; set; }
-        //价税合计
-        public double invoice_all_price { get; set; }
-        //付款方式
+        //实付金额
+        public double invoice_real_price { get; set; }
+        //客户预付款
+        public double invoice_prepay { get; set; }
+        //付款方式：0现金，1银行转账，2承兑
         public int pay_type { get; set; }
 
         //备注
