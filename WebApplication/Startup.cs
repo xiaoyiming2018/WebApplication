@@ -87,20 +87,25 @@ namespace WebApplication
 
             app.UseCors("AllowSpecificOrigin");
 
-
+            app.UseStaticFiles();
 
             app.UseStaticFiles(new StaticFileOptions()
 
             {
-
                 FileProvider = new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), @"wwwroot/Files")),
-
                 RequestPath = new PathString("/src")
-
             });
 
+            app.UseDirectoryBrowser(new DirectoryBrowserOptions()
+
+            {
+                FileProvider = new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), @"wwwroot/Files")),
+                RequestPath = new PathString("/src")
+            });
+            //等同于上面三个代码UseStaticFiles/UseStaticFiles/UseDirectoryBrowser
+
             app.UseHttpsRedirection();
-            app.UseStaticFiles();
+            
             app.UseCookiePolicy();
 
             app.UseMvc(routes =>

@@ -21,11 +21,13 @@ namespace WebApplication.Controllers
         /// <param name="page">分页页码</param>
         /// <param name="size">每页显示数量</param>
         /// <returns></returns>
-        public IActionResult Index(string start_time, string end_time, string company_name, string purchase_index, 
-            string material_name,string deliver_index, string category, int pageindex = 1, int pagesize = 20)
-        {
+        public IActionResult Index()
+        {            
+            return View();
             
-
+        }
+        public IActionResult GetData(string start_time, string end_time, string company_name, string purchase_index,
+            string material_name, string deliver_index, string category) {
             ViewBag.start_time = start_time;
             ViewBag.end_time = end_time;
 
@@ -44,25 +46,8 @@ namespace WebApplication.Controllers
                 end_time = "2222-01-01";
             }
 
-            var objList = PM.SelectDeliverAll(start_time, end_time, company_name, purchase_index, material_name,deliver_index, category);
-
-            //金额
-            double allMoney = 0;
-            //数量
-            double allNum = 0;
-
-            for (int i = 0; i < objList.Count; i++)
-            {
-                allMoney = allMoney + objList[i].material_all_price;
-                allNum = allNum + objList[i].material_num;
-            }
-            ViewBag.allMoney = allMoney;
-            ViewBag.allNum = allNum;
-
-            var pagedList = PagedList<Purchase>.PageList(pageindex, pagesize, objList);
-            ViewBag.model = pagedList.Item2;
-            return View(pagedList.Item1);
-            
+            var objList = PM.SelectDeliverAll(start_time, end_time, company_name, purchase_index, material_name, deliver_index, category);
+            return Json(objList);
         }
 
         /// <summary>
@@ -247,10 +232,12 @@ namespace WebApplication.Controllers
         }
 
 
-        public IActionResult SupplierIndex(string start_time, string end_time, string company_name, string purchase_index, 
-            string material_name, string deliver_index,string category, int pageindex = 1, int pagesize = 20)
+        public IActionResult SupplierIndex()
         {
-            
+            return View();    
+        }
+        public IActionResult GetSupplierData(string start_time, string end_time, string company_name, string purchase_index,
+            string material_name, string deliver_index, string category) {
             ViewBag.start_time = start_time;
             ViewBag.end_time = end_time;
 
@@ -270,26 +257,8 @@ namespace WebApplication.Controllers
             }
 
             var objList = PM.SelectDeliverAll(start_time, end_time, company_name, purchase_index, material_name, deliver_index, category);
-
-            //金额
-            double allMoney = 0;
-            //数量
-            double allNum = 0;
-
-            for (int i = 0; i < objList.Count; i++)
-            {
-                allMoney = allMoney + objList[i].material_all_price;
-                allNum = allNum + objList[i].material_num;
-            }
-            ViewBag.allMoney = allMoney;
-            ViewBag.allNum = allNum;
-
-            var pagedList = PagedList<Purchase>.PageList(pageindex, pagesize, objList);
-            ViewBag.model = pagedList.Item2;
-            return View(pagedList.Item1);
-            
+            return Json(objList);
         }
-
         /// <summary>
         /// 删除数据
         /// </summary>
@@ -335,10 +304,13 @@ namespace WebApplication.Controllers
         }
 
 
-        public IActionResult HistoryIndex(string start_time, string end_time, string confirm_start_time, string confirm_end_time, string company_name, string purchase_index, 
-            string material_name, string deliver_index,string category,string day,string month,string year, int pageindex = 1, int pagesize = 20)
+        public IActionResult HistoryIndex()
         {
-            
+            return View();
+        }
+
+        public IActionResult GetHistoryData(string start_time, string end_time, string confirm_start_time, string confirm_end_time, string company_name, string purchase_index,
+            string material_name, string deliver_index, string category, string day, string month, string year) {
             ViewBag.start_time = start_time;
             ViewBag.end_time = end_time;
 
@@ -371,7 +343,7 @@ namespace WebApplication.Controllers
 
             DateTime dt = DateTime.Now.AddHours(8);
             DateTime dt2 = dt.AddMonths(1);
-            
+
             if (day == "1")
             {
                 confirm_start_time = DateTime.Now.ToLocalTime().AddHours(8).ToString("yyyy-MM-dd");
@@ -391,24 +363,8 @@ namespace WebApplication.Controllers
                 ViewBag.year = "1";
             }
 
-            var objList = PM.SelectHistory(start_time, end_time, confirm_start_time, confirm_end_time, company_name,purchase_index, material_name, deliver_index, category);
-
-            //金额
-            double allMoney = 0;
-            //数量
-            double allNum = 0;
-
-            for (int i = 0; i < objList.Count; i++)
-            {
-                allMoney = allMoney + objList[i].material_all_price;
-                allNum = allNum + objList[i].material_num;
-            }
-            ViewBag.allMoney = allMoney;
-            ViewBag.allNum = allNum;
-            var pagedList = PagedList<Purchase>.PageList(pageindex, pagesize, objList);
-            ViewBag.model = pagedList.Item2;
-            return View(pagedList.Item1);
-            
+            var objList = PM.SelectHistory(start_time, end_time, confirm_start_time, confirm_end_time, company_name, purchase_index, material_name, deliver_index, category);
+            return Json(objList);
         }
     }
 }

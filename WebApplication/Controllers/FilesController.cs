@@ -47,7 +47,7 @@ namespace WebApplication.Controllers
                 {
                     Directory.CreateDirectory(filePath);
                 }
-                string suffix = fileName.Split('.')[1];
+                string suffix = fileName.Split('.')[fileName.Split('.').Length-1];
                 if (!fileFormatArray.Contains(suffix))
                 {
                     flag = 1;

@@ -4,7 +4,6 @@
     @using BLL;
 
 }
-@using AspNetCoreMvcPager;
 <!DOCTYPE html>
 <html>
 <head>
@@ -14,6 +13,213 @@
         $(function () {
             $(".sidebar ul li:nth-of-type(4)").addClass("active open")
             $(".sidebar ul li:nth-of-type(4) ul li:nth-of-type(1)").addClass("active")
+
+            $("#myTable").bootstrapTable({
+                url: '/Order/GetData',
+                method: 'GET',
+                theadClasses: "thead-blue",
+                pagination: true,
+                sidePagination: "client",
+                pageNumber: 1,
+                pageSize: 20,
+                pageList: [10, 20, 50],
+                undefinedText: '---',
+                paginationDetailHAlign: 'left',
+                toolbarAlign: 'right',
+                showFooter: true,
+                showExport: true, //是否显示导出
+                exportDataType: "all", //basic', 'all', 'selected'.
+                exportTypes: ['excel'],
+                exportOptions: {//导出设置
+                    fileName: '订单列表',//下载文件名称
+                },
+                columns: [{
+                    field: 'no',
+                    title: '编号',
+                    align: 'center',
+                    formatter: function (value, row, index) {
+                        return index + 1;
+                    },
+                    footerFormatter: function (data) {
+                        return "汇总";
+                    }
+                }, {
+                    field: 'id',
+                    title: 'id',
+                    visible: false
+                }, {
+                        field: 'order_index',
+                        title: '订单序号',
+                    align: 'center',
+                        sortable: true,
+                        footerFormatter: function (data) {
+                            var count = 0;
+                            $.each(data, function (index, item) {
+                                count += (item.open_num - item.tui_num) * item.order_price;
+                            });
+                            return "已开单金额：" + count.toFixed(2);
+                        }
+                }, {
+                        field: 'order_time',
+                        title: '下单日期',
+                        align: 'center',
+                        sortable: true,
+                        width:100,
+                        formatter: function (value, row, index) {
+                            return row.order_time.split('T')[0];
+                        },
+                        footerFormatter: function (data) {
+                            var count = 0;
+                            $.each(data, function (index, item) {
+                                count += (item.order_num - item.open_num + item.tui_num) * item.order_price;
+                            });
+                            return "未开单金额：" + count.toFixed(2);
+                        }
+                }, {
+                        field: 'company_name',
+                        title: '客户名称',
+                    align: 'center',
+                        sortable: true,
+                    width:300
+                }, {
+                        field: 'company_order_index',
+                        title: '客户单号',
+                    align: 'center',
+                    sortable: true
+                }, {
+                        field: 'order_name',
+                        title: '名称规格',
+                    align: 'center',
+                    sortable: true
+                }, {
+                        field: 'order_num',
+                        title: '数量',
+                        align: 'center',
+                        sortable: true,
+                        footerFormatter: function (data) {
+                            var count = 0;
+                            $.each(data, function (index, item) {
+                                count += item.order_num;
+                            });
+                            return count.toFixed(2);
+                        }
+                }, {
+                        field: 'order_price',
+                        title: '单价',
+                    align: 'center',
+                    sortable: true
+                }, {
+                        field: 'order_all_price',
+                        title: '金额',
+                    align: 'center',
+                    sortable: true,
+                    footerFormatter: function (data) {
+                        var count = 0;
+                        $.each(data, function (index, item) {
+                            count += item.order_all_price;
+                        });
+                        return count.toFixed(2);
+                    }
+                }, {
+                        field: 'open_num',
+                        title: '开单数',
+                        align: 'center',
+                        sortable: true,
+                        formatter: function (value, row, index) {
+                            return "<span style='color:darkseagreen'>" + row.open_num + "</span>"
+                        },
+                        footerFormatter: function (data) {
+                            var count = 0;
+                            $.each(data, function (index, item) {
+                                count += item.open_num;
+                            });
+                            return count.toFixed(2);
+                        }
+                }, {
+                        field: 'tui_num',
+                        title: '退单数',
+                    align: 'center',
+                        sortable: true,
+                        formatter: function (value, row, index) {
+                            return "<span style='color:red'>" + row.tui_num + "</span>"
+                        },
+                        footerFormatter: function (data) {
+                            var count = 0;
+                            $.each(data, function (index, item) {
+                                count += item.tui_num;
+                            });
+                            return count.toFixed(2);
+                        }
+                }, {
+                    field: 'remain',
+                        title: '剩余数',
+                    align: 'center',
+                        sortable: true,
+                        formatter: function (value, row, index) {
+                            var res = row.order_num - row.open_num + row.tui_num;
+                            return "<span style='color:orange'>" + res + "</span>";
+                        },
+                    footerFormatter: function (data) {
+                        var count = 0;
+                        $.each(data, function (index, item) {
+                            count += item.order_num - item.open_num + item.tui_num;
+                        });
+                        return count.toFixed(2);
+                    }
+                }, {
+                        field: 'deliver_time',
+                        title: '交货日期',
+                    align: 'center',
+                    sortable: true,
+                    formatter: function (value, row, index) {
+                        return row.deliver_time.split('T')[0];
+                    }
+                }, {
+                    field: 'purchase_person',
+                        title: '采购员',
+                    align: 'center',
+                    sortable: true
+                    }, {
+                        field: 'order_picture',
+                        title: '图纸',
+                        align: 'center',
+                        sortable: true,
+                        formatter: function (value, row, index) {
+                            var result = "";
+                            if (row.order_picture == "" || row.order_picture == null || row.order_picture == undefined) {
+                                result += "<a href='#' >暂无图纸</a>";
+                                
+                            } else {
+                                result += "<a href='/src/Files" + row.order_picture + "' target='_blank'>查看</a>";
+                            }
+
+                            return result;
+                        }
+                    }, {
+                        field: 'remark',
+                        title: '备注',
+                        align: 'center',
+                        sortable: true
+                    }, {
+                    field: 'edit',
+                    title: '编辑',
+                    align: 'center',
+                    formatter: function (value, row, index) {
+                        var result = "";
+                        result += "<input type='button' class='btn btn-primary' onclick=\"window.location.href = '/OrderSeq/Edit?order_id=" + row.id + "&seq_id=" + row.seq_id+"'\" value='编辑'/>";
+                        return result;
+                    }
+                    }, {
+                        field: 'delete',
+                        title: '删除',
+                        align: 'center',
+                        formatter: function (value, row, index) {
+                            var result = "";
+                            result += "<input type='button' class='btn btn-primary' onclick=\"deleteTiShi(" + row.id + "," + row.seq_id + ")\" value='删除' />";
+                            return result;
+                        }
+                    }]
+            });
         });
 
         function deleteTiShi(order_id, seq_id) {
@@ -43,7 +249,7 @@
                             success: function (msg) {
                                 if (msg == "Success") {
                                     swal({ title: "已删除 !", text: "该条记录已删除 !", type: "success" },
-                                        function () { window.location.href = '/Order/Index'; });
+                                        function () { Search(); });
                                 }
                                 else if (msg == "Existence") {
                                     swal("该订单已有送货记录!", "请先删除送货记录！", "error");
@@ -61,6 +267,21 @@
                         swal("已取消 !", "该记录已保留 !", "error");
                     }
                 });
+        }
+        function Search() {
+            var start_time = $("#start_time").val();
+            var end_time = $("#end_time").val();
+            var deliver_start_time = $("#deliver_start_time").val();
+            var deliver_end_time = $("#deliver_end_time").val();
+            var company_name = $("#company_name").val();
+            var order_index = $("#order_index").val();
+            var company_order_index = $("#company_order_index").val();
+            var purchase_person = $("#purchase_person").val();
+            var order_name = $("#order_name").val();
+            var searchUrl = "/Order/GetData?start_time=" + start_time + "&end_time=" + end_time + "&deliver_start_time=" + deliver_start_time + "&deliver_end_time=" + deliver_end_time
+                + "&company_name=" + company_name + "&order_index=" + order_index + "&company_order_index=" + company_order_index + "&purchase_person=" + purchase_person
+                + "&order_name=" + order_name;
+            $("#myTable").bootstrapTable('refresh', { url: searchUrl });
         }
     </script>
 </head>
@@ -84,7 +305,7 @@
                 <div class="col-lg-12">
                     <div class="card alert">
                         <div class="card-header">
-                            <form class="form-horizontal" action="/Order/Index" method="post" id="myfrom">
+                            <div class="form-horizontal">
                                 <div class="form-inline">
                                     <div class="form-group">
                                         <label>&emsp;&emsp;&emsp;订单序号：</label>
@@ -155,7 +376,7 @@
                                 <br />
                                 <div class="form-inline">
                                     <div class="form-group">
-                                        <input type="submit" value="查询" class="btn btn-primary" style="width:80px" />
+                                        <input type="button" value="查询" class="btn btn-primary" style="width:80px" onclick="Search()" />
                                     </div>
                                     <div class="form-group">
                                         @if (UserManager.Current.GetLevel >= UserLevelEnum.ProductManager)
@@ -166,107 +387,11 @@
                                     </div>
                                 </div>
 
-                            </form>
+                            </div>
                         </div>
                         <div class="card-body">
-                            <table class="table table-responsive table-hover ">
-                                <thead>
-                                    <tr>
-                                        <th>编号</th>
-                                        <th>订单序号</th>
-                                        <th>下单日期</th>
-                                        <th>客户名称</th>
-                                        <th>客户单号</th>
-                                        <th>名称规格</th>
-                                        <th>数量</th>
-                                        @if (UserManager.Current.GetLevel >= UserLevelEnum.ProductManager)
-                                        {
-                                            <th>单价</th>
-                                            <th>金额</th>
-                                        }
-
-                                        <th>开单数</th>
-                                        <th>退单数</th>
-                                        <th>剩余数</th>
-                                        <th>交货日期</th>
-                                        @if (UserManager.Current.GetLevel >= UserLevelEnum.ProductManager)
-                                        {
-                                            <th>采购员</th>
-                                        }
-                                        <th>图纸</th>
-                                        <th>编辑</th>
-                                        <th>删除</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @{
-                                    int index = 1;
-                                    foreach (var item in Model)
-                                    {
-                                    <tr>
-                                        <td>@index</td>
-                                        <td>@item.order_index</td>
-                                        <td>@item.order_time.ToString("yyyy/MM/dd")</td>
-                                        <td>@item.company_name</td>
-                                        <td>@item.company_order_index</td>
-                                        <td>@item.order_name</td>
-                                        <td>@item.order_num</td>
-                                        @if (UserManager.Current.GetLevel >= UserLevelEnum.ProductManager)
-                                        {
-                                            <td>@item.order_price</td>
-                                            <td>@item.order_all_price</td>
-                                        }
-                                        
-                                        <td style="color:darkseagreen">@item.open_num</td>
-                                        <td style="color:red">@item.tui_num</td>
-                                        <td style="color:orange">@(item.order_num-item.open_num+item.tui_num)</td>
-                                        <td>@item.deliver_time.ToString("yyyy/MM/dd")</td>
-                                        @if (UserManager.Current.GetLevel >= UserLevelEnum.ProductManager)
-                                        {
-                                            <td>@item.purchase_person</td>
-                                        }
-                                        <td>
-                                            @if (!string.IsNullOrEmpty(item.order_picture))
-                                            {
-                                                <a href="/src/Files/@item.order_picture" target="_blank">查看</a>
-                                            }
-                                            else
-                                            {
-                                                <a href="javascript:return false;" target="_blank">暂无图纸</a>
-                                            }
-                                        </td>
-
-                                        @if (UserManager.Current.GetLevel >= UserLevelEnum.ProductManager)
-                                        {
-                                            <td>
-                                                <input type="button" class="btn btn-primary" onclick="window.location.href = '/OrderSeq/Edit?order_id=@item.id&seq_id=@item.seq_id'" value="编辑" />
-                                            </td>
-                                        }
-                                        @if (UserManager.Current.GetLevel >= UserLevelEnum.Boss)
-                                        {
-                                            <td>
-                                                <input type="button" class="btn btn-primary" onclick="deleteTiShi(@item.id,@item.seq_id)" value="删除" />
-                                            </td>
-                                        }
-
-                                    </tr>
-                                            index++;
-                                        }
-                                <tr>
-                                    <td colspan="6" style="color:green;font-weight:bold">合计：<span style="color:green">已开单金额：@ViewBag.allFinishMoney，</span><span style="color:red">未完成金额：@ViewBag.allUnfinishMoney</span></td>
-                                    <td style="font-weight:bold">@ViewBag.allNum</td>
-                                    <td></td>
-                                    <td style="font-weight:bold">@ViewBag.allMoney</td>
-                                    
-                                    <td style="font-weight:bold">@ViewBag.allOpenNum</td>
-                                    <td style="font-weight:bold">@ViewBag.allTuiNum</td>
-                                    <td style="font-weight:bold">@ViewBag.allRemainNum</td>
-                                    <td colspan="5"></td>
-                                </tr>
-                                    }
-                                </tbody>
+                            <table id="myTable" class="table table-responsive table-hover ">
                             </table>
-                            <div class="page-nav" id="pageIndex">@Html.Raw(PagerHtmlString.Pager(ViewBag.model, "Order", "Index", true))</div>
                         </div>
                     </div><!-- /# card -->
                 </div><!-- /# column -->

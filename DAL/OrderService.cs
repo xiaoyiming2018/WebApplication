@@ -25,7 +25,7 @@ namespace DAL
                     company_name = company_name.Replace("(", "\\(").Replace(")", "\\)");
                 }
                 sql = "select c.id,c.company_order_index,c.order_index,b.company_name,a.order_time,a.order_name,a.deliver_time," +
-                    " order_num,order_price,order_all_price,tui_num, open_num,remain_num,purchase_person,a.seq_id,a.order_picture " +
+                    " order_num,order_price,order_all_price,tui_num, open_num,remain_num,purchase_person,a.seq_id,a.order_picture,a.remark " +
                     "from jinchen.orderseq_info a,jinchen.company_info b,jinchen.order_info c where a.order_id=c.id and c.customer_id=b.id and " +
                     " b.company_name ~* '{0}' and c.order_index ~* '{1}' and c.company_order_index ~*'{2}' and to_char(a.order_time,'yyyy-MM-dd')>='{3}' and to_char(a.order_time,'yyyy-MM-dd')<='{4}' and a.order_status={5} " +
                     " and to_char(a.deliver_time,'yyyy-MM-dd')>='{6}' and to_char(a.deliver_time,'yyyy-MM-dd')<='{7}' and purchase_person ~*'{8}' and order_name ~*'{9}' " +
@@ -81,7 +81,7 @@ namespace DAL
                 List<Order> objList = new List<Order>();
                 string sql = null;
                 sql = "select a.id,a.order_index,b.company_name, c.seq_id,c.order_time,c.order_name,c.unit,c.deliver_time," +
-                    "c.order_num,c.open_num,c.tui_num,c.remain_num,c.order_price,c.order_all_price,c.purchase_person,c.order_picture " +
+                    "c.order_num,c.open_num,c.tui_num,c.remain_num,c.order_price,c.order_all_price,c.purchase_person,c.order_picture,c.remark " +
                     "from jinchen.order_info a,jinchen.company_info b,jinchen.orderseq_info c " +
                     "where a.customer_id=b.id and a.id=c.order_id and a.id={0} and to_char(c.deliver_time,'yyyy-MM-dd')>='{1}' and to_char(c.deliver_time,'yyyy-MM-dd')<='{2}' and c.order_name ~* '{3}' and " +
                     "c.unit ~* '{4}' order by c.order_name";
@@ -111,14 +111,14 @@ namespace DAL
                 if (order_id == 0)
                 {
                     sql = "select a.id,c.order_id,a.order_index,b.company_name, c.seq_id,c.order_time,c.order_name,c.unit,c.deliver_time," +
-                            "c.order_num,c.open_num,c.tui_num,c.remain_num,c.order_price,c.order_all_price,c.purchase_person " +
+                            "c.order_num,c.open_num,c.tui_num,c.remain_num,c.order_price,c.order_all_price,c.purchase_person,c.remark " +
                             "from jinchen.order_info a,jinchen.company_info b,jinchen.orderseq_info c " +
                             "where a.customer_id=b.id and a.id=c.order_id and b.company_name='{0}' order by c.order_name";
                     sql = string.Format(sql, company_name);
                 }
                 else {
                     sql = "select a.id,c.order_id,a.order_index,b.company_name, c.seq_id,c.order_time,c.order_name,c.unit,c.deliver_time," +
-                        "c.order_num,c.open_num,c.tui_num,c.remain_num,c.order_price,c.order_all_price,c.purchase_person " +
+                        "c.order_num,c.open_num,c.tui_num,c.remain_num,c.order_price,c.order_all_price,c.purchase_person,c.remark " +
                         "from jinchen.order_info a,jinchen.company_info b,jinchen.orderseq_info c " +
                         "where a.customer_id=b.id and a.id=c.order_id and a.id={0} and b.company_name='{1}' order by c.order_name";
                     sql = string.Format(sql, order_id, company_name);
@@ -317,9 +317,9 @@ namespace DAL
             try
             {
                 string sql = "insert into jinchen.orderseq_info(order_id,order_time,order_name,order_num," +
-                    "order_price,order_all_price,remain_num,deliver_time,unit,purchase_person,order_picture) values({0},'{1}','{2}',{3},{4},{5},{6},'{7}','{8}','{9}','{10}')";
+                    "order_price,order_all_price,remain_num,deliver_time,unit,purchase_person,order_picture,remark) values({0},'{1}','{2}',{3},{4},{5},{6},'{7}','{8}','{9}','{10}','{11}')";
                 sql = string.Format(sql, obj.order_id, obj.order_time,obj.order_name, obj.order_num, 
-                    obj.order_price, obj.order_all_price, obj.order_num, obj.deliver_time, obj.unit, obj.purchase_person, obj.order_picture);//插入数据时，订单数量与剩余数量一致
+                    obj.order_price, obj.order_all_price, obj.order_num, obj.deliver_time, obj.unit, obj.purchase_person, obj.order_picture,obj.remark);//插入数据时，订单数量与剩余数量一致
                 int count = PostgreHelper.ExecuteNonQuery(sql);
                 return count;
             }
@@ -362,9 +362,9 @@ namespace DAL
             {
                 int count = 0;
                 string sql = "update jinchen.orderseq_info set order_name='{0}',deliver_time='{1}',unit='{2}',order_price={3}," +
-                    "order_all_price={4},order_picture='{5}',purchase_person='{6}',order_num={7},order_time='{8}' where seq_id={9}";
+                    "order_all_price={4},order_picture='{5}',purchase_person='{6}',order_num={7},order_time='{8}',remark='{9}' where seq_id={10}";
                 sql = string.Format(sql, obj.order_name, obj.deliver_time, obj.unit,obj.order_price, obj.order_all_price,
-                    obj.order_picture,obj.purchase_person,obj.order_num,obj.order_time, obj.seq_id);
+                    obj.order_picture,obj.purchase_person,obj.order_num,obj.order_time,obj.remark, obj.seq_id);
                 count = PostgreHelper.ExecuteNonQuery(sql);
                 return count;
 

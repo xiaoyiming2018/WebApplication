@@ -119,7 +119,8 @@ namespace WebApplication.Controllers
             double order_price = order.order_price;
             double order_all_price = order.order_all_price;
             string order_picture = order.order_picture;
-            
+            string remark = order.remark;
+
             if (order.seq_id >0)
             {
                 seq_id = order.seq_id;
@@ -141,6 +142,7 @@ namespace WebApplication.Controllers
             objOrder.order_price = order_price;
             objOrder.order_all_price = order_all_price;
             objOrder.order_picture = order_picture;
+            objOrder.remark = remark;
 
             if (seq_id > 0)
             {

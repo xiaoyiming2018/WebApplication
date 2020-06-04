@@ -14,7 +14,118 @@
         $(function () {
             $(".sidebar ul li:nth-of-type(5)").addClass("active open")
             $(".sidebar ul li:nth-of-type(5) ul li").removeClass()
-            $(".sidebar ul li:nth-of-type(5) ul li:nth-of-type(2)").addClass("active")
+            $(".sidebar ul li:nth-of-type(5) ul li:nth-of-type(2)").addClass("active");
+            $("#myTable").bootstrapTable({
+                url: '/SaleReturn/GetData',
+                method: 'GET',
+                theadClasses: "thead-blue",
+                pagination: true,
+                sidePagination: "client",
+                pageNumber: 1,
+                pageSize: 20,
+                pageList: [10, 20, 50],
+                undefinedText: '---',
+                paginationDetailHAlign: 'left',
+                toolbarAlign: 'right',
+                showFooter: true,
+                showExport: true, //是否显示导出
+                exportDataType: "all", //basic', 'all', 'selected'.
+                exportTypes: ['excel'],
+                exportOptions: {//导出设置
+                    fileName: '销售退货开单',//下载文件名称
+                },
+                columns: [{
+                    field: 'no',
+                    title: '编号',
+                    align: 'center',
+                    formatter: function (value, row, index) {
+                        return index + 1;
+                    },
+                    footerFormatter: function (data) {
+                        return "汇总";
+                    }
+                }, {
+                    field: 'id',
+                    title: 'id',
+                    visible: false
+                    }, {
+                        field: 'return_index',
+                        title: '退货单号',
+                        align: 'center',
+                        sortable: true
+                    }, {
+                    field: 'deliver_index',
+                    title: '送货单号',
+                    align: 'center',
+                    sortable: true
+                }, {
+                    field: 'deliver_company_head',
+                    title: '客户名称',
+                    align: 'center',
+                    sortable: true
+                }, {
+                    field: 'company_order_index',
+                    title: '客户订单号',
+                    align: 'center',
+                    sortable: true
+                }, {
+                    field: 'order_name',
+                    title: '名称规格',
+                    align: 'center',
+                    sortable: true
+                }, {
+                    field: 'unit',
+                    title: '单位',
+                    align: 'center',
+                    sortable: true
+                    }, {
+                        field: 'return_num',
+                        title: '退货数量',
+                        align: 'center',
+                        sortable: true,
+                        footerFormatter: function (data) {
+                            var count = 0;
+                            $.each(data, function (index, item) {
+                                count += item.return_num;
+                            });
+                            return count.toFixed(2);
+                        }
+                    }, {
+                        field: 'return_price',
+                        title: '退货单价',
+                    align: 'center',
+                    sortable: true
+                }, {
+                        field: 'return_all_price',
+                        title: '退货总价',
+                    align: 'center',
+                        sortable: true,
+                        footerFormatter: function (data) {
+                            var count = 0;
+                            $.each(data, function (index, item) {
+                                count += item.return_all_price;
+                            });
+                            return count.toFixed(2);
+                        }
+                    }, {
+                        field: 'insert_time',
+                        title: '退货开单日期',
+                        align: 'center',
+                        sortable: true,
+                        formatter: function (value, row, index) {
+                            return row.insert_time.split('T')[0];
+                        }
+                    }, {
+                    field: 'edit',
+                        title: '退货单确认',
+                    align: 'center',
+                    formatter: function (value, row, index) {
+                        var result = "";
+                        result += "<button class='btn btn-primary' onclick=\"confirmTiShi('" + row.return_index + "'," + row.seq_id+")\">确认</button>";
+                        return result;
+                    }
+                }]
+            });
         });
 
         function confirmTiShi(return_index, seq_id) {
@@ -44,7 +155,7 @@
                             success: function (msg) {
                                 if (msg == "Success") {
                                     swal({ title: "已确认 !", text: "该条退货单已确认 !", type: "success" },
-                                        function () { window.location.href = '/SaleReturn/Index'; });
+                                        function () { Search(); });
                                 }
                                 else {
                                     swal("执行失败 !", "该记录已保留 !", "error");
@@ -59,6 +170,16 @@
                         swal("已取消 !", "该记录已保留 !", "error");
                     }
                 });
+        }
+        function Search() {
+            var start_time = $("#start_time").val();
+            var end_time = $("#end_time").val();
+            var return_index = $("#return_index").val();
+            var order_name = $("#order_name").val();
+
+            var searchUrl = "/SaleReturn/GetData?start_time=" + start_time + "&end_time=" + end_time + "&return_index=" + return_index
+                + "&order_name=" + order_name;
+            $("#myTable").bootstrapTable('refresh', { url: searchUrl });
         }
     </script>
 </head>
@@ -82,7 +203,7 @@
                 <div class="col-lg-12">
                     <div class="card alert">
                         <div class="card-header">
-                            <form class="form-horizontal" action="/SaleReturn/Index" method="post" id="myfrom">
+                            <div class="form-horizontal">
                                 <div class="form-inline">
                                     <div class="form-group">
                                         <label>退货单号：</label>
@@ -117,7 +238,7 @@
                                 <br />
                                 <div class="form-inline">
                                     <div class="form-group">
-                                        <input type="submit" value="查询" class="btn btn-primary" style="width:80px" />
+                                        <input type="button" value="查询" class="btn btn-primary" style="width:80px" onclick="Search()" />
                                     </div>
                                     <div class="form-group">
                                         @if (UserManager.Current.GetLevel >= UserLevelEnum.ProductManager)
@@ -129,71 +250,11 @@
                                 </div>
 
                                 <br />
-
-
-                            </form>
+                            </div>
                         </div>
                         <div class="card-body">
-                            <table class="table table-responsive table-hover ">
-                                <thead>
-                                    <tr>
-                                        <th>编号</th>
-                                        <th>退货单号</th>
-                                        <th>送货单号</th>
-                                        <th>客户名称</th>
-                                        <th>客户订单号</th>
-                                        <th>名称规格</th>
-                                        <th>单位</th>
-                                        <th>退货数量</th>
-                                        @if (UserManager.Current.GetLevel >= UserLevelEnum.ProductManager)
-                                        {
-                                            <th>退货单价</th>
-                                            <th>退货总价</th>
-                                        }
-                                        <th>退货开单日期</th>
-                                        @if (UserManager.Current.GetLevel >= UserLevelEnum.ProductManager)
-                                        {
-                                            <th>退货单确认</th>
-                                        }
-
-
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @{
-                                        int index = 1;
-                                        foreach (var item in Model)
-                                        {
-                                    <tr>
-                                        <td>@index</td>
-                                        <td>@item.return_index</td>
-                                        <td>@item.deliver_index</td>
-                                        <td>@item.deliver_company_head</td>
-                                        <td>@item.company_order_index</td>
-                                        <td>@item.order_name</td>
-                                        <td>@item.unit</td>
-                                        <td>@item.return_num</td>
-                                        @if (UserManager.Current.GetLevel >= UserLevelEnum.ProductManager)
-                                        {
-                                            <td>@item.return_price</td>
-                                            <td>@item.return_all_price</td>
-                                        }
-
-                                        <td>@item.insert_time.ToString("yyyy-MM-dd")</td>
-                                        @if (UserManager.Current.GetLevel >= UserLevelEnum.ProductManager)
-                                        {
-                                            <td>
-                                                <button class="btn btn-primary" onclick="confirmTiShi('@item.return_index',@item.seq_id)">确认</button>
-                                            </td>
-                                        }
-
-                                    </tr>
-                                            index++;
-                                        }
-                                    }
-                                </tbody>
+                            <table id="myTable" class="table table-responsive table-hover ">
                             </table>
-                            <div class="page-nav" id="pageIndex">@Html.Raw(PagerHtmlString.Pager(ViewBag.model, "SaleReturn", "Index", true))</div>
                         </div>
                     </div><!-- /# card -->
                 </div><!-- /# column -->

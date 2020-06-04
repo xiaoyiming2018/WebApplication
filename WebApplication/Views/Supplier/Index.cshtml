@@ -13,7 +13,88 @@
     <script type="text/javascript">
         $(function () {
             $(".sidebar ul li:nth-of-type(1)").addClass("active open")
-            $(".sidebar ul li:nth-of-type(1) ul li:nth-of-type(1)").addClass("active")
+            $(".sidebar ul li:nth-of-type(1) ul li:nth-of-type(1)").addClass("active");
+
+            $("#myTable").bootstrapTable({
+                url: '/Supplier/GetData',
+                method: 'GET',
+                theadClasses: "thead-blue",
+                pagination: true,
+                sidePagination: "client",
+                pageNumber: 1,
+                pageSize: 20,
+                pageList:[10,20,50],
+                undefinedText: '---',
+                paginationDetailHAlign: 'left',
+                toolbarAlign: 'right',
+                columns: [ {
+                    field: 'no',
+                    title: '编号',
+                    align: 'center',
+                    formatter: function (value, row, index) {
+                        return index + 1;
+                    }
+                }, {
+                    field: 'id',
+                    title: 'id',
+                    visible: false
+                }, {
+                        field: 'company_name',
+                    title: '公司名称',
+                    align: 'center',
+                    sortable: true
+                }, {
+                        field: 'tax_num',
+                    title: '税号',
+                    align: 'center',
+                    sortable: true
+                }, {
+                        field: 'address',
+                    title: '地址',
+                    align: 'center',
+                    sortable: true
+                    }, {
+                        field: 'account',
+                        title: '银行账号',
+                        align: 'center',
+                        sortable: true
+                    }, {
+                        field: 'bank',
+                        title: '开户行',
+                        align: 'center',
+                        sortable: true
+                    }, {
+                    field: 'contact',
+                        title: '联系信息',
+                        align: 'center',
+                        formatter: function (value, row, index) {
+                            var result = "";
+                            result += "<a href = '/Contact/Index?customer_id=" + row.id + "&type=" + row.company_type + "' >查看详情</a>";
+                            return result;
+                        }
+                    }, {
+                        field: 'edit',
+                        title: '编辑',
+                        align: 'center',
+                        formatter: function (value, row, index) {
+                            var result = "";
+                            result += "<input type='button' class='btn btn-primary' onclick=\"window.location.href = '/Supplier/Edit?id=" + row.id + "'\" value='编辑' />";
+                            return result;
+                        }
+                    }, {
+                        field: 'delete',
+                        title: '删除',
+                        align: 'center',
+                        formatter: function (value, row, index) {
+                            var result = "";
+                            result += "<input type='button' class='btn btn-primary' onclick='deleteTiShi(" + row.id + ")' value='删除' />";
+                            return result;
+                        }
+                    }]
+            });
+            
+
+            
         });
 
         function deleteTiShi(id) {
@@ -43,7 +124,7 @@
                             success: function (msg) {
                                 if (msg == "Success") {
                                     swal({ title: "已删除 !", text: "该条记录已删除 !", type: "success" },
-                                        function () { window.location.href = '/Supplier/Index'; });
+                                        function () { Search(); });
                                 }
                                 else if (msg == "Existence"){
                                     swal("执行失败 !", "请先删除从该供应商购入的物料记录 !", "error");
@@ -61,6 +142,12 @@
                         swal("已取消 !", "该记录已保留 !", "error");
                     }
                 });
+        }
+        function Search() {
+            var company_name = $("#company_name").val();
+            var bank = $("#bank").val();
+            var searchUrl = "/Supplier/GetData?company_name=" + company_name + "&bank=" + bank;
+            $("#myTable").bootstrapTable('refresh', { url: searchUrl });
         }
     </script>
 </head>
@@ -84,7 +171,7 @@
                 <div class="col-lg-12">
                     <div class="card alert">
                         <div class="card-header">
-                            <form class="form-inline" action="/Supplier/Index" method="post" id="myfrom">
+                            <div class="form-inline">
                                 <div class="form-group">
                                     <label>公司名称：</label>
                                     <select class="selectpicker" data-live-search="true" data-live-search-placeholder="搜索" id="company_name" name="company_name" style="padding:6px 50px">
@@ -110,7 +197,7 @@
                                     </div>
                                 }
                                 <div class="form-group">
-                                    <input type="submit" value="查询" class="btn btn-primary" />
+                                    <input type="button" value="查询" class="btn btn-primary" onclick="Search()" />
                                 </div>
                                 <div class="form-group">
                                     @if (UserManager.Current.GetLevel >= UserLevelEnum.Boss)
@@ -118,73 +205,11 @@
                                     <input type="button" value="新增" class="btn btn-primary" onclick="window.location.href = '/Supplier/Edit'" />
                                     }                                    
                                 </div>
-                            </form>
+                            </div>
                         </div>
                         <div class="card-body">
-                            <table class="table table-responsive table-hover ">
-                                <thead>
-                                    <tr>
-                                        <th>编号</th>
-                                        <th>公司名称</th>
-                                        @if (UserManager.Current.GetLevel >= UserLevelEnum.ProductManager)
-                                        {
-                                            <th>税号</th>
-                                        }
-                                        <th>地址</th>
-                                        @if (UserManager.Current.GetLevel >= UserLevelEnum.ProductManager)
-                                        {
-                                            <th>银行账号</th>
-                                            <th>开户行</th>
-                                            <th>联系信息</th>
-                                        }
-                                        @if (UserManager.Current.GetLevel >= UserLevelEnum.Boss)
-                                        {
-                                            <th>编辑</th>
-                                            <th>删除</th>
-                                        }
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @{
-                                    int index = 1;
-                                    foreach (var item in Model)
-                                    {
-                                    <tr>
-                                        <td>@index</td>
-                                        <td>@item.company_name</td>
-                                        @if (UserManager.Current.GetLevel >= UserLevelEnum.ProductManager)
-                                        {
-                                            <td>@item.tax_num</td>
-
-                                        }
-                                        <td>@item.address</td>
-                                        @if (UserManager.Current.GetLevel >= UserLevelEnum.ProductManager)
-                                        {
-                                            <td>@item.account</td>
-                                            <td>@item.bank</td>
-                                            <td>
-                                                <a href = '/Contact/Index?customer_id=@item.id&type=@item.company_type' >查看详情</a>
-                                            </td>
-
-                                        }
-                                        @if (UserManager.Current.GetLevel >= UserLevelEnum.Boss)
-                                        {
-                                            <td>
-                                                <input type="button" class="btn btn-primary" onclick="window.location.href = '/Supplier/Edit?id=@item.id'" value="编辑" />
-                                            </td>
-
-                                            <td>
-                                                <input type="button" class="btn btn-primary" onclick="deleteTiShi(@item.id)" value="删除" />
-                                            </td>
-                                        }
-
-                                    </tr>
-                                            index++;
-                                        }
-                                    }
-                                </tbody>
+                            <table id="myTable" class="table table-responsive table-hover ">
                             </table>
-                            <div class="page-nav" id="pageIndex">@Html.Raw(PagerHtmlString.Pager(ViewBag.model, "Supplier", "Index", true))</div>
                         </div>
                     </div><!-- /# card -->
                 </div><!-- /# column -->

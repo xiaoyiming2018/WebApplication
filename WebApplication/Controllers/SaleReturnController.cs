@@ -23,8 +23,13 @@ namespace WebApplication.Controllers
         /// <param name="page">分页页码</param>
         /// <param name="size">每页显示数量</param>
         /// <returns></returns>
-        public IActionResult Index(string start_time, string end_time, string return_index, string order_name,int pageindex = 1, int pagesize = 20)
+        public IActionResult Index()
         {
+            return View();
+            
+        }
+
+        public IActionResult GetData(string start_time, string end_time, string return_index, string order_name) {
             ViewBag.start_time = start_time;
             ViewBag.end_time = end_time;
 
@@ -41,10 +46,7 @@ namespace WebApplication.Controllers
             }
 
             var objList = SM.SelectAll(0, start_time, end_time, return_index, order_name);
-            var pagedList = PagedList<SaleReturn>.PageList(pageindex, pagesize, objList);
-            ViewBag.model = pagedList.Item2;
-            return View(pagedList.Item1);
-            
+            return Json(objList);
         }
 
         /// <summary>
@@ -256,15 +258,19 @@ namespace WebApplication.Controllers
         /// <param name="page">分页页码</param>
         /// <param name="size">每页显示数量</param>
         /// <returns></returns>
-        public IActionResult ReturnHistoryIndex(string start_time, string end_time, string return_index,string order_name, string day, string month, string year, 
-            int pageindex = 1, int pagesize = 20)
+        public IActionResult ReturnHistoryIndex()
         {
+            return View();
+
+        }
+
+        public IActionResult GetHistoryData(string start_time, string end_time, string return_index, string order_name, string day, string month, string year) {
             ViewBag.start_time = start_time;
             ViewBag.end_time = end_time;
 
             ViewBag.return_index = return_index;
             ViewBag.order_name = order_name;
-            
+
 
             if (start_time == null)
             {
@@ -299,11 +305,8 @@ namespace WebApplication.Controllers
                 ViewBag.year = "1";
             }
 
-            var objList = SM.SelectAll(1, start_time, end_time,  return_index, order_name);
-            var pagedList = PagedList<SaleReturn>.PageList(pageindex, pagesize, objList);
-            ViewBag.model = pagedList.Item2;
-            return View(pagedList.Item1);
-
+            var objList = SM.SelectAll(1, start_time, end_time, return_index, order_name);
+            return Json(objList);
         }
 
         /// <summary>

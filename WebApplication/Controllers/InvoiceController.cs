@@ -20,14 +20,17 @@ namespace WebApplication.Controllers
         /// <param name="page">分页页码</param>
         /// <param name="size">每页显示数量</param>
         /// <returns></returns>
-        public IActionResult Index(string start_time, string end_time,string invoice_index, string[] company_name,
-            string day, string month, string year, int pageindex = 1, int pagesize = 20)
+        public IActionResult Index()
         {
+            return View();  
+        }
+        public IActionResult GetData(string start_time, string end_time, string invoice_index,string invoice_company, string company_name,
+            string day, string month, string year) {
             ViewBag.start_time = start_time;
             ViewBag.end_time = end_time;
             ViewBag.invoice_index = invoice_index;
             ViewBag.company_name = company_name;
-            
+            ViewBag.invoice_company = invoice_company;
             if (start_time == null)
             {
                 start_time = "0001-01-01";
@@ -62,42 +65,29 @@ namespace WebApplication.Controllers
             string confirm_end_time = "2222-01-01";
 
             List<Invoice> objList = new List<Invoice>();
-            if (company_name.Length < 1)
+            if (company_name==null)
             {
-                List<Invoice> res = IM.SelectAll(0, start_time, end_time, confirm_start_time, confirm_end_time, invoice_index, "");
-                for (int i=0;i<res.Count;i++) {
+                List<Invoice> res = IM.SelectAll(0, start_time, end_time, confirm_start_time, confirm_end_time, invoice_index, "", invoice_company);
+                for (int i = 0; i < res.Count; i++)
+                {
                     objList.Add(res[i]);
                 }
             }
-            else {
-                for (int i=0;i< company_name.Length;i++) {
-                    List<Invoice> res = IM.SelectAll(0, start_time, end_time, confirm_start_time, confirm_end_time, invoice_index, company_name[i]);
-                    for (int j=0;j<res.Count;j++) {
+            else
+            {
+                string[] company_nameRes = company_name.Split(",");
+                for (int i = 0; i < company_nameRes.Length; i++)
+                {
+                    List<Invoice> res = IM.SelectAll(0, start_time, end_time, confirm_start_time, confirm_end_time, invoice_index, company_nameRes[i], invoice_company);
+                    for (int j = 0; j < res.Count; j++)
+                    {
                         objList.Add(res[j]);
                     }
                 }
             }
             List<Invoice> resList = objList.Distinct<Invoice>(new ListComparer<Invoice>((x, y) => x.id.Equals(y.id))).ToList();
-            //显示总应付金额，实付税额和客户预付款
-            double allMoney = 0;
-            double allReal = 0;
-            double allPrepay = 0;
-            for (int i = 0; i < objList.Count; i++)
-            {
-                allMoney = allMoney + objList[i].invoice_price;
-                allReal = allReal + objList[i].invoice_real_price;
-                allPrepay = allPrepay + objList[i].invoice_prepay;
-            }
-            
-            ViewBag.allMoney = allMoney;
-            ViewBag.allReal = allReal;
-            ViewBag.allPrepay = allPrepay;
-            var pagedList = PagedList<Invoice>.PageList(pageindex, pagesize, resList);
-            ViewBag.model = pagedList.Item2;
-            return View(pagedList.Item1);
-            
+            return Json(resList);
         }
-
         /// <summary>
         /// 插入更新页面
         /// </summary>
@@ -236,17 +226,22 @@ namespace WebApplication.Controllers
         /// <param name="page">分页页码</param>
         /// <param name="size">每页显示数量</param>
         /// <returns></returns>
-        public IActionResult HistoryIndex(string start_time, string end_time, string confirm_start_time, string confirm_end_time, string invoice_index, string[] company_name, 
-            string day, string month, string year, int pageindex = 1, int pagesize = 20)
+        public IActionResult HistoryIndex()
         {
+            return View();
 
+        }
+        public IActionResult GetHistoryData(string start_time, string end_time, string confirm_start_time, string confirm_end_time, string invoice_index, string company_name,
+            string day, string month, string year,string invoice_company) {
             ViewBag.start_time = start_time;
             ViewBag.end_time = end_time;
             ViewBag.confirm_start_time = confirm_start_time;
             ViewBag.confirm_end_time = confirm_end_time;
             ViewBag.invoice_index = invoice_index;
             ViewBag.company_name = company_name;
+            ViewBag.invoice_company = invoice_company;
 
+            
             if (start_time == null)
             {
                 start_time = "0001-01-01";
@@ -288,9 +283,9 @@ namespace WebApplication.Controllers
             }
 
             List<Invoice> objList = new List<Invoice>();
-            if (company_name.Length < 1)
+            if (company_name==null)
             {
-                List<Invoice> res = IM.SelectAll(1, start_time, end_time, confirm_start_time, confirm_end_time, invoice_index, "");
+                List<Invoice> res = IM.SelectAll(1, start_time, end_time, confirm_start_time, confirm_end_time, invoice_index, "", invoice_company);
                 for (int i = 0; i < res.Count; i++)
                 {
                     objList.Add(res[i]);
@@ -298,9 +293,10 @@ namespace WebApplication.Controllers
             }
             else
             {
-                for (int i = 0; i < company_name.Length; i++)
+                string[] company_nameRes = company_name.Split(",");
+                for (int i = 0; i < company_nameRes.Length; i++)
                 {
-                    List<Invoice> res = IM.SelectAll(1, start_time, end_time, confirm_start_time, confirm_end_time, invoice_index, company_name[i]);
+                    List<Invoice> res = IM.SelectAll(1, start_time, end_time, confirm_start_time, confirm_end_time, invoice_index, company_nameRes[i], invoice_company);
                     for (int j = 0; j < res.Count; j++)
                     {
                         objList.Add(res[j]);
@@ -308,27 +304,8 @@ namespace WebApplication.Controllers
                 }
             }
             List<Invoice> resList = objList.Distinct<Invoice>(new ListComparer<Invoice>((x, y) => x.id.Equals(y.id))).ToList();
-
-            //显示总应付金额，实付税额和客户预付款
-            double allMoney = 0;
-            double allReal = 0;
-            double allPrepay = 0;
-            for (int i=0;i< objList.Count;i++) {
-                allMoney = allMoney + objList[i].invoice_price;
-                allReal = allReal + objList[i].invoice_real_price;
-                allPrepay = allPrepay + objList[i].invoice_prepay;
-            }
-
-            ViewBag.allMoney = allMoney;
-            ViewBag.allReal = allReal;
-            ViewBag.allPrepay = allPrepay;
-
-            var pagedList = PagedList<Invoice>.PageList(pageindex, pagesize, resList);
-            ViewBag.model = pagedList.Item2;
-            return View(pagedList.Item1);
-
+            return Json(resList);
         }
-
         /// <summary>
         /// 用委托实现IEqualityComparer<T>接口
         /// </summary>

@@ -90,7 +90,7 @@ namespace Model
         public string dz_index { get; set; }
 
         // 已对账数量
-        public int dz_num { get; set; }
+        public double dz_num { get; set; }
         // 绑定的发票号
         public string invoice_index { get; set; }
 

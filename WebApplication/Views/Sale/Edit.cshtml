@@ -378,6 +378,8 @@
                                     <tbody>
                                         @{
                                             int index = 1;
+                                            double allNum = 0;
+                                            double allmoney = 0;
                                             foreach (var item in Model)
                                             {
                                                 <tr>
@@ -408,7 +410,16 @@
 
                                                 </tr>
                                                 index++;
+                                                allNum += item.real_num;
+                                                allmoney += item.deliver_all_price;
                                             }
+                                    <tr>
+                                        <td style="font-weight:bold" colspan="4">汇总</td>
+                                        <td style="font-weight:bold">@allNum</td>
+                                        <td></td>
+                                        <td style="font-weight:bold">@allmoney</td>
+                                        <td colspan="3"></td>
+                                    </tr>
                                         }
                                     </tbody>
                                 </table>

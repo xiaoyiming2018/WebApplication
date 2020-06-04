@@ -25,16 +25,15 @@ namespace WebApplication.Controllers
         /// <param name="pageindex"></param>
         /// <param name="pagesize"></param>
         /// <returns>返回查询结果</returns>
-        public IActionResult Index(string company_name, string bank, int pageindex = 1, int pagesize = 20)
+        public IActionResult Index()
         {
-            
+            return View();
+        }
+        public IActionResult GetData(string company_name, string bank) {
             ViewBag.company_name = company_name;
             ViewBag.bank = bank;
             var objList = UM.SelectAll(type: 1, company_name: company_name, bank: bank);
-            var pagedList = PagedList<Company>.PageList(pageindex, pagesize, objList);
-            ViewBag.model = pagedList.Item2;
-            return View(pagedList.Item1);
-            
+            return Json(objList);
         }
 
         /// <summary>

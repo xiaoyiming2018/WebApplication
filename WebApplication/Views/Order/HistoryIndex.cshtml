@@ -9,29 +9,170 @@
 <html>
 <head>
     <meta name="viewport" content="width=device-width" />
-    <style>
-        .headstyle {
-            border: 2px solid black;
-        }
 
-        .thstyle {
-            border: 2px solid black;
-        }
-
-
-
-        .bodystyle {
-            border: 2px solid black;
-        }
-
-        .tdstyle {
-            border: 2px solid black;
-        }
-    </style>
     <script type="text/javascript">
         $(function () {
             $(".sidebar ul li:nth-of-type(4)").addClass("active open")
-            $(".sidebar ul li:nth-of-type(4) ul li:nth-of-type(2)").addClass("active")
+            $(".sidebar ul li:nth-of-type(4) ul li:nth-of-type(2)").addClass("active");
+            $("#myTable").bootstrapTable({
+                url: '/Order/GetHistoryData',
+                method: 'GET',
+                theadClasses: "thead-blue",
+                pagination: true,
+                sidePagination: "client",
+                pageNumber: 1,
+                pageSize: 20,
+                pageList: [10, 20, 50],
+                undefinedText: '---',
+                paginationDetailHAlign: 'left',
+                toolbarAlign: 'right',
+                showFooter: true,
+                showExport: true, //是否显示导出
+                exportDataType: "all", //basic', 'all', 'selected'.
+                exportTypes: ['excel'],
+                exportOptions: {//导出设置
+                    fileName: '历史客户订单',//下载文件名称
+                },
+                columns: [{
+                    field: 'no',
+                    title: '编号',
+                    align: 'center',
+                    formatter: function (value, row, index) {
+                        return index + 1;
+                    },
+                    footerFormatter: function (data) {
+                        return "汇总";
+                    }
+                }, {
+                    field: 'id',
+                    title: 'id',
+                    visible: false
+                }, {
+                    field: 'order_index',
+                    title: '订单序号',
+                    align: 'center',
+                    sortable: true
+                }, {
+                    field: 'order_time',
+                    title: '下单日期',
+                    align: 'center',
+                    sortable: true,
+                    width: 100,
+                    formatter: function (value, row, index) {
+                        return row.order_time.split('T')[0];
+                    }
+                }, {
+                    field: 'company_name',
+                    title: '客户名称',
+                    align: 'center',
+                        sortable: true,
+                        width: 300
+                }, {
+                    field: 'company_order_index',
+                    title: '客户单号',
+                    align: 'center',
+                    sortable: true
+                }, {
+                    field: 'order_name',
+                    title: '名称规格',
+                    align: 'center',
+                    sortable: true
+                }, {
+                    field: 'order_num',
+                    title: '数量',
+                    align: 'center',
+                    sortable: true,
+                    footerFormatter: function (data) {
+                        var count = 0;
+                        $.each(data, function (index, item) {
+                            count += item.order_num;
+                        });
+                        return count.toFixed(2);
+                    }
+                }, {
+                    field: 'order_price',
+                    title: '单价',
+                    align: 'center',
+                    sortable: true
+                }, {
+                    field: 'order_all_price',
+                    title: '金额',
+                    align: 'center',
+                    sortable: true,
+                    footerFormatter: function (data) {
+                        var count = 0;
+                        $.each(data, function (index, item) {
+                            count += item.order_all_price;
+                        });
+                        return count.toFixed(2);
+                    }
+                }, {
+                    field: 'open_num',
+                    title: '开单数',
+                    align: 'center',
+                    sortable: true,
+                    formatter: function (value, row, index) {
+                        return "<span style='color:darkseagreen'>" + row.open_num + "</span>"
+                    },
+                    footerFormatter: function (data) {
+                        var count = 0;
+                        $.each(data, function (index, item) {
+                            count += item.open_num;
+                        });
+                        return count.toFixed(2);
+                    }
+                }, {
+                    field: 'tui_num',
+                    title: '退单数',
+                    align: 'center',
+                    sortable: true,
+                    formatter: function (value, row, index) {
+                        return "<span style='color:red'>" + row.tui_num + "</span>"
+                    },
+                    footerFormatter: function (data) {
+                        var count = 0;
+                        $.each(data, function (index, item) {
+                            count += item.tui_num;
+                        });
+                        return count.toFixed(2);
+                    }
+                }, {
+                    field: 'deliver_time',
+                    title: '交货日期',
+                    align: 'center',
+                        sortable: true,
+                    width:100,
+                    formatter: function (value, row, index) {
+                        return row.deliver_time.split('T')[0];
+                    }
+                }, {
+                    field: 'purchase_person',
+                    title: '采购员',
+                    align: 'center',
+                    sortable: true
+                }, {
+                    field: 'order_picture',
+                    title: '图纸',
+                    align: 'center',
+                    sortable: true,
+                    formatter: function (value, row, index) {
+                        var result = "";
+                        if (row.order_picture == "" || row.order_picture == null || row.order_picture == undefined) {
+                            result += "<a href='#'>暂无图纸</a>";
+
+                        } else {
+                            result += "<a href='/src/Files" + row.order_picture + "' target='_blank'>查看</a>";
+                        }
+
+                        return result;
+                    }
+                    }, {
+                        field: 'remark',
+                        title: '备注',
+                        align: 'center',
+                        sortable: true
+                    }]
+            });
         });
         function CheckOrCancleAll(obj) {
             if (obj.is(":checked")) {
@@ -80,6 +221,25 @@
             $(".header").show()
             $(".sidebar.sidebar-shrink ~ .content-wrap").css("margin-left", "250px")
         }
+
+        function Search() {
+            var start_time = $("#start_time").val();
+            var end_time = $("#end_time").val();
+            var deliver_start_time = $("#deliver_start_time").val();
+            var deliver_end_time = $("#deliver_end_time").val();
+            var company_name = $("#company_name").val();
+            var order_index = $("#order_index").val();
+            var company_order_index = $("#company_order_index").val();
+            var purchase_person = $("#purchase_person").val();
+            var order_name = $("#order_name").val();
+            var day = $("#day").val();
+            var month = $("#month").val();
+            var year = $("#year").val();
+            var searchUrl = "/Order/GetHistoryData?start_time=" + start_time + "&end_time=" + end_time + "&deliver_start_time=" + deliver_start_time + "&deliver_end_time=" + deliver_end_time
+                + "&company_name=" + company_name + "&order_index=" + order_index + "&company_order_index=" + company_order_index + "&purchase_person=" + purchase_person
+                + "&order_name=" + order_name + "&day=" + day + "&month=" + month + "&year=" + year;
+            $("#myTable").bootstrapTable('refresh', { url: searchUrl });
+        }
     </script>
 </head>
 <body>
@@ -103,7 +263,7 @@
                 <div class="col-lg-12">
                     <div class="card alert">
                         <div class="card-header">
-                            <form class="form-horizontal" action="/Order/HistoryIndex" method="post" id="myfrom">
+                            <div class="form-horizontal">
                                 <div class="form-inline">
                                     <div class="form-group">
                                         <label>&emsp;&emsp;&emsp;订单序号：</label>
@@ -187,181 +347,21 @@
                                         <label>（下单日期）</label>
                                     </div>
                                     <div class="form-group">
-                                        <input type="submit" value="查询" class="btn btn-primary" style="width:80px" />
-                                        <input type="button" value="数据打印" class="btn btn-primary" onclick="doPrint()" style="width:80px" />
+                                        <input type="button" value="查询" class="btn btn-primary" style="width:80px" onclick="Search()" />
                                     </div>
                                 </div>
 
-                            </form>
+                            </div>
                         </div>
                         <div class="card-body">
-                            <table class="table table-responsive table-hover ">
-                                <thead>
-                                    <tr>
-                                        <th>编号</th>
-                                        <th>订单序号</th>
-                                        <th>下单日期</th>
-                                        <th>客户名称</th>
-                                        <th>客户订单号</th>
-                                        <th>名称规格</th>
-                                        <th>数量</th>
-                                        @if (UserManager.Current.GetLevel >= UserLevelEnum.ProductManager)
-                                        {
-                                            <th>单价</th>
-                                            <th>金额</th>
-                                        }
-
-                                        <th>开单数</th>
-                                        <th>退单数</th>
-                                        <th>交货日期</th>
-                                        @if (UserManager.Current.GetLevel >= UserLevelEnum.ProductManager)
-                                        {
-                                            <th>采购员</th>
-                                        }
-                                        <th>图纸</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @{
-                                        int index = 1;
-                                        foreach (var item in Model)
-                                        {
-                                            <tr>
-                                                <td>@index</td>
-                                                <td>@item.order_index</td>
-                                                <td>@item.order_time.ToString("yyyy-MM-dd")</td>
-                                                <td>@item.company_name</td>
-                                                <td>@item.company_order_index</td>
-                                                <td>@item.order_name</td>
-                                                <td>@item.order_num</td>
-                                                @if (UserManager.Current.GetLevel >= UserLevelEnum.ProductManager)
-                                                {
-                                                    <td>@item.order_price</td>
-                                                    <td>@item.order_all_price</td>
-                                                }
-
-                                                <td style="color:darkseagreen">@item.open_num</td>
-                                                <td style="color:red">@item.tui_num</td>
-                                                <td>@item.deliver_time.ToString("yyyy-MM-dd")</td>
-                                                @if (UserManager.Current.GetLevel >= UserLevelEnum.ProductManager)
-                                                {
-                                                    <td>@item.purchase_person</td>
-                                                }
-                                                <td>
-                                                    @if (!string.IsNullOrEmpty(item.order_picture))
-                                                    {
-                                                        <a href="/src/Files/@item.order_picture" target="_blank">查看</a>
-                                                    }
-                                                    else
-                                                    {
-                                                        <a href="javascript:return false;" target="_blank">暂无图纸</a>
-                                                    }
-                                                </td>
-
-                                            </tr>
-                                            index++;
-                                        }
-                                        <tr>
-                                            <td colspan="6" style="color:green;font-weight:bold">合计</td>
-                                            <td style="font-weight:bold">@ViewBag.allNum</td>
-                                            <td></td>
-                                            <td style="font-weight:bold">@ViewBag.allMoney</td>
-
-                                            <td style="font-weight:bold">@ViewBag.allOpenNum</td>
-                                            <td style="font-weight:bold">@ViewBag.allTuiNum</td>
-                                            <td colspan="5"></td>
-                                        </tr>
-                                    }
-                                </tbody>
+                            <table id="myTable" class="table table-responsive table-hover ">
                             </table>
-                            <div class="page-nav" id="pageIndex">@Html.Raw(PagerHtmlString.Pager(ViewBag.model, "Order", "HistoryIndex", true))</div>
                         </div>
                     </div><!-- /# card -->
                 </div><!-- /# column -->
             </div><!-- /# row -->
         </div>
     </div><!-- /# container-fluid -->
-    <div class="card alert" id="Data1" style="margin: 30px;display: none">
-
-        <div class="card-body">
-            <table class="table" border="0" cellspacing="0" cellpadding="0">
-                <tbody>
-                    <tr style="font-weight:bold">
-                        <td style="font-size:26px;text-align:center;padding:2px;border:0;" colspan="6"><span id="deliver_head">历史客户订单</span></td>
-                    </tr>
-                </tbody>
-            </table>
-
-            <table class="table table-responsive">
-                <thead class="headstyle">
-                    <tr>
-                        <th class="thstyle">编号</th>
-                        <th class="thstyle">订单序号</th>
-                        <th class="thstyle">下单日期</th>
-                        <th class="thstyle">客户名称</th>
-                        <th class="thstyle">客户订单号</th>
-                        <th class="thstyle">名称规格</th>
-                        <th class="thstyle">数量</th>
-                        @if (UserManager.Current.GetLevel >= UserLevelEnum.ProductManager)
-                        {
-                            <th class="thstyle">单价</th>
-                            <th class="thstyle">金额</th>
-                        }
-
-                        <th class="thstyle">开单数</th>
-                        <th class="thstyle">退单数</th>
-                        <th class="thstyle">交货日期</th>
-                        @if (UserManager.Current.GetLevel >= UserLevelEnum.ProductManager)
-                        {
-                            <th class="thstyle">采购员</th>
-                        }
-                    </tr>
-                </thead>
-                <tbody class="bodystyle">
-                    @{
-                        int index1 = 1;
-                        foreach (var item in Model)
-                        {
-                            <tr>
-                                <td class="tdstyle">@index1</td>
-                                <td class="tdstyle">@item.order_index</td>
-                                <td class="tdstyle">@item.order_time.ToString("yyyy-MM-dd")</td>
-                                <td class="tdstyle">@item.company_name</td>
-                                <td class="tdstyle">@item.company_order_index</td>
-                                <td class="tdstyle">@item.order_name</td>
-                                <td class="tdstyle">@item.order_num</td>
-                                @if (UserManager.Current.GetLevel >= UserLevelEnum.ProductManager)
-                                {
-                                    <td class="tdstyle">@item.order_price</td>
-                                    <td class="tdstyle">@item.order_all_price</td>
-                                }
-
-                                <td class="tdstyle" style="color:darkseagreen">@item.open_num</td>
-                                <td class="tdstyle" style="color:red">@item.tui_num</td>
-                                <td class="tdstyle">@item.deliver_time.ToString("yyyy-MM-dd")</td>
-                                @if (UserManager.Current.GetLevel >= UserLevelEnum.ProductManager)
-                                {
-                                    <td class="tdstyle">@item.purchase_person</td>
-                                }
-
-                            </tr>
-                            index1++;
-                        }
-                        <tr>
-                            <td class="tdstyle" colspan="6" style="color:green;font-weight:bold">合计</td>
-                            <td class="tdstyle" style="font-weight:bold">@ViewBag.allNum</td>
-                            <td class="tdstyle"></td>
-                            <td class="tdstyle" style="font-weight:bold">@ViewBag.allMoney</td>
-
-                            <td class="tdstyle" style="font-weight:bold">@ViewBag.allOpenNum</td>
-                            <td class="tdstyle" style="font-weight:bold">@ViewBag.allTuiNum</td>
-                            <td class="tdstyle" colspan="5"></td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
-        </div>
-    </div>
 </body>
 </html>
 

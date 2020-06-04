@@ -55,5 +55,8 @@ namespace Model
         //订单是否已开票
         public int invoice_status { get; set; }
 
+        //备注
+        public string remark { get; set; }
+
     }
 }

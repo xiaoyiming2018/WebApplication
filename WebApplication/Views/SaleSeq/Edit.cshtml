@@ -56,7 +56,23 @@
 
             });
         });
-
+        function getProductPrice() {
+            var real_num = $('#real_num').val()
+            var deliver_price = $('#deliver_price').val()
+            if (real_num >= 0 && deliver_price >= 0) {
+                $.ajax({
+                    type: "POST",
+                    url: "/SaleSeq/GetProductPrice",
+                    data: { real_num: real_num, deliver_price: deliver_price },
+                    success: function (msg) {
+                        $('#price_div').html(msg);
+                    },
+                    error: function (msg) {
+                        swal("获取价格失败！", "", "error");
+                    }
+                });
+            }
+        }
 
 
     </script>
@@ -141,18 +157,18 @@
                                     <div class="form-group">
                                         <label for="example-input-normal" class="col-sm-4 control-label">送货数量</label>
                                         <div class="col-sm-4">
-                                            <input type="text" class="form-control" id="real_num" name="real_num" value="@Model.real_num"/>
+                                            <input type="text" class="form-control" id="real_num" name="real_num" value="@Model.real_num" onchange="getProductPrice()"/>
                                         </div>
                                     </div>
                                     <div class="form-group">
                                         <label for="example-input-normal" class="col-sm-4 control-label">送货单价</label>
                                         <div class="col-sm-4">
-                                            <input type="text" class="form-control" id="deliver_price" name="deliver_price" value="@Model.deliver_price" />
+                                            <input type="text" class="form-control" id="deliver_price" name="deliver_price" value="@Model.deliver_price" onchange="getProductPrice()" />
                                         </div>
                                     </div>
                                     <div class="form-group">
                                         <label for="example-input-normal" class="col-sm-4 control-label">送货总价</label>
-                                        <div class="col-sm-4">
+                                        <div class="col-sm-4" id="price_div">
                                             <input type="text" class="form-control" id="deliver_all_price" name="deliver_all_price" value="@Model.deliver_all_price"/>
                                         </div>
                                     </div>

@@ -23,9 +23,14 @@ namespace WebApplication.Controllers
         /// <param name="page">分页页码</param>
         /// <param name="size">每页显示数量</param>
         /// <returns></returns>
-        public IActionResult Index(string dz_start_time, string dz_end_time, string deliver_start_time, string deliver_end_time, string deliver_index,
-            string deliver_company_head, string order_name, string dz_index, string day, string month, string year, int pageindex = 1, int pagesize = 20)
+        public IActionResult Index()
         {
+            return View();
+        }
+
+        public IActionResult GetData(string dz_start_time, string dz_end_time, string deliver_start_time, string deliver_end_time, string deliver_index,
+            string deliver_company_head, string order_name, string dz_index, string day, string month, string year) {
+
             ViewBag.dz_start_time = dz_start_time;
             ViewBag.dz_end_time = dz_end_time;
             ViewBag.deliver_start_time = deliver_start_time;
@@ -78,20 +83,7 @@ namespace WebApplication.Controllers
             }
 
             var objList = DZM.SelectForInvoice(dz_start_time, dz_end_time, deliver_start_time, deliver_end_time, deliver_index, deliver_company_head, order_name, dz_index);
-
-            double allNum = 0;
-            double allPrice = 0;
-            for (int i=0;i< objList.Count;i++) {
-                allNum += objList[i].dui_num;
-                allPrice += objList[i].dui_all_price;
-            }
-            ViewBag.allNum = allNum;
-            ViewBag.allPrice = allPrice;
-
-
-            var pagedList = PagedList<DuiZhang>.PageList(pageindex, pagesize, objList);
-            ViewBag.model = pagedList.Item2;
-            return View(pagedList.Item1);
+            return Json(objList);
         }
 
         public IActionResult GetPickerList()
@@ -184,9 +176,13 @@ namespace WebApplication.Controllers
         /// <param name="page">分页页码</param>
         /// <param name="size">每页显示数量</param>
         /// <returns></returns>
-        public IActionResult HistoryIndex(string deliver_start_time, string deliver_end_time, string dz_start_time, string dz_end_time, string company_order_index,
-            string company_name, string order_name, string dz_index, string invoice_index,string deliver_index, string day, string month, string year, int pageindex = 1, int pagesize = 20)
+        public IActionResult HistoryIndex()
         {
+            return View();
+        }
+
+        public IActionResult GetHistoryData(string deliver_start_time, string deliver_end_time, string dz_start_time, string dz_end_time, string company_order_index,
+            string company_name, string order_name, string dz_index, string invoice_index, string deliver_index, string day, string month, string year) {
             ViewBag.deliver_start_time = deliver_start_time;
             ViewBag.deliver_end_time = deliver_end_time;
 
@@ -243,21 +239,7 @@ namespace WebApplication.Controllers
 
             var objList = DZM.SelectHistory(deliver_start_time, deliver_end_time, dz_start_time, dz_end_time, company_order_index, company_name,
                 order_name, dz_index, invoice_index, deliver_index);
-
-            double allNum = 0;
-            double allPrice = 0;
-            for (int i = 0; i < objList.Count; i++)
-            {
-                allNum += objList[i].dui_num;
-                allPrice += objList[i].dui_all_price;
-            }
-            ViewBag.allNum = allNum;
-            ViewBag.allPrice = allPrice;
-
-
-            var pagedList = PagedList<DuiZhang>.PageList(pageindex, pagesize, objList);
-            ViewBag.model = pagedList.Item2;
-            return View(pagedList.Item1);
+            return Json(objList);
         }
 
         /// <summary>

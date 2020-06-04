@@ -9,6 +9,10 @@
     {
       "library": "vue@2.6.11",
       "destination": "wwwroot/lib/vue/"
+    },
+    {
+      "library": "TableExport@5.2.0",
+      "destination": "wwwroot/lib/TableExport/"
     }
   ]
 }

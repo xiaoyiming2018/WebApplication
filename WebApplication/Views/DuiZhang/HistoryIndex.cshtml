@@ -9,31 +9,128 @@
 <html>
 <head>
     <meta name="viewport" content="width=device-width" />
-    <style>
-        .headstyle {
-            border: 2px solid black;
-        }
-
-        .thstyle {
-            border: 2px solid black;
-        }
-
-
-
-        .bodystyle {
-            border: 2px solid black;
-        }
-
-        .tdstyle {
-            border: 2px solid black;
-        }
-    </style>
     <script src="~/js/xlsx.core.min.js"></script>
     <script type="text/javascript">
         $(function () {
             $(".sidebar ul li:nth-of-type(5)").addClass("active open")
             $(".sidebar ul li:nth-of-type(5) ul li").removeClass()
             $(".sidebar ul li:nth-of-type(5) ul li:nth-of-type(7)").addClass("active");
+
+            $("#myTable").bootstrapTable({
+                url: '/DuiZhang/GetHistoryData',
+                method: 'GET',
+                theadClasses: "thead-blue",
+                pagination: true,
+                sidePagination: "client",
+                pageNumber: 1,
+                pageSize: 20,
+                pageList: [10, 20, 50],
+                undefinedText: '---',
+                paginationDetailHAlign: 'left',
+                toolbarAlign: 'right',
+                showFooter: true,
+                showExport: true, //是否显示导出
+                exportDataType: "all", //basic', 'all', 'selected'.
+                exportTypes: ['excel'],
+                exportOptions: {//导出设置
+                    fileName: '历史对账记录',//下载文件名称
+                },
+                columns: [{
+                    field: 'no',
+                    title: '编号',
+                    align: 'center',
+                    formatter: function (value, row, index) {
+                        return index + 1;
+                    },
+                    footerFormatter: function (data) {
+                        return "汇总";
+                    }
+                }, {
+                    field: 'id',
+                    title: 'id',
+                    visible: false
+                }, {
+                    field: 'company_name',
+                    title: '客户名称',
+                    align: 'center',
+                    sortable: true
+                }, {
+                    field: 'company_order_index',
+                    title: '客户订单号',
+                    align: 'center',
+                    sortable: true
+                    }, {
+                        field: 'deliver_index',
+                        title: '送货单号',
+                        align: 'center',
+                        sortable: true
+                    }, {
+                        field: 'deliver_time',
+                        title: '送货开单时间',
+                        align: 'center',
+                        sortable: true,
+                        formatter: function (value, row, index) {
+                            return row.deliver_time.split('T')[0];
+                        }
+                    }, {
+                        field: 'dz_index',
+                        title: '对账单号',
+                        align: 'center',
+                        sortable: true
+                    }, {
+                        field: 'dui_time',
+                    title: '对账时间',
+                    align: 'center',
+                    sortable: true,
+                    formatter: function (value, row, index) {
+                        return row.dui_time.split('T')[0];
+                    }
+                    }, {
+                        field: 'invoice_index',
+                        title: '发票号',
+                        align: 'center',
+                        sortable: true
+                    }, {
+                    field: 'order_name',
+                    title: '名称规格',
+                    align: 'center',
+                    sortable: true
+                }, {
+                    field: 'dui_num',
+                    title: '数量',
+                    align: 'center',
+                        sortable: true,
+                        footerFormatter: function (data) {
+                            var count = 0;
+                            $.each(data, function (index, item) {
+                                count += item.dui_num;
+                            });
+                            return count.toFixed(2);
+                        }
+                }, {
+                    field: 'unit',
+                    title: '单位',
+                    align: 'center',
+                    sortable: true
+                }, {
+                    field: 'dui_price',
+                    title: '单价',
+                    align: 'center',
+                    sortable: true
+                }, {
+                    field: 'dui_all_price',
+                    title: '总价',
+                    align: 'center',
+                        sortable: true,
+                        footerFormatter: function (data) {
+                            var count = 0;
+                            $.each(data, function (index, item) {
+                                count += item.dui_all_price;
+                            });
+                            return count.toFixed(2);
+                        }
+                }]
+            });
 
             document.getElementById('file').addEventListener('change', function (e) {
                 var files = e.target.files;
@@ -53,6 +150,8 @@
                 document.getElementById("file").value = "";
 
             });
+
+
         });
 
         function CheckOrCancleAll(obj) {
@@ -106,7 +205,7 @@
                 },
                 success: function (msg) {
                     swal({ title: "导入完成!", text: msg, type: "success" },
-                        function () { window.location.href = '/DuiZhang/HistoryIndex'; });
+                        function () { Search(); });
 
                 },
                 error: function (msg) {
@@ -277,6 +376,30 @@
             $(".header").show()
             $(".sidebar.sidebar-shrink ~ .content-wrap").css("margin-left", "250px")
         }
+
+        function Search() {
+            var dz_start_time = $("#dz_start_time").val();
+            var dz_end_time = $("#dz_end_time").val();
+            var deliver_start_time = $("#deliver_start_time").val();
+            var deliver_end_time = $("#deliver_end_time").val();
+
+            var deliver_index = $("#deliver_index").val();
+            var order_name = $("#order_name").val();
+            var dz_index = $("#dz_index").val();
+            var company_order_index = $("#company_order_index").val();
+
+            var company_name = $("#company_name").val();
+            var invoice_index = $("#invoice_index").val();
+
+            var day = $("#day").val();
+            var month = $("#month").val();
+            var year = $("#year").val();
+
+            var searchUrl = "/DuiZhang/GetHistoryData?dz_start_time=" + dz_start_time + "&dz_end_time=" + dz_end_time + "&deliver_start_time=" + deliver_start_time
+                + "&deliver_end_time=" + deliver_end_time + "&deliver_index=" + deliver_index + "&order_name=" + order_name + "&dz_index=" + dz_index + "&company_order_index=" + company_order_index
+                + "&day=" + day + "&month=" + month + "&year=" + year + "&company_name=" + company_name + "&invoice_index=" + invoice_index;
+            $("#myTable").bootstrapTable('refresh', { url: searchUrl });
+        }
     </script>
 </head>
 <body>
@@ -299,7 +422,7 @@
                 <div class="col-lg-12">
                     <div class="card alert">
                         <div class="card-header">
-                            <form class="form-horizontal" action="/DuiZhang/HistoryIndex" method="post" id="myfrom">
+                            <div class="form-horizontal">
                                 <div class="form-inline">
                                     <div class="form-group">
                                         <label>送货单号：</label>
@@ -359,6 +482,10 @@
                                         <input id="order_name" name="order_name" type="text" class="form-control" style="width:220px" value="@ViewBag.order_name" />
                                     </div>
                                     <div class="form-group">
+                                        <label>客户订单号：</label>
+                                        <input id="company_order_index" name="company_order_index" type="text" class="form-control" style="width:220px" value="@ViewBag.company_order_index" />
+                                    </div>
+                                    <div class="form-group">
                                         <label>对账开始时间：</label>
                                         <input id="dz_start_time" name="dz_start_time" type="text" autocomplete="off" class="form-control" style="width:180px" onclick="WdatePicker({ skin: 'whyGreen',dateFmt:'yyyy-MM-dd' })" value="@ViewBag.dz_start_time" />
                                     </div>
@@ -366,95 +493,38 @@
                                         <label>对账结束时间：</label>
                                         <input id="dz_end_time" name="dz_end_time" type="text" autocomplete="off" class="form-control" style="width:180px" onclick="WdatePicker({ skin: 'whyGreen',dateFmt:'yyyy-MM-dd' })" value="@ViewBag.dz_end_time" />
                                     </div>
-                                    <div class="form-group">
-                                        <label>本日</label>
-                                        <input id="day" name="day" type="checkbox" class="form-control" onclick="CheckOrCancleAll($(this))" style="width:16px" value="0" @if (ViewBag.day == "1") { <text> checked</text> } />
-                                    </div>
-                                    <div class="form-group">
-                                        <label>本月</label>
-                                        <input id="month" name="month" type="checkbox" class="form-control" onclick="CheckOrCancleAll($(this))" style="width:16px" value="0" @if (ViewBag.month == "1") { <text> checked</text> } />
-                                    </div>
-                                    <div class="form-group">
-                                        <label>本年</label>
-                                        <input id="year" name="year" type="checkbox" class="form-control" onclick="CheckOrCancleAll($(this))" style="width:16px" value="0" @if (ViewBag.year == "1") { <text> checked</text> } />
-                                        <label>（对账时间）</label>
-                                    </div>
-                                    <div class="form-group">
-                                        <input type="submit" value="查询" class="btn btn-primary" style="width:80px" />
-
-                                    </div>
+                                    
                                 </div>
                                 <br />
-                            </form>
+                            </div>
                             <div class="form-inline">
+                                <div class="form-group">
+                                    <label>本日</label>
+                                    <input id="day" name="day" type="checkbox" class="form-control" onclick="CheckOrCancleAll($(this))" style="width:16px" value="0" @if (ViewBag.day == "1") { <text> checked</text> } />
+                                </div>
+                                <div class="form-group">
+                                    <label>本月</label>
+                                    <input id="month" name="month" type="checkbox" class="form-control" onclick="CheckOrCancleAll($(this))" style="width:16px" value="0" @if (ViewBag.month == "1") { <text> checked</text> } />
+                                </div>
+                                <div class="form-group">
+                                    <label>本年</label>
+                                    <input id="year" name="year" type="checkbox" class="form-control" onclick="CheckOrCancleAll($(this))" style="width:16px" value="0" @if (ViewBag.year == "1") { <text> checked</text> } />
+                                    <label>（对账时间）</label>
+                                </div>
+                                <div class="form-group">
+                                    <input type="button" value="查询" class="btn btn-primary" style="width:80px" onclick="Search()" />
+
+                                </div>
+
                                 <input type="file" id="file" style="display:none;" accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet">
                                 <button class="btn btn-primary" onclick="selectFile()"><i class="ti-download"></i>历史数据导入</button>
                                 <button class="btn btn-primary" onclick="exportSpecialExcel()"><i class="ti-upload"></i>模板导出</button>
-                                <input type="button" value="数据打印" class="btn btn-primary" onclick="doPrint()" style="width:80px" />
                             </div>
 
                         </div>
                         <div class="card-body">
-                            <table class="table table-responsive table-hover ">
-                                <thead>
-                                    <tr>
-                                        <th>编号</th>
-                                        <th>客户名称</th>
-                                        <th>客户订单号</th>
-                                        <th>送货单号</th>
-                                        <th>送货开单时间</th>
-                                        <th>对账单号</th>
-                                        <th>对账日期</th>
-                                        <th>发票号</th>
-                                        <th>名称规格</th>
-                                        <th>数量</th>
-                                        <th>单位</th>
-                                        @if (UserManager.Current.GetLevel >= UserLevelEnum.ProductManager)
-                                        {
-                                            <th>单价</th>
-                                            <th>总价</th>
-                                        }
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @{
-                                        int index = 1;
-                                        foreach (var item in Model)
-                                        {
-                                            <tr>
-                                                <td>@index</td>
-                                                <td>@item.company_name</td>
-                                                <td>@item.company_order_index</td>
-                                                <td>@item.deliver_index</td>
-                                                <td>@item.deliver_time.ToString("yyyy-MM-dd")</td>
-                                                <td>@item.dz_index</td>
-                                                <td>@if (item.dui_time.ToString("yyyy-MM-dd") == "0001-01-01")
-                                                {<text>-</text> }
-                                            else
-                                            { @item.dui_time.ToString("yyyy-MM-dd");
-                                        }</td>
-                                                <td>@item.invoice_index</td>
-                                                <td>@item.order_name</td>
-                                                <td>@item.dui_num</td>
-                                                <td>@item.unit</td>
-                                                @if (UserManager.Current.GetLevel >= UserLevelEnum.ProductManager)
-                                                {
-                                                    <td>@item.dui_price</td>
-                                                    <td>@item.dui_all_price</td>
-                                                }
-                                            </tr>
-                                            index++;
-                                        }
-                                        <tr>
-                                            <td colspan="9" style="color:green;font-weight:bold">合计</td>
-                                            <td style="font-weight:bold">@ViewBag.allNum</td>
-                                            <td colspan="2"></td>
-                                            <td style="font-weight:bold">@ViewBag.allPrice</td>
-                                        </tr>
-                                    }
-                                </tbody>
+                            <table id="myTable" class="table table-responsive table-hover ">
                             </table>
-                            <div class="page-nav" id="pageIndex">@Html.Raw(PagerHtmlString.Pager(ViewBag.model, "DuiZhang", "HistoryIndex", true))</div>
                         </div>
                     </div><!-- /# card -->
                 </div><!-- /# column -->
@@ -489,66 +559,7 @@
                 </tbody>
             </table>
 
-            <table class="table table-responsive">
-                <thead class="headstyle">
-                    <tr>
-                        <th class="thstyle">编号</th>
-                        <th class="thstyle">客户名称</th>
-                        <th class="thstyle">客户订单号</th>
-                        <th class="thstyle">送货单号</th>
-                        <th class="thstyle">送货开单时间</th>
-                        <th class="thstyle">对账单号</th>
-                        <th class="thstyle">对账日期</th>
-                        <th class="thstyle">发票号</th>
-                        <th class="thstyle">名称规格</th>
-                        <th class="thstyle">数量</th>
-                        <th class="thstyle">单位</th>
-                        @if (UserManager.Current.GetLevel >= UserLevelEnum.ProductManager)
-                        {
-                            <th class="thstyle">单价</th>
-                            <th class="thstyle">总价</th>
-                        }
-                    </tr>
-                </thead>
-                <tbody class="bodystyle">
-                    @{
-                        int index1 = 1;
-                        foreach (var item in Model)
-                        {
-                            <tr>
-                                <td class="tdstyle">@index1</td>
-                                <td class="tdstyle">@item.company_name</td>
-                                <td class="tdstyle">@item.company_order_index</td>
-                                <td class="tdstyle">@item.deliver_index</td>
-                                <td class="tdstyle">@item.deliver_time.ToString("yyyy-MM-dd")</td>
-                                <td class="tdstyle">@item.dz_index</td>
-                                <td class="tdstyle">
-                                    @if (item.dui_time.ToString("yyyy-MM-dd") == "0001-01-01")
-                                    {<text>-</text> }
-                                else
-                                { @item.dui_time.ToString("yyyy-MM-dd");
-                            }
-                            </td>
-                            <td class="tdstyle">@item.invoice_index</td>
-                            <td class="tdstyle">@item.order_name</td>
-                            <td class="tdstyle">@item.dui_num</td>
-                            <td class="tdstyle">@item.unit</td>
-                            @if (UserManager.Current.GetLevel >= UserLevelEnum.ProductManager)
-                            {
-                                <td class="tdstyle">@item.dui_price</td>
-                                <td class="tdstyle">@item.dui_all_price</td>
-                            }
-                        </tr>
-                        index1++;
-                    }
-                    <tr>
-                        <td class="tdstyle" colspan="9" style="color:green;font-weight:bold">合计</td>
-                        <td class="tdstyle" style="font-weight:bold">@ViewBag.allNum</td>
-                        <td class="tdstyle" colspan="2"></td>
-                        <td class="tdstyle" style="font-weight:bold">@ViewBag.allPrice</td>
-                    </tr>
-                    }
-                </tbody>
+            <table id="myTable1" class="table table-responsive">
             </table>
         </div>
     </div>

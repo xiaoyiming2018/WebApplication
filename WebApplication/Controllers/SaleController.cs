@@ -23,10 +23,12 @@ namespace WebApplication.Controllers
         /// <param name="page">分页页码</param>
         /// <param name="size">每页显示数量</param>
         /// <returns></returns>
-        public IActionResult Index(string start_time, string end_time, string deliver_index, string deliver_company_head,
-            int pageindex = 1, int pagesize = 20)
+        public IActionResult Index()
         {
+            return View();
+        }
 
+        public IActionResult GetData(string start_time, string end_time, string deliver_index, string deliver_company_head) {
             ViewBag.start_time = start_time;
             ViewBag.end_time = end_time;
 
@@ -43,10 +45,7 @@ namespace WebApplication.Controllers
             }
 
             var objList = SM.SelectAll(start_time, end_time, deliver_index, deliver_company_head);
-            var pagedList = PagedList<Sale>.PageList(pageindex, pagesize, objList);
-            ViewBag.model = pagedList.Item2;
-            return View(pagedList.Item1);
-            
+            return Json(objList);
         }
 
         /// <summary>
@@ -275,8 +274,12 @@ namespace WebApplication.Controllers
         /// <param name="pageindex"></param>
         /// <param name="pagesize"></param>
         /// <returns></returns>
-        public IActionResult Payment(string start_time, string end_time, string deliver_index, string deliver_company_head,
-    string order_name, int pageindex = 1, int pagesize = 20)
+        public IActionResult Payment()
+        {            
+            return View();
+        }
+
+        public IActionResult GetPaymentData(string start_time, string end_time, string deliver_index, string deliver_company_head, string order_name) 
         {
             ViewBag.start_time = start_time;
             ViewBag.end_time = end_time;
@@ -296,9 +299,7 @@ namespace WebApplication.Controllers
             }
 
             var objList = SM.SelectMoneyAll(start_time, end_time, deliver_index, deliver_company_head, order_name);
-            var pagedList = PagedList<Sale>.PageList(pageindex, pagesize, objList);
-            ViewBag.model = pagedList.Item2;
-            return View(pagedList.Item1);
+            return Json(objList);
         }
 
         /// <summary>
@@ -307,8 +308,26 @@ namespace WebApplication.Controllers
         /// <param name="page">分页页码</param>
         /// <param name="size">每页显示数量</param>
         /// <returns></returns>
-        public IActionResult MoneyIndex(string start_time, string end_time, string deliver_index, string deliver_company_head,
-            string order_name,int pageindex = 1, int pagesize = 20)
+        public IActionResult MoneyIndex()
+        {
+            string count_num = "";
+            int num = DZM.SelectHistory("0000-01-01", "2222-01-01", "0000-01-01", "2222-01-01").GroupBy(s => s.dz_index).Select(s => s.Key).ToList().Count + 1;//从1开始
+            if (num < 10)
+            {
+                count_num = "00" + num;
+            }
+            else if (num < 100)
+            {
+                count_num = "0" + num;
+            }
+            else
+            {
+                count_num = "" + num;
+            }
+            ViewBag.dz_index = SettingM.SelectConfigList(8)[0].config_list + count_num;
+            return View();
+        }
+        public IActionResult GetMoneyIndexData(string start_time, string end_time, string deliver_index, string deliver_company_head,string order_name) 
         {
             ViewBag.start_time = start_time;
             ViewBag.end_time = end_time;
@@ -327,46 +346,11 @@ namespace WebApplication.Controllers
                 end_time = "2222-01-01";
             }
 
-            string count_num = "";
-            int num = DZM.SelectHistory("0000-01-01", "2222-01-01", "0000-01-01", "2222-01-01").GroupBy(s => s.dz_index).Select(s => s.Key).ToList().Count + 1;//从1开始
-            if (num < 10)
-            {
-                count_num = "00" + num;
-            }
-            else if (num < 100)
-            {
-                count_num = "0" + num;
-            }
-            else
-            {
-                count_num = "" + num;
-            }
-            ViewBag.dz_index = SettingM.SelectConfigList(8)[0].config_list + count_num;
+            
 
-            var objList = SM.SelectMoneyAll(start_time, end_time,deliver_index, deliver_company_head,order_name).Where(s=>s.real_num>s.dz_num).ToList();
-
-            //总数
-            double allNum = 0;
-            //未对账总数
-            double unDuiNum = 0;
-            //总价
-            double allPrice = 0;
-
-            for (int i = 0; i < objList.Count; i++)
-            {
-                allNum = allNum + objList[i].real_num;
-                allPrice = allPrice + objList[i].deliver_all_price;
-                unDuiNum = unDuiNum + objList[i].real_num- objList[i].dz_num;
-            }
-            ViewBag.allNum = allNum;
-            ViewBag.allPrice = allPrice;
-            ViewBag.unDuiNum = unDuiNum;
-
-            var pagedList = PagedList<Sale>.PageList(pageindex, pagesize, objList);
-            ViewBag.model = pagedList.Item2;
-            return View(pagedList.Item1);
+            var objList = SM.SelectMoneyAll(start_time, end_time, deliver_index, deliver_company_head, order_name).Where(s => s.real_num > s.dz_num).ToList();
+            return Json(objList);
         }
-
         /// <summary>
         /// 更新结款方式
         /// </summary>

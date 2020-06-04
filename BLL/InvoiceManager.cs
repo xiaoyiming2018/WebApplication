@@ -15,8 +15,8 @@ namespace BLL
         /// </summary>
         /// <param name="name"></param>
         /// <returns></returns>
-        public List<Invoice> SelectAll(int status, string start_time, string end_time, string confirm_start_time, string confirm_end_time, string invoice_index="", string company_name="") { 
-            List<Invoice> objList = IS.SelectAll(status, start_time, end_time, confirm_start_time, confirm_end_time, invoice_index, company_name);
+        public List<Invoice> SelectAll(int status, string start_time, string end_time, string confirm_start_time, string confirm_end_time, string invoice_index="", string company_name="",string invoice_company="") { 
+            List<Invoice> objList = IS.SelectAll(status, start_time, end_time, confirm_start_time, confirm_end_time, invoice_index, company_name, invoice_company);
             return objList;
         }
 

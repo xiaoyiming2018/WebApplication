@@ -130,9 +130,9 @@ namespace WebApplication.Controllers
         /// 获取材料规格
         /// </summary>
         /// <returns></returns>
-        public IActionResult GetProductPrice(double order_num, double order_price)
+        public IActionResult GetProductPrice(double real_num, double deliver_price)
         {
-            ViewBag.order_all_price = order_num * order_price;
+            ViewBag.deliver_all_price = real_num * deliver_price;
             return View();
         }
     }

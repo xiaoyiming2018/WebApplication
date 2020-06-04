@@ -15,7 +15,7 @@ namespace DAL
         /// <param name="company_name"></param>
         /// <returns></returns>
         public List<Invoice> SelectAll(int status, string start_time, string end_time, string confirm_start_time, string confirm_end_time, 
-            string invoice_index, string company_name)
+            string invoice_index, string company_name,string invoice_company)
         {
             try
             {
@@ -29,9 +29,9 @@ namespace DAL
                     "a.invoice_time,a.invoice_price,a.invoice_real_price,a.invoice_prepay,a.pay_type,a.remark,confirm_time " +
                     "from jinchen.invoice_info a " +
                     "where a.invoice_index ~* '{0}' and a.company_name ~* '{1}' and a.status={2} and to_char(invoice_time,'yyyy-MM-dd')>='{3}' " +
-                    "and to_char(invoice_time,'yyyy-MM-dd')<='{4}' and to_char(confirm_time,'yyyy-MM-dd')>='{5}' and to_char(confirm_time,'yyyy-MM-dd')<='{6}' " +
+                    "and to_char(invoice_time,'yyyy-MM-dd')<='{4}' and to_char(confirm_time,'yyyy-MM-dd')>='{5}' and to_char(confirm_time,'yyyy-MM-dd')<='{6}' and invoice_company ~* '{7}' " +
                     "order by a.invoice_time desc";
-                sql = string.Format(sql, invoice_index, company_name, status,start_time,end_time, confirm_start_time, confirm_end_time);
+                sql = string.Format(sql, invoice_index, company_name, status,start_time,end_time, confirm_start_time, confirm_end_time,invoice_company);
 
                 objList = PostgreHelper.GetEntityList<Invoice>(sql);
 

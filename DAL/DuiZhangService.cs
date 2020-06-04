@@ -64,7 +64,7 @@ namespace DAL
                       "where company_order_index ~*'{0}' and company_name ~*'{1}' and to_char(a.deliver_time,'yyyy-MM-dd')>='{2}' and " +
                       "to_char(a.deliver_time,'yyyy-MM-dd')<='{3}' and to_char(a.dui_time,'yyyy-MM-dd')>='{4}' and to_char(a.dui_time,'yyyy-MM-dd')<='{5}' and " +
                       "order_name ~* '{6}' and dz_index ~* '{7}' and invoice_index ~* '{8}' ) a " +
-                      "left join (select * from jinchen.sale_info) b on a.sale_id=b.id and deliver_index ~* '{9}' " +
+                      "inner join (select * from jinchen.sale_info) b on a.sale_id=b.id and deliver_index ~* '{9}' " +
                       "order by a.dui_time desc, b.deliver_index desc,a.company_name";
                 sql = string.Format(sql, company_order_index, company_name, deliver_start_time, deliver_end_time, dz_start_time, dz_end_time,
                     order_name, dz_index, invoice_index, deliver_index);

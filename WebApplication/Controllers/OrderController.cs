@@ -21,10 +21,13 @@ namespace WebApplication.Controllers
         /// <param name="page">分页页码</param>
         /// <param name="size">每页显示数量</param>
         /// <returns></returns>
-        public IActionResult Index(string start_time, string end_time,string deliver_start_time, string deliver_end_time, string company_name, 
-            string order_index,string company_order_index,string purchase_person,string order_name, int pageindex = 1, int pagesize = 20)
+        public IActionResult Index()
         {            
-                          
+            return View();
+        }
+
+        public IActionResult GetData(string start_time, string end_time, string deliver_start_time, string deliver_end_time, string company_name,
+            string order_index, string company_order_index, string purchase_person, string order_name) {
             ViewBag.company_name = company_name;
             ViewBag.order_index = order_index;
             ViewBag.company_order_index = company_order_index;
@@ -35,7 +38,7 @@ namespace WebApplication.Controllers
             ViewBag.end_time = end_time;
             ViewBag.deliver_start_time = deliver_start_time;
             ViewBag.deliver_end_time = deliver_end_time;
-            if (start_time==null)
+            if (start_time == null)
             {
                 start_time = "0001-01-01";
             }
@@ -55,46 +58,8 @@ namespace WebApplication.Controllers
 
 
             var objList = OM.SelectAll(0, start_time, end_time, deliver_start_time, deliver_end_time, company_name, order_index, company_order_index, purchase_person, order_name);
-
-            //金额
-            double allMoney = 0;
-            //已完成金额
-            double allFinishMoney = 0;
-            //未完成金额
-            double allUnfinishMoney = 0;
-            //数量
-            double allNum = 0;
-            //开单数
-            double allOpenNum = 0;
-            //退单数
-            double allTuiNum = 0;
-            //剩余数
-            double allRemainNum = 0;
-            
-            for (int i = 0; i < objList.Count; i++)
-            {
-                allMoney = allMoney + objList[i].order_all_price;
-                allFinishMoney = allFinishMoney + objList[i].order_price* objList[i].open_num;
-                allUnfinishMoney = allUnfinishMoney + objList[i].order_price * objList[i].remain_num;
-                allNum = allNum + objList[i].order_num;
-                allOpenNum = allOpenNum + objList[i].open_num;
-                allTuiNum = allTuiNum + objList[i].tui_num;
-                allRemainNum = allRemainNum + objList[i].order_num- objList[i].open_num + objList[i].tui_num;
-            }
-            ViewBag.allMoney = allMoney;
-            ViewBag.allFinishMoney = allFinishMoney;
-            ViewBag.allUnfinishMoney = allUnfinishMoney;
-            ViewBag.allNum = allNum;
-            ViewBag.allOpenNum = allOpenNum;
-            ViewBag.allTuiNum = allTuiNum;
-            ViewBag.allRemainNum = allRemainNum;
-
-            var pagedList = PagedList<Order>.PageList(pageindex, pagesize, objList);
-            ViewBag.model = pagedList.Item2;
-            return View(pagedList.Item1);
-           
+            return Json(objList);
         }
-
         /// <summary>
         /// 插入更新页面
         /// </summary>
@@ -172,6 +137,8 @@ namespace WebApplication.Controllers
             string[] order_all_price = Convert.ToString(HttpContext.Request.Form["Order_All_Price"]).Split(',');
             string[] order_picture = Convert.ToString(HttpContext.Request.Form["Order_Picture"]).Split(',');
             string[] purchase_person = Convert.ToString(HttpContext.Request.Form["Purchase_Person"]).Split(',');
+            string[] remark = Convert.ToString(HttpContext.Request.Form["Remark"]).Split(',');
+
             int rowLength = Convert.ToInt32(HttpContext.Request.Form["rowLength"]); 
             Order orderList = new Order();
             if (!string.IsNullOrEmpty(HttpContext.Request.Form["id"]))
@@ -203,6 +170,7 @@ namespace WebApplication.Controllers
                         orderList.deliver_time = Convert.ToDateTime(deliver_time[i]);
                         orderList.unit = unit[i];
                         orderList.purchase_person = purchase_person[i];
+                        orderList.remark = remark[i];
                         if (order_num[i] == "")
                         {
                             orderList.order_num = 0;
@@ -263,10 +231,13 @@ namespace WebApplication.Controllers
             return View();
         }
 
-        public IActionResult HistoryIndex(string start_time, string end_time, string deliver_start_time, string deliver_end_time, 
-            string company_name, string order_index, string company_order_index,string purchase_person,string order_name, string day, string month, string year, 
-            int pageindex = 1, int pagesize = 20)
-        {
+        public IActionResult HistoryIndex()
+        {  
+            return View();
+        }
+
+        public IActionResult GetHistoryData(string start_time, string end_time, string deliver_start_time, string deliver_end_time,
+            string company_name, string order_index, string company_order_index, string purchase_person, string order_name, string day, string month, string year) {
             ViewBag.company_name = company_name;
             ViewBag.order_index = order_index;
             ViewBag.company_order_index = company_order_index;
@@ -318,33 +289,9 @@ namespace WebApplication.Controllers
                 ViewBag.year = "1";
             }
 
-            var objList = OM.SelectAll(1, start_time, end_time, deliver_start_time, deliver_end_time,  company_name, order_index, company_order_index, purchase_person, order_name);
-
-            //金额
-            double allMoney = 0;
-            //数量
-            double allNum = 0;
-            //开单数
-            double allOpenNum = 0;
-            //退单数
-            double allTuiNum = 0;
-            for (int i = 0; i < objList.Count; i++)
-            {
-                allMoney = allMoney + objList[i].order_all_price;
-                allNum = allNum + objList[i].order_num;
-                allOpenNum = allOpenNum + objList[i].open_num;
-                allTuiNum = allTuiNum + objList[i].tui_num;
-            }
-            ViewBag.allMoney = allMoney;
-            ViewBag.allNum = allNum;
-            ViewBag.allOpenNum = allOpenNum;
-            ViewBag.allTuiNum = allTuiNum;
-
-            var pagedList = PagedList<Order>.PageList(pageindex, pagesize, objList);
-            ViewBag.model = pagedList.Item2;
-            return View(pagedList.Item1);
+            var objList = OM.SelectAll(1, start_time, end_time, deliver_start_time, deliver_end_time, company_name, order_index, company_order_index, purchase_person, order_name);
+            return Json(objList);
         }
-
 
     }
 }

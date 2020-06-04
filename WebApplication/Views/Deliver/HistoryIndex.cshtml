@@ -4,36 +4,169 @@
     @using BLL;
 
 }
-@using AspNetCoreMvcPager;
 <!DOCTYPE html>
 <html>
 <head>
     <meta name="viewport" content="width=device-width" />
-    <style>
-        .headstyle {
-            border: 2px solid black;
-        }
-
-        .thstyle {
-            border: 2px solid black;
-        }
-
-
-
-        .bodystyle {
-            border: 2px solid black;
-        }
-
-        .tdstyle {
-            border: 2px solid black;
-        }
-    </style>
     <script type="text/javascript">
         $(function () {
             $(".sidebar ul li:nth-of-type(2)").addClass("active open")
             $(".sidebar ul li:nth-of-type(2) ul li").removeClass()
             $(".sidebar ul li:nth-of-type(2) ul li:nth-of-type(3)").addClass("active")
+            $("#myTable").bootstrapTable({
+                url: '/Deliver/GetHistoryData',
+                method: 'GET',
+                theadClasses: "thead-blue",
+                pagination: true,
+                sidePagination: "client",
+                pageNumber: 1,
+                pageSize: 20,
+                pageList: [10, 20, 50],
+                undefinedText: '---',
+                paginationDetailHAlign: 'left',
+                toolbarAlign: 'right',
+                showFooter: true,
+                showExport: true, //是否显示导出
+                exportDataType: "all", //basic', 'all', 'selected'.
+                exportTypes: ['excel'],
+                exportOptions: {//导出设置
+                    fileName: '历史购入清单',//下载文件名称
+                },
+                columns: [{
+                    field: 'no',
+                    title: '编号',
+                    align: 'center',
+                    formatter: function (value, row, index) {
+                        return index + 1;
+                    },
+                    footerFormatter: function (data) {
+                        return "汇总";
+                    }
+                }, {
+                    field: 'id',
+                    title: 'id',
+                    visible: false
+                }, {
+                    field: 'purchase_index',
+                    title: '购入单号',
+                    align: 'center',
+                    sortable: true
+                }, {
+                    field: 'company_name',
+                    title: '供应商',
+                    align: 'center',
+                    sortable: true
+                }, {
+                    field: 'category',
+                    title: '分类',
+                    align: 'center',
+                    sortable: true
+                }, {
+                    field: 'deliver_index',
+                    title: '送货单号',
+                    align: 'center',
+                    sortable: true
+                }, {
+                    field: 'deliver_time',
+                    title: '送货时间',
+                    align: 'center',
+                    sortable: true,
+                    formatter: function (value, row, index) {
+                        return row.deliver_time.split('T')[0];
+                    }
+                }, {
+                    field: 'material_name',
+                    title: '物料名称',
+                    align: 'center',
+                    sortable: true
+                }, {
+                    field: 'material_spec',
+                    title: '物料规格',
+                    align: 'center',
+                    sortable: true
+                }, {
+                    field: 'material_num',
+                    title: '购入数量',
+                    align: 'center',
+                    sortable: true,
+                    footerFormatter: function (data) {
+                        var count = 0;
+                        $.each(data, function (index, item) {
+                            count += item.material_num;
+                        });
+                        return count.toFixed(2);
+                    }
+                }, {
+                    field: 'material_unit',
+                    title: '物料单位',
+                    align: 'center',
+                    sortable: true
+                }, {
+                    field: 'material_price',
+                    title: '单价',
+                    align: 'center',
+                    sortable: true
+                }, {
+                    field: 'material_all_price',
+                    title: '总价',
+                    align: 'center',
+                    sortable: true,
+                    footerFormatter: function (data) {
+                        var count = 0;
+                        $.each(data, function (index, item) {
+                            count += item.material_all_price;
+                        });
+                        return count.toFixed(2);
+                    }
+                }, {
+                    field: 'money_onoff',
+                    title: '结款与否',
+                    align: 'center',
+                    sortable: true,
+                    formatter: function (value, row, index) {
+                        if (row.money_onoff == 0) {
+                            return "<span style='color:red'>未结款</span>";
 
+                        } else {
+                            return "<span style='color:green'>已结款</span>";
+                        }
+                    }
+                }, {
+                    field: 'money_way',
+                    title: '结款方式',
+                    align: 'center',
+                    sortable: true,
+                    formatter: function (value, row, index) {
+                        if (row.money_way == 0) {
+                            return "";
+
+                        } else if (row.money_way == 1) {
+                            return "月结";
+                        } else if (row.money_way == 2) {
+                            return "现金";
+                        } else {
+                            return "小额支付";
+                        }
+                    }
+                    },{
+                        field: 'confirm_time',
+                        title: '确认结款时间',
+                        align: 'center',
+                        sortable: true,
+                        formatter: function (value, row, index) {
+                            return row.confirm_time.replace('T', ' ');
+                        }
+                    }, {
+                    field: 'edit',
+                    title: '操作',
+                    align: 'center',
+                    formatter: function (value, row, index) {
+                        var result = "";
+                        result += "<input type='button' class='btn btn-primary' onclick='confirmTiShi(" + row.id + ")' value='取消确认' />";
+                        return result;
+                    }
+                }]
+            });
         });
 
         function confirmTiShi(id) {
@@ -63,7 +196,7 @@
                             success: function (msg) {
                                 if (msg == "Success") {
                                     swal({ title: "已取消 !", text: "", type: "success" },
-                                        function () { window.location.href = '/Deliver/HistoryIndex'; });
+                                        function () { Search(); });
                                 }
                                 else {
                                     swal("执行失败 !", "", "error");
@@ -128,6 +261,26 @@
             $(".header").show()
             $(".sidebar.sidebar-shrink ~ .content-wrap").css("margin-left", "250px")
         }
+
+        function Search() {
+            var start_time = $("#start_time").val();
+            var end_time = $("#end_time").val();
+            var company_name = $("#company_name").val();
+            var purchase_index = $("#purchase_index").val();
+            var material_name = $("#material_name").val();
+            var deliver_index = $("#deliver_index").val();
+            var category = $("#category").val();
+            var confirm_start_time = $("#confirm_start_time").val();
+            var confirm_end_time = $("#confirm_end_time").val();
+            var day = $("#day").val();
+            var month = $("#month").val();
+            var year = $("#year").val();
+
+            var searchUrl = "/Deliver/GetHistoryData?start_time=" + start_time + "&end_time=" + end_time + "&company_name=" + company_name + "&purchase_index=" + purchase_index
+                + "&material_name=" + material_name + "&deliver_index=" + deliver_index + "&category=" + category + "&confirm_start_time=" + confirm_start_time
+                + "&confirm_end_time=" + confirm_end_time + "&day=" + day + "&month=" + month + "&year=" + year;
+            $("#myTable").bootstrapTable('refresh', { url: searchUrl });
+        }
     </script>
 </head>
 <body>
@@ -151,7 +304,7 @@
                 <div class="col-lg-12">
                     <div class="card alert">
                         <div class="card-header">
-                            <form class="form-horizontal" action="/Deliver/HistoryIndex" method="post" id="myfrom">
+                            <div class="form-horizontal">
                                 <div class="form-inline">
                                     <div class="form-group">
                                         <label>购入单号：</label>
@@ -252,214 +405,24 @@
                                         <label>（确认结款时间）</label>
                                     </div>
                                     <div class="form-group">
-                                        <input type="submit" value="查询" class="btn btn-primary" style="width:80px" />
-                                        <input type="button" value="数据打印" class="btn btn-primary" onclick="doPrint()" style="width:80px" />
+                                        <input type="button" value="查询" class="btn btn-primary" style="width:80px" onclick="Search()" />
                                     </div>
 
                                 </div>
                                 <br />
 
 
-                            </form>
+                            </div>
                         </div>
                         <div class="card-body">
-                            <table class="table table-responsive table-hover ">
-                                <thead>
-                                    <tr>
-                                        <th>编号</th>
-                                        <th>购入单号</th>
-                                        <th>供应商</th>
-                                        <th>分类</th>
-                                        <th>送货单号</th>
-                                        <th>送货时间</th>
-                                        <th>物料名称</th>
-                                        <th>物料规格</th>
-                                        <th>购入数量</th>
-                                        <th>物料单位</th>
-                                        @if (UserManager.Current.GetLevel >= UserLevelEnum.ProductManager)
-                                        {
-                                            <th>单价</th>
-                                            <th>总价</th>
-                                            <th>结款与否</th>
-                                            <th>结款方式</th>
-                                            <th>确认结款时间</th>
-                                        }
-                                        @if (UserManager.Current.GetLevel >= UserLevelEnum.Developer)
-                                        {
-                                            <th>取消确认</th>
-                                        }
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @{
-                                        int index = 1;
-                                        foreach (var item in Model)
-                                        {
-                                            <tr>
-                                                <td>@index</td>
-                                                <td>@item.purchase_index</td>
-                                                <td>@item.company_name</td>
-                                                <td>@item.category</td>
-                                                <td>@item.deliver_index</td>
-                                                <td>@item.deliver_time.ToString("yyyy-MM-dd")</td>
-                                                <td>@item.material_name</td>
-                                                <td>@item.material_spec</td>
-                                                <td>@item.material_num</td>
-                                                <td>@item.material_unit</td>
-                                                @if (UserManager.Current.GetLevel >= UserLevelEnum.ProductManager)
-                                                {
-                                                    <td>@item.material_price</td>
-                                                    <td>@item.material_all_price</td>
-                                                    @if (item.money_onoff == 0)
-                                                    {
-                                                        <td style="color:red">未结款</td>
-                                                    }
-                                                    else
-                                                    {
-                                                        <td style="color:green"> 已结款</td>
-                                                    }
-                                                    @if (item.money_way == 0)
-                                                    {
-                                                        <td></td>
-                                                    }
-                                                    else if (item.money_way == 1)
-                                                    {
-                                                        <td style="color:green">月结</td>
-                                                    }
-                                                    else if (item.money_way == 2)
-                                                    {
-                                                        <td style="color:green">现金</td>
-                                                    }
-                                                    else
-                                                    {
-                                                        <td style="color:green">小额支付</td>
-                                                    }
-                                                    <td>@item.confirm_time.ToString("yyyy-MM-dd HH:mm:ss")</td>
-                                                }
-                                                @if (UserManager.Current.GetLevel >= UserLevelEnum.Developer)
-                                                {
-                                                    <td>
-                                                        <input type="button" class="btn btn-default" onclick="confirmTiShi(@item.id)" value="取消确认" />
-                                                    </td>
-                                                }
-
-                                            </tr>
-                                            index++;
-                                        }
-                                        <tr>
-                                            <td colspan="8" style="color:green;font-weight:bold">合计</td>
-                                            <td style="font-weight:bold">@ViewBag.allNum</td>
-                                            <td colspan="2"></td>
-                                            <td style="font-weight:bold">@ViewBag.allMoney</td>
-                                            <td colspan="4"></td>
-                                        </tr>
-                                    }
-                                </tbody>
+                            <table id="myTable" class="table table-responsive table-hover ">
                             </table>
-                            <div class="page-nav" id="pageIndex">@Html.Raw(PagerHtmlString.Pager(ViewBag.model, "Deliver", "HistoryIndex", true))</div>
                         </div>
                     </div><!-- /# card -->
                 </div><!-- /# column -->
             </div><!-- /# row -->
         </div>
     </div><!-- /# container-fluid -->
-
-    <div class="card alert" id="Data1" style="margin: 30px;display: none">
-
-        <div class="card-body">
-            <table class="table" border="0" cellspacing="0" cellpadding="0">
-                <tbody>
-                    <tr style="font-weight:bold">
-                        <td style="font-size:26px;text-align:center;padding:2px;border:0;" colspan="6"><span id="deliver_head">历史购入清单</span></td>
-                    </tr>
-                </tbody>
-            </table>
-
-            <table class="table table-responsive">
-                <thead class="headstyle">
-                    <tr>
-                        <th class="thstyle">编号</th>
-                        <th class="thstyle">购入单号</th>
-                        <th class="thstyle">供应商</th>
-                        <th class="thstyle">分类</th>
-                        <th class="thstyle">送货单号</th>
-                        <th class="thstyle">送货时间</th>
-                        <th class="thstyle">物料名称</th>
-                        <th class="thstyle">物料规格</th>
-                        <th class="thstyle">购入数量</th>
-                        <th class="thstyle">物料单位</th>
-                        @if (UserManager.Current.GetLevel >= UserLevelEnum.ProductManager)
-                        {
-                            <th class="thstyle">单价</th>
-                            <th class="thstyle">总价</th>
-                            <th class="thstyle">结款与否</th>
-                            <th class="thstyle">结款方式</th>
-                            <th class="thstyle">确认结款时间</th>
-                        }
-                    </tr>
-                </thead>
-                <tbody class="bodystyle">
-                    @{
-                        int index1 = 1;
-                        foreach (var item in Model)
-                        {
-                            <tr>
-                                <td class="tdstyle">@index1</td>
-                                <td class="tdstyle">@item.purchase_index</td>
-                                <td class="tdstyle">@item.company_name</td>
-                                <td class="tdstyle">@item.category</td>
-                                <td class="tdstyle">@item.deliver_index</td>
-                                <td class="tdstyle">@item.deliver_time.ToString("yyyy-MM-dd")</td>
-                                <td class="tdstyle">@item.material_name</td>
-                                <td class="tdstyle">@item.material_spec</td>
-                                <td class="tdstyle">@item.material_num</td>
-                                <td class="tdstyle">@item.material_unit</td>
-                                @if (UserManager.Current.GetLevel >= UserLevelEnum.ProductManager)
-                                {
-                                    <td class="tdstyle">@item.material_price</td>
-                                    <td class="tdstyle">@item.material_all_price</td>
-                                    @if (item.money_onoff == 0)
-                                    {
-                                        <td class="tdstyle" style="color:red">未结款</td>
-                                    }
-                                    else
-                                    {
-                                        <td class="tdstyle" style="color:green"> 已结款</td>
-                                    }
-                                    @if (item.money_way == 0)
-                                    {
-                                        <td class="tdstyle"></td>
-                                    }
-                                    else if (item.money_way == 1)
-                                    {
-                                        <td class="tdstyle" style="color:green">月结</td>
-                                    }
-                                    else if (item.money_way == 2)
-                                    {
-                                        <td class="tdstyle" style="color:green">现金</td>
-                                    }
-                                    else
-                                    {
-                                        <td class="tdstyle" style="color:green">小额支付</td>
-                                    }
-                                    <td class="tdstyle">@item.confirm_time.ToString("yyyy-MM-dd HH:mm:ss")</td>
-                                }
-
-                            </tr>
-                            index1++;
-                        }
-                        <tr>
-                            <td class="tdstyle" colspan="8" style="color:green;font-weight:bold">合计</td>
-                            <td class="tdstyle" style="font-weight:bold">@ViewBag.allNum</td>
-                            <td class="tdstyle" colspan="2"></td>
-                            <td class="tdstyle" style="font-weight:bold">@ViewBag.allMoney</td>
-                            <td class="tdstyle" colspan="4"></td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
-        </div>
-    </div>
 </body>
 </html>
 
