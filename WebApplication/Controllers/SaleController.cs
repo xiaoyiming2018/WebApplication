@@ -238,7 +238,7 @@ namespace WebApplication.Controllers
         /// <returns></returns>
         public IActionResult GetOrderList(string deliver_company_head)
         {
-            List<Order> order = OM.SelectOrderSeqList(0,deliver_company_head);
+            List<Order> order = OM.SelectOrderSeqList(0,deliver_company_head).OrderByDescending(s=>s.remain_num).ToList();
             return View(order);
         }
 

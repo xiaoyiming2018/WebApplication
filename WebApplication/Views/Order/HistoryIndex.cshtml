@@ -65,8 +65,8 @@
                     field: 'company_name',
                     title: '客户名称',
                     align: 'center',
-                        sortable: true,
-                        width: 300
+                    sortable: true,
+                    width: 240
                 }, {
                     field: 'company_order_index',
                     title: '客户单号',
@@ -140,8 +140,8 @@
                     field: 'deliver_time',
                     title: '交货日期',
                     align: 'center',
-                        sortable: true,
-                    width:100,
+                    sortable: true,
+                    width: 100,
                     formatter: function (value, row, index) {
                         return row.deliver_time.split('T')[0];
                     }
@@ -166,12 +166,13 @@
 
                         return result;
                     }
-                    }, {
-                        field: 'remark',
-                        title: '备注',
-                        align: 'center',
-                        sortable: true
-                    }]
+                }, {
+                    field: 'remark',
+                    title: '备注',
+                    align: 'center',
+                    sortable: true,
+                    width: 200
+                }]
             });
         });
         function CheckOrCancleAll(obj) {

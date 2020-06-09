@@ -48,69 +48,69 @@
                     title: 'id',
                     visible: false
                 }, {
-                        field: 'order_index',
-                        title: '订单序号',
+                    field: 'order_index',
+                    title: '订单序号',
                     align: 'center',
-                        sortable: true,
-                        footerFormatter: function (data) {
-                            var count = 0;
-                            $.each(data, function (index, item) {
-                                count += (item.open_num - item.tui_num) * item.order_price;
-                            });
-                            return "已开单金额：" + count.toFixed(2);
-                        }
+                    sortable: true,
+                    footerFormatter: function (data) {
+                        var count = 0;
+                        $.each(data, function (index, item) {
+                            count += (item.open_num - item.tui_num) * item.order_price;
+                        });
+                        return "已开单金额：" + count.toFixed(2);
+                    }
                 }, {
-                        field: 'order_time',
-                        title: '下单日期',
-                        align: 'center',
-                        sortable: true,
-                        width:100,
-                        formatter: function (value, row, index) {
-                            return row.order_time.split('T')[0];
-                        },
-                        footerFormatter: function (data) {
-                            var count = 0;
-                            $.each(data, function (index, item) {
-                                count += (item.order_num - item.open_num + item.tui_num) * item.order_price;
-                            });
-                            return "未开单金额：" + count.toFixed(2);
-                        }
-                }, {
-                        field: 'company_name',
-                        title: '客户名称',
+                    field: 'order_time',
+                    title: '下单日期',
                     align: 'center',
-                        sortable: true,
-                    width:300
+                    sortable: true,
+                    width: 100,
+                    formatter: function (value, row, index) {
+                        return row.order_time.split('T')[0];
+                    },
+                    footerFormatter: function (data) {
+                        var count = 0;
+                        $.each(data, function (index, item) {
+                            count += (item.order_num - item.open_num + item.tui_num) * item.order_price;
+                        });
+                        return "未开单金额：" + count.toFixed(2);
+                    }
                 }, {
-                        field: 'company_order_index',
-                        title: '客户单号',
+                    field: 'company_name',
+                    title: '客户名称',
                     align: 'center',
-                    sortable: true
+                    sortable: true,
+                    width: 240
                 }, {
-                        field: 'order_name',
-                        title: '名称规格',
+                    field: 'company_order_index',
+                    title: '客户单号',
                     align: 'center',
                     sortable: true
                 }, {
-                        field: 'order_num',
-                        title: '数量',
-                        align: 'center',
-                        sortable: true,
-                        footerFormatter: function (data) {
-                            var count = 0;
-                            $.each(data, function (index, item) {
-                                count += item.order_num;
-                            });
-                            return count.toFixed(2);
-                        }
-                }, {
-                        field: 'order_price',
-                        title: '单价',
+                    field: 'order_name',
+                    title: '名称规格',
                     align: 'center',
                     sortable: true
                 }, {
-                        field: 'order_all_price',
-                        title: '金额',
+                    field: 'order_num',
+                    title: '数量',
+                    align: 'center',
+                    sortable: true,
+                    footerFormatter: function (data) {
+                        var count = 0;
+                        $.each(data, function (index, item) {
+                            count += item.order_num;
+                        });
+                        return count.toFixed(2);
+                    }
+                }, {
+                    field: 'order_price',
+                    title: '单价',
+                    align: 'center',
+                    sortable: true
+                }, {
+                    field: 'order_all_price',
+                    title: '金额',
                     align: 'center',
                     sortable: true,
                     footerFormatter: function (data) {
@@ -121,44 +121,44 @@
                         return count.toFixed(2);
                     }
                 }, {
-                        field: 'open_num',
-                        title: '开单数',
-                        align: 'center',
-                        sortable: true,
-                        formatter: function (value, row, index) {
-                            return "<span style='color:darkseagreen'>" + row.open_num + "</span>"
-                        },
-                        footerFormatter: function (data) {
-                            var count = 0;
-                            $.each(data, function (index, item) {
-                                count += item.open_num;
-                            });
-                            return count.toFixed(2);
-                        }
-                }, {
-                        field: 'tui_num',
-                        title: '退单数',
+                    field: 'open_num',
+                    title: '开单数',
                     align: 'center',
-                        sortable: true,
-                        formatter: function (value, row, index) {
-                            return "<span style='color:red'>" + row.tui_num + "</span>"
-                        },
-                        footerFormatter: function (data) {
-                            var count = 0;
-                            $.each(data, function (index, item) {
-                                count += item.tui_num;
-                            });
-                            return count.toFixed(2);
-                        }
+                    sortable: true,
+                    formatter: function (value, row, index) {
+                        return "<span style='color:darkseagreen'>" + row.open_num + "</span>"
+                    },
+                    footerFormatter: function (data) {
+                        var count = 0;
+                        $.each(data, function (index, item) {
+                            count += item.open_num;
+                        });
+                        return count.toFixed(2);
+                    }
+                }, {
+                    field: 'tui_num',
+                    title: '退单数',
+                    align: 'center',
+                    sortable: true,
+                    formatter: function (value, row, index) {
+                        return "<span style='color:red'>" + row.tui_num + "</span>"
+                    },
+                    footerFormatter: function (data) {
+                        var count = 0;
+                        $.each(data, function (index, item) {
+                            count += item.tui_num;
+                        });
+                        return count.toFixed(2);
+                    }
                 }, {
                     field: 'remain',
-                        title: '剩余数',
+                    title: '剩余数',
                     align: 'center',
-                        sortable: true,
-                        formatter: function (value, row, index) {
-                            var res = row.order_num - row.open_num + row.tui_num;
-                            return "<span style='color:orange'>" + res + "</span>";
-                        },
+                    sortable: true,
+                    formatter: function (value, row, index) {
+                        var res = row.order_num - row.open_num + row.tui_num;
+                        return "<span style='color:orange'>" + res + "</span>";
+                    },
                     footerFormatter: function (data) {
                         var count = 0;
                         $.each(data, function (index, item) {
@@ -167,58 +167,76 @@
                         return count.toFixed(2);
                     }
                 }, {
-                        field: 'deliver_time',
-                        title: '交货日期',
+                    field: 'deliver_time',
+                    title: '交货日期',
                     align: 'center',
                     sortable: true,
                     formatter: function (value, row, index) {
-                        return row.deliver_time.split('T')[0];
+                        // 目标时区，东9区
+                        let targetTimezone = -8;
+                        // 当前时区与中时区时差，以min为维度
+                        let _dif = new Date().getTimezoneOffset();
+                        // 本地时区时间 + 时差  = 中时区时间
+                        // 目标时区时间 + 时差 = 中时区时间
+                        // 目标时区时间 = 本地时区时间 + 本地时区时差 - 目标时区时差
+                        // 东9区时间
+                        let east8time = new Date().getTime() + _dif * 60 * 1000 - (targetTimezone * 60 * 60 * 1000)
+                        var nowDate = new Date(east8time);
+                        var realDate = new Date(row.deliver_time);
+
+                        if (realDate > nowDate) {
+                            return "<span style='color:red'>" + row.deliver_time.split('T')[0] + "<span>";
+                        } else {
+                            return row.deliver_time.split('T')[0];
+                        }
+
                     }
                 }, {
                     field: 'purchase_person',
-                        title: '采购员',
+                    title: '采购员',
                     align: 'center',
                     sortable: true
-                    }, {
-                        field: 'order_picture',
-                        title: '图纸',
-                        align: 'center',
-                        sortable: true,
-                        formatter: function (value, row, index) {
-                            var result = "";
-                            if (row.order_picture == "" || row.order_picture == null || row.order_picture == undefined) {
-                                result += "<a href='#' >暂无图纸</a>";
-                                
-                            } else {
-                                result += "<a href='/src/Files" + row.order_picture + "' target='_blank'>查看</a>";
-                            }
+                }, {
+                    field: 'order_picture',
+                    title: '图纸',
+                    align: 'center',
+                    sortable: true,
+                    formatter: function (value, row, index) {
+                        var result = "";
+                        if (row.order_picture == "" || row.order_picture == null || row.order_picture == undefined) {
+                            result += "<a href='#' >暂无图纸</a>";
 
-                            return result;
+                        } else {
+                            result += "<a href='/src/Files" + row.order_picture + "' target='_blank'>查看</a>";
                         }
-                    }, {
-                        field: 'remark',
-                        title: '备注',
-                        align: 'center',
-                        sortable: true
-                    }, {
+
+                        return result;
+                    }
+                }, {
+                    field: 'remark',
+                    title: '备注',
+                    align: 'center',
+                    width: 200,
+                    sortable: true
+                }, {
                     field: 'edit',
                     title: '编辑',
                     align: 'center',
                     formatter: function (value, row, index) {
                         var result = "";
-                        result += "<input type='button' class='btn btn-primary' onclick=\"window.location.href = '/OrderSeq/Edit?order_id=" + row.id + "&seq_id=" + row.seq_id+"'\" value='编辑'/>";
+                        result += "<input type='button' class='btn btn-primary' onclick=\"window.location.href = '/OrderSeq/Edit?order_id=" + row.id + "&seq_id=" + row.seq_id + "'\" value='编辑'/>";
                         return result;
                     }
-                    }, {
-                        field: 'delete',
-                        title: '删除',
-                        align: 'center',
-                        formatter: function (value, row, index) {
-                            var result = "";
-                            result += "<input type='button' class='btn btn-primary' onclick=\"deleteTiShi(" + row.id + "," + row.seq_id + ")\" value='删除' />";
-                            return result;
-                        }
-                    }]
+                }, {
+                    field: 'delete',
+                    title: '删除',
+                    align: 'center',
+                    formatter: function (value, row, index) {
+                        var result = "";
+                        result += "<input type='button' class='btn btn-primary' onclick=\"deleteTiShi(" + row.id + "," + row.seq_id + ")\" value='删除' />";
+                        return result;
+                    }
+                }]
             });
         });
 
@@ -338,7 +356,7 @@
                                             <option value=""></option>
                                             @{
                                                 ContactManager ConM = new ContactManager();
-                                                List<string> obList = ConM.SelectAllContact().GroupBy(s=>s.name).Select(s=>s.Key).ToList();
+                                                List<string> obList = ConM.SelectAllContact().GroupBy(s => s.name).Select(s => s.Key).ToList();
                                                 if (obList.Count > 0)
                                                 {
                                                     for (int i = 0; i < obList.Count; i++)

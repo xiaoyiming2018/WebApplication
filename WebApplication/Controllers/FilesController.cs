@@ -41,7 +41,9 @@ namespace WebApplication.Controllers
             {
                 var fileName = ContentDispositionHeaderValue.Parse(file.ContentDisposition).FileName.ToString().Trim('"');
 
-                string filePath = hostingEnv.WebRootPath + $@"\Files\Files\";
+                string filePath = hostingEnv.WebRootPath + $@"/Files/Files/";
+                //docker中
+                //string filePath = "Files";
 
                 if (!Directory.Exists(filePath))
                 {

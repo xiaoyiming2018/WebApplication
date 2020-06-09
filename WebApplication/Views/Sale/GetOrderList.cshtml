@@ -38,8 +38,8 @@
                     <td>@index</td>
                     <td hidden><input type="text" name="seq_id" style="width:100px" value="@item.seq_id" /></td>
                     <td hidden><input type="text" name="order_id" style="width:100px" value="@item.order_id" /></td>
-                    <td>@item.order_index</td>
-                    <td>@item.order_name</td>
+                    <td>@item.company_order_index</td>
+                    <td style="color: @if (item.remain_num > 0) {<text>red</text> } else {<text>darkseagreen</text> }">@item.order_name</td>
                     <td>@item.order_num</td>
                     <td>@item.unit</td>
                     @if (UserManager.Current.GetLevel >= UserLevelEnum.ProductManager)

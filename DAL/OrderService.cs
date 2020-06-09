@@ -111,14 +111,14 @@ namespace DAL
                 if (order_id == 0)
                 {
                     sql = "select a.id,c.order_id,a.order_index,b.company_name, c.seq_id,c.order_time,c.order_name,c.unit,c.deliver_time," +
-                            "c.order_num,c.open_num,c.tui_num,c.remain_num,c.order_price,c.order_all_price,c.purchase_person,c.remark " +
+                            "c.order_num,c.open_num,c.tui_num,c.remain_num,c.order_price,c.order_all_price,c.purchase_person,c.remark,a.company_order_index " +
                             "from jinchen.order_info a,jinchen.company_info b,jinchen.orderseq_info c " +
                             "where a.customer_id=b.id and a.id=c.order_id and b.company_name='{0}' order by c.order_name";
                     sql = string.Format(sql, company_name);
                 }
                 else {
                     sql = "select a.id,c.order_id,a.order_index,b.company_name, c.seq_id,c.order_time,c.order_name,c.unit,c.deliver_time," +
-                        "c.order_num,c.open_num,c.tui_num,c.remain_num,c.order_price,c.order_all_price,c.purchase_person,c.remark " +
+                        "c.order_num,c.open_num,c.tui_num,c.remain_num,c.order_price,c.order_all_price,c.purchase_person,c.remark,a.company_order_index " +
                         "from jinchen.order_info a,jinchen.company_info b,jinchen.orderseq_info c " +
                         "where a.customer_id=b.id and a.id=c.order_id and a.id={0} and b.company_name='{1}' order by c.order_name";
                     sql = string.Format(sql, order_id, company_name);
