@@ -31,23 +31,23 @@ namespace WebApplication.Controllers
             //订单开头
             ViewBag.order_index_begin = settingOrder[0].config_list;
             ViewBag.order_index_id = settingOrder[0].id;
-            ViewBag.order_index_view = settingOrder[0].config_list + "20190101001";
+            ViewBag.order_index_view = settingOrder[0].config_list + "2019010001";
             //采购单开头
             ViewBag.purchase_index_begin = settingPurchase[0].config_list;
             ViewBag.purchase_index_id = settingPurchase[0].id;
-            ViewBag.purchase_index_view = settingPurchase[0].config_list + "20190101001";
+            ViewBag.purchase_index_view = settingPurchase[0].config_list + "2019010001";
             //出货单开头
             ViewBag.deliver_index_begin = settingDeliver[0].config_list;
             ViewBag.deliver_index_id = settingDeliver[0].id;
-            ViewBag.deliver_index_view = settingDeliver[0].config_list + "20190101001";
+            ViewBag.deliver_index_view = settingDeliver[0].config_list + "2019010001";
             //退货单开头
             ViewBag.return_index_begin = settingReturn[0].config_list;
             ViewBag.return_index_id = settingReturn[0].id;
-            ViewBag.return_index_view = settingReturn[0].config_list + "20190101001";
+            ViewBag.return_index_view = settingReturn[0].config_list + "2019010001";
             //对账单号开头
             ViewBag.dz_index_begin = settingDz[0].config_list;
             ViewBag.dz_index_id = settingDz[0].id;
-            ViewBag.dz_index_view = settingDz[0].config_list + "000001";
+            ViewBag.dz_index_view = settingDz[0].config_list + "2019010001";
             return View();
             
         }

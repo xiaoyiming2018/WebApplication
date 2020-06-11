@@ -107,7 +107,7 @@ namespace DAL
                 string sql = null;
                 sql = sql = "select a.return_index " +
                     "from jinchen.salereturn_info a " +
-                    "where to_char(a.insert_time,'yyyy-MM-dd')='{0}' group by a.return_index ";
+                    "where to_char(a.insert_time,'yyyy-MM')='{0}' group by a.return_index ";
                 sql = string.Format(sql, insert_time);
 
                 objList = PostgreHelper.GetEntityList<SaleReturn>(sql);

@@ -66,14 +66,18 @@ namespace WebApplication.Controllers
                 }
                 else
                 {
-                    List<Purchase> listPurchase = PM.SelectTodayForPurchaseIndex(DateTime.Now.ToLocalTime().AddHours(8).ToString("yyyy-MM-dd"));
+                    List<Purchase> listPurchase = PM.SelectTodayForPurchaseIndex(DateTime.Now.ToLocalTime().AddHours(8).ToString("yyyy-MM"));
                     string count_num = "";
                     int num = listPurchase.Count + 1;
                     if (num < 10)
                     {
-                        count_num = "00" + num;
+                        count_num = "000" + num;
                     }
                     else if (num < 100)
+                    {
+                        count_num = "00" + num;
+                    }
+                    else if (num < 1000)
                     {
                         count_num = "0" + num;
                     }
@@ -84,7 +88,7 @@ namespace WebApplication.Controllers
 
                     ViewBag.supplier_id = 0;
 
-                    ViewBag.purchase_index = SM.SelectConfigList(4)[0].config_list + DateTime.Now.ToLocalTime().AddHours(8).ToString("yyyy-MM-dd").Replace("-", "") + count_num;
+                    ViewBag.purchase_index = SM.SelectConfigList(4)[0].config_list + DateTime.Now.ToLocalTime().AddHours(8).ToString("yyyy-MM").Replace("-", "") + count_num;
 
                     return View();
                 }

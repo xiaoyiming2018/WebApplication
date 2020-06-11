@@ -81,14 +81,18 @@ namespace WebApplication.Controllers
                 }
                 else
                 {
-                    List<SaleReturn> listSale = SM.SelectTodayForReturnIndex(DateTime.Now.ToLocalTime().AddHours(8).ToString("yyyy-MM-dd"));
+                    List<SaleReturn> listSale = SM.SelectTodayForReturnIndex(DateTime.Now.ToLocalTime().AddHours(8).ToString("yyyy-MM"));
                     string count_num = "";
                     int num = listSale.Count + 1;
                     if (num < 10)
                     {
-                        count_num = "00" + num;
+                        count_num = "000" + num;
                     }
                     else if (num < 100)
+                    {
+                        count_num = "00" + num;
+                    }
+                    else if (num < 1000)
                     {
                         count_num = "0" + num;
                     }
@@ -96,7 +100,7 @@ namespace WebApplication.Controllers
                     {
                         count_num = "" + num;
                     }
-                    ViewBag.return_index = SettingM.SelectConfigList(7)[0].config_list + DateTime.Now.ToLocalTime().AddHours(8).ToString("yyyy-MM-dd").Replace("-", "") + count_num;
+                    ViewBag.return_index = SettingM.SelectConfigList(7)[0].config_list + DateTime.Now.ToLocalTime().AddHours(8).ToString("yyyy-MM").Replace("-", "") + count_num;
                     return View();
                 }
             }

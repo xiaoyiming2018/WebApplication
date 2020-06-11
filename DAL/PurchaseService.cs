@@ -22,7 +22,7 @@ namespace DAL
                 string sql = null;
                 sql = "SELECT a.purchase_index " +
                  "FROM jinchen.purchase_info a, jinchen.company_info b " +
-                   " where a.supplier_id = b.id and to_char(a.purchase_time,'yyyy-MM-dd')='{0}' group by a.purchase_index ";
+                   " where a.supplier_id = b.id and to_char(a.purchase_time,'yyyy-MM')='{0}' group by a.purchase_index ";
                 sql = string.Format(sql, purchase_time);
 
                 objList = PostgreHelper.GetEntityList<Purchase>(sql);

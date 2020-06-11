@@ -163,7 +163,7 @@
                 data: { Dui_Zhang: Dui_Zhang},
                 success: function (msg) {
                     $('#picker_list').html(msg);
-                    $('#picker_list1').html(msg);
+
                     $("#myModalLabel").text("对账预览");
                     $('#myModal').modal();
                 },
@@ -390,13 +390,13 @@
                 <div class="modal-footer">
                     <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
                     <button type="button" class="btn btn-primary" data-dismiss="modal" onclick="duiZhang()">保存</button>
-                    <button type="button" class="btn btn-primary" data-dismiss="modal" onclick="doPrint()">打印</button>
+                    @*<button type="button" class="btn btn-primary" data-dismiss="modal" onclick="doPrint()">打印</button>*@
                 </div>
             </div>
         </div>
     </div>
 
-    <div class="card alert" id="Data1" style="margin: 30px;display:none;">
+    @*<div class="card alert" id="Data1" style="margin: 30px;display:none;">
         <table class="table" border="0" cellspacing="0" cellpadding="0">
             <tbody>
                 <tr style="font-weight:bold">
@@ -414,7 +414,7 @@
         </table>
         <div class="card-body" id="picker_list1">
         </div>
-    </div>
+    </div>*@
 </body>
 </html>
 

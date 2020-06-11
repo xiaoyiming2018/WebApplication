@@ -271,7 +271,7 @@ namespace DAL
                 List<Order> objList = new List<Order>();
                 string sql = null;
                 sql = "select a.id,a.order_index " +
-                    "from jinchen.order_info a where to_char(a.insert_time,'yyyy-MM-dd')='{0}' ";
+                    "from jinchen.order_info a where to_char(a.insert_time,'yyyy-MM')='{0}' ";
                 sql = string.Format(sql, start_time);
 
                 objList = PostgreHelper.GetEntityList<Order>(sql);

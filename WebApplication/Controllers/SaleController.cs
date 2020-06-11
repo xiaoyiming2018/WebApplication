@@ -80,14 +80,18 @@ namespace WebApplication.Controllers
                 }
                 else
                 {
-                    List<Sale> listSale = SM.SelectTodayForDeliverIndex(DateTime.Now.ToLocalTime().AddHours(8).ToString("yyyy-MM-dd"));
+                    List<Sale> listSale = SM.SelectTodayForDeliverIndex(DateTime.Now.ToLocalTime().AddHours(8).ToString("yyyy-MM"));
                     string count_num = "";
                     int num = listSale.Count + 1;
                     if (num < 10)
                     {
-                        count_num = "00" + num;
+                        count_num = "000" + num;
                     }
                     else if (num < 100)
+                    {
+                        count_num = "00" + num;
+                    }
+                    else if (num < 1000)
                     {
                         count_num = "0" + num;
                     }
@@ -95,7 +99,7 @@ namespace WebApplication.Controllers
                     {
                         count_num = "" + num;
                     }
-                    ViewBag.deliver_index = SettingM.SelectConfigList(5)[0].config_list + DateTime.Now.ToLocalTime().AddHours(8).ToString("yyyy-MM-dd").Replace("-", "") + count_num;
+                    ViewBag.deliver_index = SettingM.SelectConfigList(5)[0].config_list + DateTime.Now.ToLocalTime().AddHours(8).ToString("yyyy-MM").Replace("-", "") + count_num;
                     return View();
                 }
             }
@@ -311,12 +315,19 @@ namespace WebApplication.Controllers
         public IActionResult MoneyIndex()
         {
             string count_num = "";
-            int num = DZM.SelectHistory("0000-01-01", "2222-01-01", "0000-01-01", "2222-01-01").GroupBy(s => s.dz_index).Select(s => s.Key).ToList().Count + 1;//从1开始
+            int num = DZM.SelectHistory("0000-01-01", "2222-01-01", "0000-01-01", "2222-01-01")
+                .Where(s=>s.dui_time.ToLocalTime().ToString("yyyy-MM") ==DateTime.Now.ToLocalTime().AddHours(8).ToString("yyyy-MM"))
+                .GroupBy(s => s.dz_index)
+                .Select(s => s.Key).ToList().Count + 1;//从1开始
             if (num < 10)
+            {
+                count_num = "000" + num;
+            }
+            else if (num < 100)
             {
                 count_num = "00" + num;
             }
-            else if (num < 100)
+            else if (num < 1000)
             {
                 count_num = "0" + num;
             }
@@ -324,7 +335,7 @@ namespace WebApplication.Controllers
             {
                 count_num = "" + num;
             }
-            ViewBag.dz_index = SettingM.SelectConfigList(8)[0].config_list + count_num;
+            ViewBag.dz_index = SettingM.SelectConfigList(8)[0].config_list+ DateTime.Now.ToLocalTime().AddHours(8).ToString("yyyy-MM").Replace("-", "") + count_num;
             return View();
         }
         public IActionResult GetMoneyIndexData(string start_time, string end_time, string deliver_index, string deliver_company_head,string order_name) 
