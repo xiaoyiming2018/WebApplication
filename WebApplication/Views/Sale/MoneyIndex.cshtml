@@ -55,92 +55,97 @@
                     align: 'center',
                     sortable: true
                 }, {
-                        field: 'deliver_company_head',
+                    field: 'deliver_company_head',
                     title: '客户名称',
                     align: 'center',
                     sortable: true
                 }, {
-                        field: 'company_order_index',
+                    field: 'company_order_index',
                     title: '客户订单号',
                     align: 'center',
                     sortable: true
                 }, {
-                        field: 'insert_time',
+                    field: 'insert_time',
                     title: '送货开单时间',
                     align: 'center',
                     sortable: true,
                     formatter: function (value, row, index) {
                         return row.insert_time.split('T')[0];
                     }
-                    }, {
-                        field: 'order_name',
-                        title: '名称规格',
-                        align: 'center',
-                        sortable: true,
-                        formatter: function (value,row,index) {
-                            if (row.return_flag == 1) {
-                                return "<span style='color:red'>" + row.order_name + "</span>"
-                            } else {
-                                return "<span>" + row.order_name + "</span>"
-                            }
+                }, {
+                    field: 'order_name',
+                    title: '名称规格',
+                    align: 'center',
+                    sortable: true,
+                    formatter: function (value, row, index) {
+                        if (row.return_flag == 1) {
+                            return "<span style='color:red'>" + row.order_name + "</span>"
+                        } else {
+                            return "<span>" + row.order_name + "</span>"
                         }
-                    }, {
-                        field: 'real_num',
-                        title: '送货数量',
-                        align: 'center',
-                        sortable: true,
-                        footerFormatter: function (data) {
-                            var count = 0;
-                            $.each(data, function (index, item) {
-                                count += item.real_num;
-                            });
-                            return count.toFixed(2);
-                        }
-                    }, {
-                        field: 'unit',
-                        title: '单位',
-                        align: 'center',
-                        sortable: true
-                    }, {
-                        field: 'deliver_price',
-                        title: '送货单价',
-                        align: 'center',
-                        sortable: true
-                    }, {
-                        field: 'deliver_all_price',
-                        title: '送货总价',
-                        align: 'center',
-                        sortable: true,
-                        footerFormatter: function (data) {
-                            var count = 0;
-                            $.each(data, function (index, item) {
-                                count += item.deliver_all_price;
-                            });
-                            return count.toFixed(2);
-                        }
-                    }, {
-                        field: 'unDui',
-                        title: '未对账数量',
-                        align: 'center',
-                        sortable: true,
-                        formatter: function (value, row, index) {
-                            var res = row.real_num - row.dz_num;
-                            return res;
-                        },
-                        footerFormatter: function (data) {
-                            var count = 0;
-                            $.each(data, function (index, item) {
-                                count += item.real_num - item.dz_num;
-                            });
-                            return count.toFixed(2);
-                        }
-                    }, {
+                    }
+                }, {
+                    field: 'purchase_person',
+                    title: '采购人员',
+                    align: 'center',
+                    sortable: true
+                }, {
+                    field: 'real_num',
+                    title: '送货数量',
+                    align: 'center',
+                    sortable: true,
+                    footerFormatter: function (data) {
+                        var count = 0;
+                        $.each(data, function (index, item) {
+                            count += item.real_num;
+                        });
+                        return count.toFixed(2);
+                    }
+                }, {
+                    field: 'unit',
+                    title: '单位',
+                    align: 'center',
+                    sortable: true
+                }, {
+                    field: 'deliver_price',
+                    title: '送货单价',
+                    align: 'center',
+                    sortable: true
+                }, {
+                    field: 'deliver_all_price',
+                    title: '送货总价',
+                    align: 'center',
+                    sortable: true,
+                    footerFormatter: function (data) {
+                        var count = 0;
+                        $.each(data, function (index, item) {
+                            count += item.deliver_all_price;
+                        });
+                        return count.toFixed(2);
+                    }
+                }, {
+                    field: 'unDui',
+                    title: '未对账数量',
+                    align: 'center',
+                    sortable: true,
+                    formatter: function (value, row, index) {
+                        var res = row.real_num - row.dz_num;
+                        return res;
+                    },
+                    footerFormatter: function (data) {
+                        var count = 0;
+                        $.each(data, function (index, item) {
+                            count += item.real_num - item.dz_num;
+                        });
+                        return count.toFixed(2);
+                    }
+                }, {
                     field: 'edit',
                     title: '对账',
                     align: 'center',
                     formatter: function (value, row, index) {
                         var result = "";
-                        result += "<input name='duizhang' type='checkbox' style='width:18px;height:18px;' value='" + row.deliver_index + "+" + row.seq_id+"' />";
+                        result += "<input name='duizhang' type='checkbox' style='width:18px;height:18px;' value='" + row.deliver_index + "+" + row.seq_id + "' />";
                         return result;
                     }
                 }]
@@ -160,7 +165,7 @@
             $.ajax({
                 type: "POST",
                 url: "/Sale/GetPickerList",
-                data: { Dui_Zhang: Dui_Zhang},
+                data: { Dui_Zhang: Dui_Zhang },
                 success: function (msg) {
                     $('#picker_list').html(msg);
 
@@ -174,8 +179,7 @@
         }
 
 
-        function duiZhang()
-        {
+        function duiZhang() {
             var saleidList = document.getElementsByName("sale_id");
             var judgeTagList = document.getElementsByName("judgeTag");
             var duinumList = document.getElementsByName("dui_num");
@@ -202,7 +206,7 @@
             var Sale_Id = saleid.join(',');
             var Dui_Num = duinum.join(',');
             var Dui_Price = duiprice.join(',');
-            if (flag==0) {
+            if (flag == 0) {
                 swal({
                     title: "是否确认对账?",
                     text: "",
@@ -277,9 +281,10 @@
             var deliver_index = $("#deliver_index").val();
             var deliver_company_head = $("#deliver_company_head").val();
             var order_name = $("#order_name").val();
+            var purchase_person = $("#purchase_person").val();
 
             var searchUrl = "/Sale/GetMoneyIndexData?start_time=" + start_time + "&end_time=" + end_time + "&deliver_index=" + deliver_index
-                + "&deliver_company_head=" + deliver_company_head + "&order_name=" + order_name;
+                + "&deliver_company_head=" + deliver_company_head + "&order_name=" + order_name + "&purchase_person=" + purchase_person;
             $("#myTable").bootstrapTable('refresh', { url: searchUrl });
         }
     </script>
@@ -355,7 +360,23 @@
                                 </div>
                                 <br />
                                 <div class="form-inline">
-
+                                    <div class="form-group">
+                                        <label>采购人员：</label>
+                                        
+                                        <select class="selectpicker" data-live-search="true" data-live-search-placeholder="搜索" id="purchase_person" name="purchase_person" style="padding:6px 50px">
+                                            <option value=""></option>
+                                            @{
+                                                if (ViewBag.contacts.Count > 0)
+                                                {
+                                                    for (int i = 0; i < ViewBag.contacts.Count; i++)
+                                                    {
+                                                        <!option value="@ViewBag.contacts[i]">@ViewBag.contacts[i]</!option>
+                                                    }
+                                                }
+                                            }
+                                        </select>
+                                        
+                                    </div>
                                     <div class="form-group">
                                         <input type="button" value="查询" class="btn btn-primary" style="width:80px" onclick="Search()" />
                                     </div>
@@ -397,24 +418,24 @@
     </div>
 
     @*<div class="card alert" id="Data1" style="margin: 30px;display:none;">
-        <table class="table" border="0" cellspacing="0" cellpadding="0">
-            <tbody>
-                <tr style="font-weight:bold">
-                    <td style="font-size:26px;text-align:center;padding:2px;border:0;" colspan="6"><span id="deliver_head">对账单</span></td>
-                </tr>
-                <tr>
-                    <td style="padding:2px;border:0;text-align:left;width:70px">对账单号：</td>
-                    <td style="padding:2px;border:0;text-align:left;width:80px" id="dz_index">@ViewBag.dz_index</td>
-                    <td style="padding:2px;border:0;"></td>
-                    <td style="padding:2px;border:0;"></td>
-                    <td style="padding:2px;border:0;text-align:right">打印日期：</td>
-                    <td style="padding:2px;border:0;text-align:right;width:120px">@(DateTime.Now.ToLocalTime().AddHours(8).ToString("yyyy-MM-dd HH:ss:mm"))</td>
-                </tr>
-            </tbody>
-        </table>
-        <div class="card-body" id="picker_list1">
-        </div>
-    </div>*@
+            <table class="table" border="0" cellspacing="0" cellpadding="0">
+                <tbody>
+                    <tr style="font-weight:bold">
+                        <td style="font-size:26px;text-align:center;padding:2px;border:0;" colspan="6"><span id="deliver_head">对账单</span></td>
+                    </tr>
+                    <tr>
+                        <td style="padding:2px;border:0;text-align:left;width:70px">对账单号：</td>
+                        <td style="padding:2px;border:0;text-align:left;width:80px" id="dz_index">@ViewBag.dz_index</td>
+                        <td style="padding:2px;border:0;"></td>
+                        <td style="padding:2px;border:0;"></td>
+                        <td style="padding:2px;border:0;text-align:right">打印日期：</td>
+                        <td style="padding:2px;border:0;text-align:right;width:120px">@(DateTime.Now.ToLocalTime().AddHours(8).ToString("yyyy-MM-dd HH:ss:mm"))</td>
+                    </tr>
+                </tbody>
+            </table>
+            <div class="card-body" id="picker_list1">
+            </div>
+        </div>*@
 </body>
 </html>
 

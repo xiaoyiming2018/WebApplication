@@ -113,9 +113,9 @@ namespace BLL
         /// 用于销售对账和结款
         /// </summary>
         /// <returns></returns>
-        public List<Sale> SelectMoneyAll(string start_time, string end_time,string deliver_index="", string deliver_company_head="", string order_name="")
+        public List<Sale> SelectMoneyAll(string start_time, string end_time,string deliver_index="", string deliver_company_head="", string order_name="",string purchase_person="")
         {
-            List<Sale> objList = SS.SelectMoneyAll(start_time, end_time, deliver_index,deliver_company_head, order_name);
+            List<Sale> objList = SS.SelectMoneyAll(start_time, end_time, deliver_index,deliver_company_head, order_name, purchase_person);
             return objList;
         }
 

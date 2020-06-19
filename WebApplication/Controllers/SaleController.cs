@@ -17,6 +17,7 @@ namespace WebApplication.Controllers
         DuiZhangManager DZM = new DuiZhangManager();
         OrderManager OM = new OrderManager();
         SettingManager SettingM = new SettingManager();
+        ContactManager CM = new ContactManager();
         /// <summary>
         /// 用户列表首页
         /// </summary>
@@ -335,10 +336,13 @@ namespace WebApplication.Controllers
             {
                 count_num = "" + num;
             }
+            List<string> contacts = CM.SelectAllContact().GroupBy(s => s.name).Select(s => s.Key).ToList();
+            ViewBag.contacts = contacts;
+
             ViewBag.dz_index = SettingM.SelectConfigList(8)[0].config_list+ DateTime.Now.ToLocalTime().AddHours(8).ToString("yyyy-MM").Replace("-", "") + count_num;
             return View();
         }
-        public IActionResult GetMoneyIndexData(string start_time, string end_time, string deliver_index, string deliver_company_head,string order_name) 
+        public IActionResult GetMoneyIndexData(string start_time, string end_time, string deliver_index, string deliver_company_head,string order_name,string purchase_person) 
         {
             ViewBag.start_time = start_time;
             ViewBag.end_time = end_time;
@@ -347,6 +351,8 @@ namespace WebApplication.Controllers
 
             ViewBag.deliver_company_head = deliver_company_head;
             ViewBag.order_name = order_name;
+
+            ViewBag.purchase_person = purchase_person;
 
             if (start_time == null)
             {
@@ -359,7 +365,7 @@ namespace WebApplication.Controllers
 
             
 
-            var objList = SM.SelectMoneyAll(start_time, end_time, deliver_index, deliver_company_head, order_name).Where(s => s.real_num > s.dz_num).ToList();
+            var objList = SM.SelectMoneyAll(start_time, end_time, deliver_index, deliver_company_head, order_name, purchase_person).Where(s => s.real_num > s.dz_num).ToList();
             return Json(objList);
         }
         /// <summary>

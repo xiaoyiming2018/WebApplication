@@ -259,7 +259,7 @@ namespace DAL
         /// </summary>
         /// <param name="name"></param>
         /// <returns></returns>
-        public List<Sale> SelectMoneyAll(string start_time, string end_time,string deliver_index, string deliver_company_head,string order_name)
+        public List<Sale> SelectMoneyAll(string start_time, string end_time,string deliver_index, string deliver_company_head,string order_name,string purchase_person)
         {
             try
             {
@@ -273,9 +273,9 @@ namespace DAL
                     "a.money_way,order_name,unit,purchase_person,a.insert_time,a.seq_id,a.money_onoff,c.tui_num,a.return_flag,a.dz_num " +
                     " from jinchen.sale_info a,jinchen.order_info b,jinchen.orderseq_info c " +
                       "where a.order_id=b.id and a.seq_id=c.seq_id and a.order_id=c.order_id and deliver_index ~*'{0}' and deliver_company_head ~*'{1}' and to_char(a.insert_time,'yyyy-MM-dd')>='{2}' and " +
-                      "to_char(a.insert_time,'yyyy-MM-dd')<='{3}' and order_name ~* '{4}' " +
+                      "to_char(a.insert_time,'yyyy-MM-dd')<='{3}' and order_name ~* '{4}' and purchase_person ~* '{5}' " +
                       "order by deliver_index desc,deliver_company_head";
-                sql = string.Format(sql, deliver_index, deliver_company_head, start_time, end_time,order_name);
+                sql = string.Format(sql, deliver_index, deliver_company_head, start_time, end_time,order_name, purchase_person);
 
                 objList = PostgreHelper.GetEntityList<Sale>(sql);
 
