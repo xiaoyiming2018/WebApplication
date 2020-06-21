@@ -190,6 +190,9 @@ namespace WebApplication.Controllers
         {
             Purchase newPurchase = purchase;
             int count1 = PM.UpdateDeliver(newPurchase);
+            if (purchase.money_way==2) {
+                purchase.status = 1;
+            }
             int count2 = PM.UpdateCommonDeliver(newPurchase);//更新公共部分
             if (count1 > 0 && count2 > 0)
             {

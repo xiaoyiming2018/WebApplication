@@ -215,8 +215,9 @@ namespace DAL
             {
                 int count = 0;
                 string sql = "update jinchen.purchase_info set category='{0}',supplier_id={1}, deliver_time='{2}', " +
-                    "money_onoff={3},money_way={4} where purchase_index='{5}'";
-                sql = string.Format(sql, obj.category, obj.supplier_id, obj.deliver_time, obj.money_onoff, obj.money_way, obj.purchase_index);
+                    "money_onoff={3},money_way={4},confirm_time='{5}',status={6} where purchase_index='{7}'";
+                sql = string.Format(sql, obj.category, obj.supplier_id, obj.deliver_time, obj.money_onoff, obj.money_way, obj.confirm_time, 
+                    obj.status,obj.purchase_index);
                 count = PostgreHelper.ExecuteNonQuery(sql);
                 return count;
 

@@ -18,7 +18,11 @@
             $(".sidebar ul li:nth-of-type(2) ul li:nth-of-type(1)").addClass("active")
             $(".sidebar ul li:nth-of-type(2) ul li:nth-of-type(2)").removeClass("active open")
 
-
+            var showflag = $("#showflag").val();
+            console.log(showflag)
+            if (showflag == 2) {
+                document.getElementById('show').style.display = 'block';
+            }
             $('#submit').click(function () {
                 var id = $('#id').val();
                 var purchase_index = $('#purchase_index').val();
@@ -28,7 +32,7 @@
 
                 var deliver_index = $('#deliver_index').val();
                 var deliver_time = $('#deliver_time').val();
-                var money_onoff = $('#money_onoff').val();
+                var confirm_time = $('#confirm_time').val();
                 var money_way = $('#money_way').val();
 
                 var material_name = $('#material_name').val();
@@ -39,7 +43,7 @@
                 var material_all_price = $('#material_all_price').val();
 
 
-                if (deliver_index == "" || deliver_time == "" || purchase_index == "" || category == "" ) {
+                if (deliver_index == "" || deliver_time == "" || purchase_index == "" || category == "") {
                     swal("信息不能为空！", "请重新填写内容", "error");
                 }
                 else if (supplier_id <= 0) {
@@ -47,6 +51,9 @@
                 }
                 else if (money_way < 1) {
                     swal("请选择结账方式！", "", "error");
+                }
+                else if (money_way == 2 && confirm_time == "") {
+                    swal("请选择结款时间！", "", "error");
                 }
                 else {
                     $.ajax({
@@ -59,7 +66,7 @@
                         data: {
                             id: id, purchase_index: purchase_index, supplier_id: supplier_id, category: category, material_name: material_name,
                             material_num: material_num, material_spec: material_spec, material_unit: material_unit, material_price: material_price,
-                            material_all_price: material_all_price, deliver_index: deliver_index, deliver_time: deliver_time, money_onoff: money_onoff, money_way: money_way
+                            material_all_price: material_all_price, deliver_index: deliver_index, deliver_time: deliver_time, confirm_time: confirm_time, money_way: money_way
                         },
                         success: function (msg) {
                             if (msg == "Success") {
@@ -80,21 +87,34 @@
         });
 
         function getProductPrice(id) {
-            var material_num = $('#material_num'+id+'').val()
-            var material_price = $('#material_price' + id +'').val()
+            var material_num = $('#material_num' + id + '').val()
+            var material_price = $('#material_price' + id + '').val()
             if (material_num >= 0 && material_price >= 0) {
                 $.ajax({
                     type: "POST",
                     url: "/Deliver/GetProductPrice",
-                    data: {id:id, material_num: material_num, material_price: material_price },
+                    data: { id: id, material_num: material_num, material_price: material_price },
                     success: function (msg) {
-                        $('#price_div'+id+'').html(msg);
+                        $('#price_div' + id + '').html(msg);
                     },
                     error: function (msg) {
                         swal("获取价格失败！", "", "error");
                     }
                 });
             }
+        }
+
+        function selectChange() {
+            var flag = $('#money_way').val();
+            //console.log(flag)
+            if (flag == 2) {
+                document.getElementById('confirm_time').value = '';
+                document.getElementById('show').style.display = "block";
+            } else {
+                document.getElementById('confirm_time').value = '2001-01-01';
+                document.getElementById('show').style.display = "none";
+            }
+
         }
     </script>
 </head>
@@ -156,7 +176,7 @@
                                                             for (int i = 0; i < objList.Count; i++)
                                                             {
                                                                 <!option value="@objList[i].id" @if (Model != null) { if (objList[i].id == Model.supplier_id) { <text> selected</text>}}>
-                                                                @objList[i].company_name
+                                                                    @objList[i].company_name
                                                                 </!option>
                                                             }
                                                         }
@@ -178,7 +198,7 @@
                                                             for (int i = 0; i < sList.Count; i++)
                                                             {
                                                                 <!option value="@sList[i].config_list" @if (Model != null) { if (sList[i].config_list == Model.category) { <text> selected</text> } }>
-                                                                @sList[i].config_list
+                                                                    @sList[i].config_list
                                                                 </!option>
                                                             }
                                                         }
@@ -205,21 +225,21 @@
                                             </div>
                                         </div>
                                         @*<div class="form-group">
-                <label for="example-input-normal" class="col-sm-4 control-label">是否结账</label>
-                <div class="col-sm-4">
-                    <select class="form-control" id="money_onoff" name="money_onoff" style="width:220px">
-                        <option value="">-请选择-</option>
-                        @{
-                            <!option value="0" @if (Model != null) { if (0 == Model.money_onoff) { <text> selected</text> } } else {<text> selected</text> }>未结账</!option>
-                            <!option value="1" @if (Model != null) { if (1 == Model.money_onoff) { <text> selected</text> } }>已结账</!option>
-                        }
-                    </select>
-                </div>
-            </div>*@
+                                                <label for="example-input-normal" class="col-sm-4 control-label">是否结账</label>
+                                                <div class="col-sm-4">
+                                                    <select class="form-control" id="money_onoff" name="money_onoff" style="width:220px">
+                                                        <option value="">-请选择-</option>
+                                                        @{
+                                                            <!option value="0" @if (Model != null) { if (0 == Model.money_onoff) { <text> selected</text> } } else {<text> selected</text> }>未结账</!option>
+                                                            <!option value="1" @if (Model != null) { if (1 == Model.money_onoff) { <text> selected</text> } }>已结账</!option>
+                                                        }
+                                                    </select>
+                                                </div>
+                                            </div>*@
                                         <div class="form-group">
                                             <label for="example-input-normal" class="col-sm-4 control-label">结账方式</label>
                                             <div class="col-sm-4">
-                                                <select class="form-control" id="money_way" name="money_way" style="width:220px">
+                                                <select class="form-control" id="money_way" name="money_way" style="width:220px" onchange="selectChange()">
                                                     <option value="">-请选择-</option>
                                                     @{
                                                         <!option value="1" @if (Model != null) { if (1 == Model.money_way) { <text> selected</text> } }>月结</!option>
@@ -230,7 +250,16 @@
                                                 </select>
                                             </div>
                                         </div>
-
+                                        <input type="hidden" id="showflag" value="@Model.money_way" class="form-control" />
+                                        <div id="show" style="display:none">
+                                            <br />
+                                            <div class="form-group">
+                                                <label for="example-input-normal" class="col-sm-4 control-label">结款时间</label>
+                                                <div class="col-sm-4">
+                                                    <input type="text" class="form-control" style="width:220px" id="confirm_time" name="confirm_time" onclick="WdatePicker({ skin: 'whyGreen',dateFmt:'yyyy-MM-dd' })" value="" />
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
                                     <br />
                                     <br />
@@ -245,21 +274,21 @@
                                                 <div class="col-sm-4">
                                                     <input type="text" class="form-control" id="material_name" name="material_name" value="@if (Model!=null) {@Model.material_name }" />
                                                     @*<select class="selectpicker" data-live-search="true" data-live-search-placeholder="搜索" id="material_name" name="material_name">
-                            <option value="">-请选择-</option>
-                            @{
-                                SettingManager MM = new SettingManager();
-                                List<Setting> mList = MM.SelectConfigList(10);
-                                if (mList.Count > 0)
-                                {
-                                    for (int i = 0; i < mList.Count; i++)
-                                    {
-                                        <!option value="@mList[i].config_list" @if (Model != null) { if (mList[i].config_list == Model.material_name) { <text> selected</text> } }>
-                                            @mList[i].config_list
-                                        </!option>
-                                    }
-                                }
-                            }
-                        </select>*@
+                                                            <option value="">-请选择-</option>
+                                                            @{
+                                                                SettingManager MM = new SettingManager();
+                                                                List<Setting> mList = MM.SelectConfigList(10);
+                                                                if (mList.Count > 0)
+                                                                {
+                                                                    for (int i = 0; i < mList.Count; i++)
+                                                                    {
+                                                                        <!option value="@mList[i].config_list" @if (Model != null) { if (mList[i].config_list == Model.material_name) { <text> selected</text> } }>
+                                                                            @mList[i].config_list
+                                                                        </!option>
+                                                                    }
+                                                                }
+                                                            }
+                                                        </select>*@
                                                 </div>
                                             </div>
 
@@ -290,7 +319,7 @@
                                                                 for (int i = 0; i < uList.Count; i++)
                                                                 {
                                                                     <!option value="@uList[i].config_list" @if (Model != null) { if (uList[i].config_list == Model.material_unit) { <text> selected</text> } }>
-                                                                    @uList[i].config_list
+                                                                        @uList[i].config_list
                                                                     </!option>
                                                                 }
                                                             }
@@ -326,7 +355,7 @@
                                         </div>
                                     </div>
                                 </div>
-                                
+
                             </div>
                         </div><!-- /# card -->
                     </div><!-- /# column -->
