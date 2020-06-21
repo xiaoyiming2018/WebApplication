@@ -156,7 +156,7 @@
                                                             for (int i = 0; i < objList.Count; i++)
                                                             {
                                                                 <!option value="@objList[i].id" @if (Model != null) { if (objList[i].id == Model.supplier_id) { <text> selected</text>}}>
-                                                                    @objList[i].company_name
+                                                                @objList[i].company_name
                                                                 </!option>
                                                             }
                                                         }
@@ -178,7 +178,7 @@
                                                             for (int i = 0; i < sList.Count; i++)
                                                             {
                                                                 <!option value="@sList[i].config_list" @if (Model != null) { if (sList[i].config_list == Model.category) { <text> selected</text> } }>
-                                                                    @sList[i].config_list
+                                                                @sList[i].config_list
                                                                 </!option>
                                                             }
                                                         }
@@ -204,18 +204,18 @@
                                                 <input type="text" class="form-control" style="width:220px" id="deliver_time" name="deliver_time" onclick="WdatePicker({ skin: 'whyGreen',dateFmt:'yyyy-MM-dd' })" value="@if (Model !=null) { @Model.deliver_time.ToString("yyyy-MM-dd")} " />
                                             </div>
                                         </div>
-                                        <div class="form-group">
-                                            <label for="example-input-normal" class="col-sm-4 control-label">是否结账</label>
-                                            <div class="col-sm-4">
-                                                <select class="form-control" id="money_onoff" name="money_onoff" style="width:220px">
-                                                    <option value="">-请选择-</option>
-                                                    @{
-                                                        <!option value="0" @if (Model != null) { if (0 == Model.money_onoff) { <text> selected</text> } } else {<text> selected</text> }>未结账</!option>
-                                                        <!option value="1" @if (Model != null) { if (1 == Model.money_onoff) { <text> selected</text> } }>已结账</!option>
-                                                    }
-                                                </select>
-                                            </div>
-                                        </div>
+                                        @*<div class="form-group">
+                <label for="example-input-normal" class="col-sm-4 control-label">是否结账</label>
+                <div class="col-sm-4">
+                    <select class="form-control" id="money_onoff" name="money_onoff" style="width:220px">
+                        <option value="">-请选择-</option>
+                        @{
+                            <!option value="0" @if (Model != null) { if (0 == Model.money_onoff) { <text> selected</text> } } else {<text> selected</text> }>未结账</!option>
+                            <!option value="1" @if (Model != null) { if (1 == Model.money_onoff) { <text> selected</text> } }>已结账</!option>
+                        }
+                    </select>
+                </div>
+            </div>*@
                                         <div class="form-group">
                                             <label for="example-input-normal" class="col-sm-4 control-label">结账方式</label>
                                             <div class="col-sm-4">
@@ -224,7 +224,7 @@
                                                     @{
                                                         <!option value="1" @if (Model != null) { if (1 == Model.money_way) { <text> selected</text> } }>月结</!option>
                                                         <!option value="2" @if (Model != null) { if (2 == Model.money_way) { <text> selected</text> } }>现金</!option>
-                                                        <!option value="3" @if (Model != null) { if (3 == Model.money_way) { <text> selected</text> } }>小额支付</!option>
+                                                        //<!option value="3" @if (Model != null) { if (3 == Model.money_way) { <text> selected</text> } }>小额支付</!option>
 
                                                     }
                                                 </select>
@@ -233,28 +233,33 @@
 
                                     </div>
                                     <br />
+                                    <br />
+                                    <hr />
+                                    <br />
+                                    <br />
                                     <div id="addTest1">
 
                                         <div class="form-inline">
                                             <div class="form-group">
                                                 <label for="example-input-normal" class="col-sm-4 control-label">物料名称</label>
                                                 <div class="col-sm-4">
-                                                    <select class="selectpicker" data-live-search="true" data-live-search-placeholder="搜索" id="material_name" name="material_name">
-                                                        <option value="">-请选择-</option>
-                                                        @{
-                                                            SettingManager MM = new SettingManager();
-                                                            List<Setting> mList = MM.SelectConfigList(10);
-                                                            if (mList.Count > 0)
-                                                            {
-                                                                for (int i = 0; i < mList.Count; i++)
-                                                                {
-                                                                    <!option value="@mList[i].config_list" @if (Model != null) { if (mList[i].config_list == Model.material_name) { <text> selected</text> } }>
-                                                                        @mList[i].config_list
-                                                                    </!option>
-                                                                }
-                                                            }
-                                                        }
-                                                    </select>
+                                                    <input type="text" class="form-control" id="material_name" name="material_name" value="@if (Model!=null) {@Model.material_name }" />
+                                                    @*<select class="selectpicker" data-live-search="true" data-live-search-placeholder="搜索" id="material_name" name="material_name">
+                            <option value="">-请选择-</option>
+                            @{
+                                SettingManager MM = new SettingManager();
+                                List<Setting> mList = MM.SelectConfigList(10);
+                                if (mList.Count > 0)
+                                {
+                                    for (int i = 0; i < mList.Count; i++)
+                                    {
+                                        <!option value="@mList[i].config_list" @if (Model != null) { if (mList[i].config_list == Model.material_name) { <text> selected</text> } }>
+                                            @mList[i].config_list
+                                        </!option>
+                                    }
+                                }
+                            }
+                        </select>*@
                                                 </div>
                                             </div>
 
@@ -314,7 +319,7 @@
                                         </div>
                                         <hr />
                                     </div>
-                         
+
                                     <div class="form-group">
                                         <div class="col-sm-offset-5">
                                             <input type="button" id="submit" name="submit" class="btn btn-primary" style=" width:12%" value="提交" />

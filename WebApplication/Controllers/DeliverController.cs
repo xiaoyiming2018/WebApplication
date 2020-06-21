@@ -22,12 +22,13 @@ namespace WebApplication.Controllers
         /// <param name="size">每页显示数量</param>
         /// <returns></returns>
         public IActionResult Index()
-        {            
+        {
             return View();
-            
+
         }
         public IActionResult GetData(string start_time, string end_time, string company_name, string purchase_index,
-            string material_name, string deliver_index, string category) {
+            string material_name, string deliver_index, string category)
+        {
             ViewBag.start_time = start_time;
             ViewBag.end_time = end_time;
 
@@ -121,10 +122,12 @@ namespace WebApplication.Controllers
             string[] material_all_price = Convert.ToString(HttpContext.Request.Form["material_all_price"]).Split(',');
             int rowLength = Convert.ToInt32(HttpContext.Request.Form["rowLength"]);
 
-            int money_onoff = Convert.ToInt32(HttpContext.Request.Form["money_onoff"]);
+            //int money_onoff = Convert.ToInt32(HttpContext.Request.Form["money_onoff"]);
             int money_way = Convert.ToInt32(HttpContext.Request.Form["money_way"]);
             DateTime deliver_time = Convert.ToDateTime(HttpContext.Request.Form["deliver_time"]);
-            string deliver_index = Convert.ToString(HttpContext.Request.Form["deliver_index"]);           
+            
+            DateTime confirm_time = Convert.ToDateTime(HttpContext.Request.Form["confirm_time"]);
+            string deliver_index = Convert.ToString(HttpContext.Request.Form["deliver_index"]);
 
             Purchase objPurchase = new Purchase();
 
@@ -134,10 +137,19 @@ namespace WebApplication.Controllers
 
             objPurchase.deliver_index = deliver_index;
             objPurchase.deliver_time = deliver_time;
-            objPurchase.money_onoff = money_onoff;
+            //objPurchase.money_onoff = money_onoff;
             objPurchase.money_way = money_way;
-            if (material_name[0] != "") {
-                for (int i = 0; i < material_name.Length; i++) {
+            if (material_name[0] != "")
+            {
+                //若为现金，则直接进入到历史
+                if (money_way == 2)
+                {
+                    objPurchase.money_onoff = 1;
+                    objPurchase.status = 1;
+                    objPurchase.confirm_time = confirm_time;
+                }
+                for (int i = 0; i < material_name.Length; i++)
+                {
                     int count = 0;
                     objPurchase.material_name = material_name[i];
                     objPurchase.material_spec = material_spec[i];
@@ -147,19 +159,22 @@ namespace WebApplication.Controllers
                     objPurchase.material_all_price = Convert.ToDouble(material_all_price[i]);
                     objPurchase.purchase_time = DateTime.Now.ToLocalTime().AddHours(8);
                     count = PM.Insert(objPurchase);
-                    if (count < 1) {
+                    if (count < 1)
+                    {
                         return Json("Fail");
                     }
                 }
                 return Json("Success");
             }
-            else {
+            else
+            {
                 return Json("Fail");
-            }           
+            }
 
         }
 
-        public IActionResult EditDetail() {
+        public IActionResult EditDetail()
+        {
             try
             {
                 int id = Convert.ToInt32(Request.Query["id"]);
@@ -171,7 +186,8 @@ namespace WebApplication.Controllers
                 throw ex;
             }
         }
-        public IActionResult EditHandleDetail(Purchase purchase) {
+        public IActionResult EditHandleDetail(Purchase purchase)
+        {
             Purchase newPurchase = purchase;
             int count1 = PM.UpdateDeliver(newPurchase);
             int count2 = PM.UpdateCommonDeliver(newPurchase);//更新公共部分
@@ -179,7 +195,8 @@ namespace WebApplication.Controllers
             {
                 return Json("Success");
             }
-            else {
+            else
+            {
                 return Json("Fail");
             }
 
@@ -228,7 +245,7 @@ namespace WebApplication.Controllers
         /// 获取材料规格
         /// </summary>
         /// <returns></returns>
-        public IActionResult GetProductPrice(int id,double material_num, double material_price)
+        public IActionResult GetProductPrice(int id, double material_num, double material_price)
         {
             ViewBag.material_all_price = material_price * material_num;
             ViewBag.id = "material_all_price" + id;
@@ -238,10 +255,11 @@ namespace WebApplication.Controllers
 
         public IActionResult SupplierIndex()
         {
-            return View();    
+            return View();
         }
         public IActionResult GetSupplierData(string start_time, string end_time, string company_name, string purchase_index,
-            string material_name, string deliver_index, string category) {
+            string material_name, string deliver_index, string category)
+        {
             ViewBag.start_time = start_time;
             ViewBag.end_time = end_time;
 
@@ -274,7 +292,7 @@ namespace WebApplication.Controllers
                 int id = Convert.ToInt32(Request.Query["id"]);
                 Purchase purchase = PM.SelectById(id);
                 int status = 0;
-                
+
                 DateTimeFormatInfo dtFormat = new DateTimeFormatInfo();
                 dtFormat.ShortDatePattern = "yyyy/M/d H:mm:ss";
                 DateTime dt = Convert.ToDateTime("0001/1/1 0:00:00", dtFormat);
@@ -282,12 +300,14 @@ namespace WebApplication.Controllers
                 if (purchase.status == 1)
                 {
                     status = 0;
+                    purchase.money_onoff = 0;
                     dt = Convert.ToDateTime("0001/1/1 0:00:00");
                 }
                 else
                 {
                     status = 1;
-                    dt= DateTime.Now.ToLocalTime().AddHours(8);
+                    purchase.money_onoff = 1;
+                    dt = Convert.ToDateTime(Request.Query["comfirm_time"]);
                 }
                 purchase.status = status;
                 purchase.confirm_time = dt;
@@ -314,7 +334,8 @@ namespace WebApplication.Controllers
         }
 
         public IActionResult GetHistoryData(string start_time, string end_time, string confirm_start_time, string confirm_end_time, string company_name, string purchase_index,
-            string material_name, string deliver_index, string category, string day, string month, string year) {
+            string material_name, string deliver_index, string category, string day, string month, string year)
+        {
             ViewBag.start_time = start_time;
             ViewBag.end_time = end_time;
 

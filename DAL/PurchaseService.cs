@@ -166,10 +166,11 @@ namespace DAL
             {
                 string sql = "INSERT INTO jinchen.purchase_info(supplier_id, purchase_index, category, material_name, " +
                     "material_spec, material_num, material_unit, material_price, material_all_price,purchase_time," +
-                    "deliver_index,deliver_time,money_onoff,money_way) " +
-                    "values({0},'{1}','{2}','{3}','{4}',{5},'{6}',{7},{8},'{9}','{10}','{11}',{12},{13}) ";
+                    "deliver_index,deliver_time,money_onoff,money_way,status,confirm_time) " +
+                    "values({0},'{1}','{2}','{3}','{4}',{5},'{6}',{7},{8},'{9}','{10}','{11}',{12},{13},{14},'{15}') ";
                 sql = string.Format(sql, obj.supplier_id, obj.purchase_index, obj.category, obj.material_name, obj.material_spec, obj.material_num,
-                    obj.material_unit, obj.material_price, obj.material_all_price, obj.purchase_time,obj.deliver_index,obj.deliver_time,obj.money_onoff,obj.money_way);
+                    obj.material_unit, obj.material_price, obj.material_all_price, obj.purchase_time,obj.deliver_index,obj.deliver_time,
+                    obj.money_onoff,obj.money_way,obj.status,obj.confirm_time);
                 int count = PostgreHelper.ExecuteNonQuery(sql);
                 return count;
             }
@@ -235,8 +236,8 @@ namespace DAL
             try
             {
                 int count = 0;
-                string sql = "update jinchen.purchase_info set status={0},confirm_time='{1}' where id={2}";
-                sql = string.Format(sql, obj.status,obj.confirm_time,obj.id);
+                string sql = "update jinchen.purchase_info set status={0},confirm_time='{1}',money_onoff={2} where id={3}";
+                sql = string.Format(sql, obj.status,obj.confirm_time,obj.money_onoff,obj.id);
                 count = PostgreHelper.ExecuteNonQuery(sql);
                 return count;
             }
