@@ -25,7 +25,7 @@ namespace DAL
                 }
                 sql = "select deliver_index,deliver_company_head,sum(real_num) as real_num,sum(deliver_all_price) as deliver_all_price,max(insert_time) as insert_time " +
                       "from jinchen.sale_info a "+
-                      "where deliver_index ~*'{0}' and deliver_company_head ~*'{1}' and to_char(insert_time,'yyyy-MM-dd')>='{2}' and to_char(insert_time,'yyyy-MM-dd')<='{3}' " +
+                      "where deliver_index ~*'{0}' and deliver_company_head ~*'{1}' and to_char(insert_time,'yyyy-MM-dd')>='{2}' and to_char(insert_time,'yyyy-MM-dd')<='{3}' and a.flag=0 " +
                       "group by deliver_index,deliver_company_head order by deliver_index desc";
                 sql = string.Format(sql, deliver_index, deliver_company_head,start_time,end_time);
 
@@ -53,7 +53,7 @@ namespace DAL
                 sql = "select a.deliver_index,a.deliver_company_head,b.address,max(money_onoff) as money_onoff," +
                     "max(money_way) as money_way,max(a.insert_time) as insert_time " +
                         "from jinchen.sale_info a,jinchen.company_info b " +
-                        "where a.deliver_index='{0}' and a.deliver_company_head=b.company_name " +
+                        "where a.deliver_index='{0}' and a.deliver_company_head=b.company_name and a.flag=0 " +
                         "group by a.deliver_index,a.deliver_company_head,b.address";
                 sql = string.Format(sql, deliver_index);
 
@@ -83,7 +83,7 @@ namespace DAL
                         "c.order_num,c.remain_num,c.unit,c.purchase_person,c.deliver_time,c.order_name,c.order_time,a.remark " +
                         "from jinchen.sale_info a,jinchen.order_info b, jinchen.orderseq_info c, jinchen.company_info d " +
                         "where a.order_id = b.id and b.id = c.order_id and a.seq_id = c.seq_id and b.customer_id = d.id and a.deliver_index= '{0}' and " +
-                        "b.order_index ~*'{1}' and c.order_name ~*'{2}' " +
+                        "b.order_index ~*'{1}' and c.order_name ~*'{2}' and a.flag=0 and c.flag=0 " +
                         "order by c.order_name";
                 sql = string.Format(sql, deliver_index, order_index, order_name);
 
@@ -109,7 +109,7 @@ namespace DAL
                 List<Sale> objList = new List<Sale>();
                 string sql = null;
                 sql = "select c.order_name,c.unit,c.purchase_person,a.real_num,a.deliver_price,a.deliver_all_price " +
-                    "from jinchen.sale_info a,jinchen.order_info b,jinchen.orderseq_info c where a.order_id=b.id and b.id=c.order_id and a.seq_id=c.seq_id " +
+                    "from jinchen.sale_info a,jinchen.order_info b,jinchen.orderseq_info c where a.order_id=b.id and b.id=c.order_id and a.seq_id=c.seq_id and a.flag=0 and c.flag=0 " +
                     "and a.deliver_index='{0}' and b.order_index='{1}'";
                 sql = string.Format(sql, deliver_index);
 
@@ -135,7 +135,7 @@ namespace DAL
                 List<Sale> objList = new List<Sale>();
                 string sql = null;
                 sql = "select * from jinchen.sale_info a,jinchen.orderseq_info b "+
-                       " where a.order_id = b.order_id and a.seq_id = b.seq_id and a.order_id ={0} "+
+                       " where a.order_id = b.order_id and a.seq_id = b.seq_id and a.order_id ={0} and a.flag=0 and b.flag=0 " +
                        " order by deliver_index";
                 sql = string.Format(sql, order_id);
 
@@ -212,7 +212,7 @@ namespace DAL
                 List<Sale> objList = new List<Sale>();
                 string sql = null;
                 sql = "select a.deliver_index " +
-                        "from jinchen.sale_info a " +
+                        "from jinchen.sale_info a where a.flag=0 " +
                         "group by a.deliver_index " +
                         "order by a.deliver_index";
                 sql = string.Format(sql);
@@ -239,7 +239,7 @@ namespace DAL
                 List<Sale> objList = new List<Sale>();
                 string sql = null;
                 sql = "select a.deliver_index " +
-                        "from jinchen.sale_info a " +
+                        "from jinchen.sale_info a where a.flag=0 " +
                         "group by a.deliver_index " +
                         "order by a.deliver_index";
                 sql = string.Format(sql);
@@ -273,7 +273,7 @@ namespace DAL
                     "a.money_way,order_name,unit,purchase_person,a.insert_time,a.seq_id,a.money_onoff,c.tui_num,a.return_flag,a.dz_num " +
                     " from jinchen.sale_info a,jinchen.order_info b,jinchen.orderseq_info c " +
                       "where a.order_id=b.id and a.seq_id=c.seq_id and a.order_id=c.order_id and deliver_index ~*'{0}' and deliver_company_head ~*'{1}' and to_char(a.insert_time,'yyyy-MM-dd')>='{2}' and " +
-                      "to_char(a.insert_time,'yyyy-MM-dd')<='{3}' and order_name ~* '{4}' and purchase_person ~* '{5}' " +
+                      "to_char(a.insert_time,'yyyy-MM-dd')<='{3}' and order_name ~* '{4}' and purchase_person ~* '{5}' and a.flag=0 and c.flag=0 " +
                       "order by deliver_index desc,deliver_company_head";
                 sql = string.Format(sql, deliver_index, deliver_company_head, start_time, end_time,order_name, purchase_person);
 
@@ -473,7 +473,7 @@ namespace DAL
         {
             try
             {
-                string sql = "delete from jinchen.sale_info where seq_id={0} and deliver_index='{1}'";
+                string sql = "update jinchen.sale_info set flag=1 where seq_id={0} and deliver_index='{1}'";
                 sql = string.Format(sql, seq_id, deliver_index);
                 int count = PostgreHelper.ExecuteNonQuery(sql);
                 return count;

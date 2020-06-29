@@ -24,6 +24,7 @@
     <tbody>
         @{
             int index = 1;
+            double money = 0;
             foreach (var item in Model)
             {
                 <tr>
@@ -42,10 +43,17 @@
                     <td>@(item.real_num-item.dz_num)</td>
                     <td style="display:none"><input type="hidden" name="judgeTag" value="@(item.real_num-item.dz_num)" /></td>
                     <td><input type="text" name="dui_num" style="width:80px;outline:none;" value="@(item.real_num-item.dz_num)" /></td>
-                    <td><input type="text" name="dui_price" style="width:80px;outline:none;" value="@item.deliver_all_price" /></td>
+                    <td><input type="text" name="dui_price" style="width:80px;outline:none;" value="@item.deliver_all_price" onchange="GetAllMoney()" /></td>
                 </tr>
                 index++;
+                money += item.deliver_all_price;
             }
+            <tr>
+                <td colspan="10">合计</td>
+                <td id="allMoney">
+                    @money
+                </td>
+            </tr>
         } 
     </tbody>
 </table>

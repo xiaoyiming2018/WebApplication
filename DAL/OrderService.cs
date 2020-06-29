@@ -26,7 +26,7 @@ namespace DAL
                 }
                 sql = "select c.id,c.company_order_index,c.order_index,b.company_name,a.order_time,a.order_name,a.deliver_time," +
                     " order_num,order_price,order_all_price,tui_num, open_num,remain_num,purchase_person,a.seq_id,a.order_picture,a.remark " +
-                    "from jinchen.orderseq_info a,jinchen.company_info b,jinchen.order_info c where a.order_id=c.id and c.customer_id=b.id and " +
+                    "from jinchen.orderseq_info a,jinchen.company_info b,jinchen.order_info c where a.order_id=c.id and c.customer_id=b.id and a.flag=0 and " +
                     " b.company_name ~* '{0}' and c.order_index ~* '{1}' and c.company_order_index ~*'{2}' and to_char(a.order_time,'yyyy-MM-dd')>='{3}' and to_char(a.order_time,'yyyy-MM-dd')<='{4}' and a.order_status={5} " +
                     " and to_char(a.deliver_time,'yyyy-MM-dd')>='{6}' and to_char(a.deliver_time,'yyyy-MM-dd')<='{7}' and purchase_person ~*'{8}' and order_name ~*'{9}' " +
                     " order by a.order_time desc,c.order_index desc,order_name";
@@ -55,7 +55,7 @@ namespace DAL
                 List<Order> objList = new List<Order>();
                 string sql = null;
                 sql = "select a.order_id,b.order_index,b.company_order_index " +
-                    "from jinchen.orderseq_info a,jinchen.order_info b where a.order_id=b.id and a.order_status={0} " +
+                    "from jinchen.orderseq_info a,jinchen.order_info b where a.order_id=b.id  and a.flag=0 and a.order_status={0} " +
                     "group by b.order_index,a.order_id,b.company_order_index order by b.order_index ";
                 sql = string.Format(sql,order_status);
 
@@ -83,7 +83,8 @@ namespace DAL
                 sql = "select a.id,a.order_index,b.company_name, c.seq_id,c.order_time,c.order_name,c.unit,c.deliver_time," +
                     "c.order_num,c.open_num,c.tui_num,c.remain_num,c.order_price,c.order_all_price,c.purchase_person,c.order_picture,c.remark " +
                     "from jinchen.order_info a,jinchen.company_info b,jinchen.orderseq_info c " +
-                    "where a.customer_id=b.id and a.id=c.order_id and a.id={0} and to_char(c.deliver_time,'yyyy-MM-dd')>='{1}' and to_char(c.deliver_time,'yyyy-MM-dd')<='{2}' and c.order_name ~* '{3}' and " +
+                    "where a.customer_id=b.id and a.id=c.order_id and a.id={0} and to_char(c.deliver_time,'yyyy-MM-dd')>='{1}' and " +
+                    "to_char(c.deliver_time,'yyyy-MM-dd')<='{2}' and c.order_name ~* '{3}' and c.flag=0 and " +
                     "c.unit ~* '{4}' order by c.order_name";
                 sql = string.Format(sql, order_id, start_time, end_time, order_name, unit);
 
@@ -113,14 +114,14 @@ namespace DAL
                     sql = "select a.id,c.order_id,a.order_index,b.company_name, c.seq_id,c.order_time,c.order_name,c.unit,c.deliver_time," +
                             "c.order_num,c.open_num,c.tui_num,c.remain_num,c.order_price,c.order_all_price,c.purchase_person,c.remark,a.company_order_index " +
                             "from jinchen.order_info a,jinchen.company_info b,jinchen.orderseq_info c " +
-                            "where a.customer_id=b.id and a.id=c.order_id and b.company_name='{0}' order by c.order_name";
+                            "where a.customer_id=b.id and a.id=c.order_id and b.company_name='{0}' and c.flag=0 order by c.order_name";
                     sql = string.Format(sql, company_name);
                 }
                 else {
                     sql = "select a.id,c.order_id,a.order_index,b.company_name, c.seq_id,c.order_time,c.order_name,c.unit,c.deliver_time," +
                         "c.order_num,c.open_num,c.tui_num,c.remain_num,c.order_price,c.order_all_price,c.purchase_person,c.remark,a.company_order_index " +
                         "from jinchen.order_info a,jinchen.company_info b,jinchen.orderseq_info c " +
-                        "where a.customer_id=b.id and a.id=c.order_id and a.id={0} and b.company_name='{1}' order by c.order_name";
+                        "where a.customer_id=b.id and a.id=c.order_id and a.id={0} and b.company_name='{1}' and c.flag=0 order by c.order_name";
                     sql = string.Format(sql, order_id, company_name);
                 }
                 
@@ -148,7 +149,7 @@ namespace DAL
                 List<Order> objList = new List<Order>();
                 string sql = null;
                 sql = "select order_index,company_order_index " +
-                    "from jinchen.order_info a group by order_index " +
+                    "from jinchen.order_info a where flag=0 group by order_index " +
                     " order by a.order_index";
                 sql = string.Format(sql);
 
@@ -174,7 +175,7 @@ namespace DAL
             {
                 Order obj = new Order();
                 string sql = null;
-                sql = "select * from jinchen.order_info a,jinchen.company_info b where a.customer_id=b.id and a.id={0}";
+                sql = "select * from jinchen.order_info a,jinchen.company_info b where a.customer_id=b.id and a.id={0} and a.flag=0 ";
                 sql = string.Format(sql, id);
 
                 obj = PostgreHelper.GetSingleEntity<Order>(sql);
@@ -198,7 +199,7 @@ namespace DAL
             {
                 List<Order> obj = new List<Order>();
                 string sql = null;
-                sql = "select * from jinchen.order_info a where a.customer_id={0}";
+                sql = "select * from jinchen.order_info a where a.customer_id={0} and flag=0";
                 sql = string.Format(sql, customer_id);
 
                 obj = PostgreHelper.GetEntityList<Order>(sql);
@@ -222,7 +223,7 @@ namespace DAL
             {
                 Order obj = new Order();
                 string sql = null;
-                sql = "select * from jinchen.order_info a where a.order_index='{0}'";
+                sql = "select * from jinchen.order_info a where a.order_index='{0}' and flag=0 ";
                 sql = string.Format(sql, order_index);
 
                 obj = PostgreHelper.GetSingleEntity<Order>(sql);
@@ -246,7 +247,7 @@ namespace DAL
             {
                 Order obj = new Order();
                 string sql = null;
-                sql = "select * from jinchen.orderseq_info a,jinchen.order_info b where a.order_id=b.id and a.seq_id={0}";
+                sql = "select * from jinchen.orderseq_info a,jinchen.order_info b where a.order_id=b.id and a.seq_id={0} and a.flag=0";
                 sql = string.Format(sql, seq_id);
 
                 obj = PostgreHelper.GetSingleEntity<Order>(sql);
@@ -428,7 +429,7 @@ namespace DAL
         {
             try
             {
-                string sql = "delete from jinchen.order_info where id={0}";
+                string sql = "update jinchen.order_info set flag=1 where id={0}";
                 sql = string.Format(sql, id);
                 int count = PostgreHelper.ExecuteNonQuery(sql);
                 return count;
@@ -448,7 +449,7 @@ namespace DAL
         {
             try
             {
-                string sql = "delete from jinchen.orderseq_info where seq_id={0}";
+                string sql = "update jinchen.orderseq_info set flag=1 where seq_id={0}";
                 sql = string.Format(sql, id);
                 int count = PostgreHelper.ExecuteNonQuery(sql);
                 return count;

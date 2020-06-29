@@ -287,6 +287,15 @@
                 + "&deliver_company_head=" + deliver_company_head + "&order_name=" + order_name + "&purchase_person=" + purchase_person;
             $("#myTable").bootstrapTable('refresh', { url: searchUrl });
         }
+
+        function GetAllMoney() {
+            var moneyList = document.getElementsByName('dui_price');
+            var allMoney = 0;
+            for (var i = 0; i < moneyList.length; i++) {
+                allMoney += parseFloat(moneyList[i].value);
+            }
+            document.getElementById('allMoney').innerText = allMoney;
+        }
     </script>
 </head>
 <body>

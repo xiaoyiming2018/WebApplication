@@ -48,7 +48,7 @@ namespace DAL
                 string sql = null;
                 sql = "SELECT * " +
                  "FROM jinchen.purchase_info a, jinchen.company_info b " +
-                   " where a.supplier_id = b.id and supplier_id={0} ";
+                   " where a.supplier_id = b.id and flag=0 and supplier_id={0} ";
                 sql = string.Format(sql, supplier_id);
 
                 objList = PostgreHelper.GetEntityList<Purchase>(sql);
@@ -103,7 +103,7 @@ namespace DAL
                 sql = "SELECT a.id, b.company_name, a.purchase_index, a.category,a.deliver_index,a.deliver_time, a.material_name, a.material_spec, " +
                 "a.material_num, a.material_unit, a.material_price, a.material_all_price,money_onoff,money_way,status,confirm_time " +
                  "FROM jinchen.purchase_info a, jinchen.company_info b " +
-                   " where a.supplier_id = b.id and a.purchase_index ~* '{0}' and b.company_name ~* '{1}' and a.material_name ~* '{2}' and " +
+                   " where a.supplier_id = b.id and a.purchase_index ~* '{0}' and b.company_name ~* '{1}' and a.material_name ~* '{2}' and flag=0 and " +
                    "a.deliver_index ~* '{3}' and a.status =0 and to_char(a.deliver_time,'yyyy-MM-dd')>='{4}' and to_char(a.deliver_time,'yyyy-MM-dd')<='{5}' and a.category ~* '{6}' " +
                    "order by a.purchase_index desc ";
                 sql = string.Format(sql, purchase_index, company_name, material_name, deliver_index, start_time, end_time, category);
@@ -137,7 +137,7 @@ namespace DAL
                 sql = "SELECT a.id, b.company_name, a.purchase_index, a.category,a.deliver_index,a.deliver_time, a.material_name, a.material_spec, " +
                 "a.material_num, a.material_unit, a.material_price, a.material_all_price,money_onoff,money_way,confirm_time " +
                  "FROM jinchen.purchase_info a, jinchen.company_info b " +
-                   " where a.supplier_id = b.id and a.purchase_index ~* '{0}' and b.company_name ~* '{1}' and a.material_name ~* '{2}' and " +
+                   " where a.supplier_id = b.id and a.purchase_index ~* '{0}' and b.company_name ~* '{1}' and a.material_name ~* '{2}' and flag=0 and " +
                    "a.deliver_index ~* '{3}' and to_char(a.deliver_time,'yyyy-MM-dd')>='{4}' and to_char(a.deliver_time,'yyyy-MM-dd')<='{5}' and a.status=1 " +
                    "and to_char(a.confirm_time,'yyyy-MM-dd')>='{6}' and to_char(a.confirm_time,'yyyy-MM-dd')<='{7}' and a.category ~* '{8}' " +
                    "order by a.purchase_index desc ";
@@ -257,7 +257,7 @@ namespace DAL
         {
             try
             {
-                string sql = "delete from jinchen.purchase_info where id={0}";
+                string sql = "update jinchen.purchase_info set flag=1 where id={0}";
                 sql = string.Format(sql, id);
                 int count = PostgreHelper.ExecuteNonQuery(sql);
                 return count;
