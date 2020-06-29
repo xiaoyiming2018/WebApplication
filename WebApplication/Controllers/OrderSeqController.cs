@@ -181,7 +181,7 @@ namespace WebApplication.Controllers
                 int seq_id = Convert.ToInt32(Request.Query["seq_id"]);
                 List<Order> orderList = OMM.SelectOrderSeqList(order_id);
 
-                List<Sale> sales = SM.SelectByOrderId(order_id);
+                List<Sale> sales = SM.SelectByOrderId(order_id).Where(s=>s.seq_id==seq_id).ToList();
                 //在删除order之前需判断一下该order是否已开送货单，若开了则提示无法删除送货单
                 if (sales.Count >= 1)
                 {
