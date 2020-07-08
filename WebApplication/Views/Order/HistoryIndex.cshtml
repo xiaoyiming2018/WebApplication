@@ -75,13 +75,15 @@
                 }, {
                     field: 'order_name',
                     title: '名称规格',
-                    align: 'center',
+                        align: 'center',
+                        width: 200,
                     sortable: true
                 }, {
                     field: 'order_num',
                     title: '数量',
                     align: 'center',
-                    sortable: true,
+                        sortable: true,
+                        width: 50,
                     footerFormatter: function (data) {
                         var count = 0;
                         $.each(data, function (index, item) {
@@ -125,7 +127,8 @@
                     field: 'tui_num',
                     title: '退单数',
                     align: 'center',
-                    sortable: true,
+                        sortable: true,
+                    width: 50,
                     formatter: function (value, row, index) {
                         return "<span style='color:red'>" + row.tui_num + "</span>"
                     },
@@ -171,7 +174,7 @@
                     title: '备注',
                     align: 'center',
                     sortable: true,
-                    width: 200
+                    width: 100
                 }]
             });
         });

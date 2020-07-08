@@ -101,6 +101,7 @@ namespace WebApplication.Controllers
                         count_num = "" + num;
                     }
                     ViewBag.deliver_index = SettingM.SelectConfigList(5)[0].config_list + DateTime.Now.ToLocalTime().AddHours(8).ToString("yyyy-MM").Replace("-", "") + count_num;
+
                     return View();
                 }
             }
@@ -241,9 +242,28 @@ namespace WebApplication.Controllers
         /// 
         /// </summary>
         /// <returns></returns>
-        public IActionResult GetOrderList(string deliver_company_head)
+        public IActionResult GetOrderList(string deliver_company_head, string purchase_person, string company_order_index)
         {
-            List<Order> order = OM.SelectOrderSeqList(0,deliver_company_head).OrderByDescending(s=>s.remain_num).ToList();
+            List<Order> order = new List<Order>();
+            if (!string.IsNullOrEmpty(purchase_person) && !string.IsNullOrEmpty(company_order_index)) {
+                order = OM.SelectOrderSeqList(0, deliver_company_head)
+                    .Where(s => s.remain_num > 0 && s.purchase_person == purchase_person && s.company_order_index == company_order_index)
+                    .OrderByDescending(s => s.order_time).ToList();
+            } else if (!string.IsNullOrEmpty(purchase_person) && string.IsNullOrEmpty(company_order_index)) {
+                order = OM.SelectOrderSeqList(0, deliver_company_head)
+                        .Where(s => s.remain_num > 0 && s.purchase_person == purchase_person)
+                        .OrderByDescending(s => s.order_time).ToList();
+            } else if (string.IsNullOrEmpty(purchase_person) && !string.IsNullOrEmpty(company_order_index)) {
+                order = OM.SelectOrderSeqList(0, deliver_company_head)
+                        .Where(s => s.remain_num > 0 && s.company_order_index == company_order_index)
+                        .OrderByDescending(s => s.order_time).ToList();
+            }
+            else {
+                order = OM.SelectOrderSeqList(0, deliver_company_head)
+                            .Where(s => s.remain_num > 0 )
+                            .OrderByDescending(s => s.order_time).ToList();
+            }
+            
             return View(order);
         }
 

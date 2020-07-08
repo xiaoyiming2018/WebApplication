@@ -174,18 +174,28 @@ namespace WebApplication.Controllers
         {
             try
             {
-                int id = Convert.ToInt32(Request.Query["id"]);
+                string[] id = Convert.ToString(Request.Query["id"]).Split(",");
+
                 int pay_type = Convert.ToInt32(Request.Query["pay_type"]);
                 string confirm_time = Convert.ToDateTime(HttpContext.Request.Form["confirm_time"]).ToString("yyyy-MM-dd HH:mm:ss");
-                int count = IM.UpdateStatus(id, confirm_time, pay_type);
-                if (count>0)
+
+                bool flag = true;
+
+                for (int i=0;i<id.Length;i++) {
+                    int count = IM.UpdateStatus(Convert.ToInt32(id[i]), confirm_time, pay_type);
+                    if (count<1) {
+                        flag = false;
+                    }
+                }
+                if (flag)
                 {
                     return Json("Success");
                 }
-                else
-                {
+                else {
                     return Json("Fail");
                 }
+
+                
             }
             catch (Exception ex)
             {

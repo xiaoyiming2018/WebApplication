@@ -14,151 +14,7 @@
             $(".sidebar ul li:nth-of-type(6)").addClass("active open")
             $(".sidebar ul li:nth-of-type(6) ul li:nth-of-type(1)").addClass("active");
 
-            $("#myTable").bootstrapTable({
-                url: '/Invoice/GetData',
-                method: 'GET',
-                theadClasses: "thead-blue",
-                pagination: true,
-                sidePagination: "client",
-                pageNumber: 1,
-                pageSize: 20,
-                pageList: [10, 20, 50],
-                undefinedText: '---',
-                paginationDetailHAlign: 'left',
-                toolbarAlign: 'right',
-                showFooter: true,
-                showExport: true, //是否显示导出
-                exportDataType: "all", //basic', 'all', 'selected'.
-                exportTypes: ['excel'],
-                exportOptions: {//导出设置
-                    fileName: '已开发票记录',//下载文件名称
-                },
-                columns: [{
-                    field: 'no',
-                    title: '编号',
-                    align: 'center',
-                    formatter: function (value, row, index) {
-                        return index + 1;
-                    },
-                    footerFormatter: function (data) {
-                        return "汇总";
-                    }
-                }, {
-                    field: 'id',
-                    title: 'id',
-                    visible: false
-                }, {
-                    field: 'company_name',
-                    title: '客户名称',
-                    align: 'center',
-                    sortable: true
-                }, {
-                        field: 'invoice_company',
-                        title: '开票公司',
-                    align: 'center',
-                    sortable: true
-                }, {
-                        field: 'invoice_index',
-                        title: '发票号',
-                    align: 'center',
-                    sortable: true
-                }, {
-                        field: 'invoice_type',
-                        title: '发票类型',
-                    align: 'center',
-                    sortable: true,
-                        formatter: function (value, row, index) {
-                            if (row.invoice_type == 0) {
-                                return "普通发票";
-                            } else {
-                                return "增值税专用发票";
-                            }
-                    }
-                }, {
-                        field: 'invoice_time',
-                        title: '开票日期',
-                    align: 'center',
-                    sortable: true,
-                    formatter: function (value, row, index) {
-                        return row.invoice_time.split('T')[0];
-                    }
-                }, {
-                        field: 'invoice_price',
-                        title: '应付金额',
-                    align: 'center',
-                        sortable: true,
-                        footerFormatter: function (data) {
-                            var count = 0;
-                            $.each(data, function (index, item) {
-                                count += item.invoice_price;
-                            });
-                            return count.toFixed(2);
-                        }
-                }, {
-                        field: 'invoice_real_price',
-                        title: '已付金额',
-                    align: 'center',
-                        sortable: true,
-                        footerFormatter: function (data) {
-                            var count = 0;
-                            $.each(data, function (index, item) {
-                                count += item.invoice_real_price;
-                            });
-                            return count.toFixed(2);
-                        }
-                }, {
-                    field: 'unnum',
-                        title: '未付金额',
-                    align: 'center',
-                        sortable: true,
-                        formatter: function (value, row, index) {
-                            var res = row.invoice_price - row.invoice_real_price;
-                            return res;
-                        },
-                        footerFormatter: function (data) {
-                            var count = 0;
-                            $.each(data, function (index, item) {
-                                count += item.invoice_price - item.invoice_real_price;
-                            });
-                            return count.toFixed(2);
-                        }
-                }, {
-                        field: 'invoice_prepay',
-                        title: '客户预付款',
-                    align: 'center',
-                        sortable: true,
-                        footerFormatter: function (data) {
-                            var count = 0;
-                            $.each(data, function (index, item) {
-                                count += item.invoice_prepay;
-                            });
-                            return count.toFixed(2);
-                        }
-                    }, {
-                        field: 'remark',
-                        title: '备注',
-                        align: 'center',
-                        sortable: true
-                    }, {
-                        field: 'edit',
-                        title: '操作',
-                        align: 'center',
-                        formatter: function (value, row, index) {
-                            var result = "";
-                            result += "<input type='button' class='btn btn-primary' onclick=\"window.location.href = '/Invoice/Edit?id=" + row.id + "'\" value='编辑' />";
-                            result += "<span style='margin:5px;'></span>";
-                            if (row.invoice_price > row.invoice_real_price) {
-                                result += "<input type='button' class='btn btn-primary' onclick='duiZhang(" + row.id + ")' value='确认付款' disabled />";
-                            } else {
-                                result += "<input type='button' class='btn btn-primary' onclick='duiZhang(" + row.id + ")' value='确认付款' />";
-                            }
-                            result += "<span style='margin:5px;'></span>";
-                            result += "<input type='button' class='btn btn-primary' onclick=\"deleteTiShi(" + row.id + ")\" value='删除' />";
-                            return result;
-                        }
-                    }
-                ]
-            });
+            
         });
 
         function Search() {
@@ -166,7 +22,7 @@
             var company_name = companyNameList.join(',');
             var invoice_index = $("#invoice_index").val();
             var invoice_company = $("#invoice_company").val();
-            
+
             var start_time = $("#start_time").val();
             var end_time = $("#end_time").val();
 
@@ -183,7 +39,7 @@
             var pay_type = $('#pay_type').val();
             var confirm_time = $('#confirm_time').val();
             var id = $('#duizhang_id').val();
-            if (pay_type == "" || confirm_time=="") {
+            if (pay_type == "" || confirm_time == "") {
                 swal("信息不能为空！", "", "error");
             }
             else {
@@ -202,7 +58,7 @@
                         if (isConfirm) {
                             $.ajax({
                                 type: "POST",
-                                url: "/Invoice/Confirm?id=" + id + "&pay_type=" + pay_type+"",
+                                url: "/Invoice/Confirm?id=" + id + "&pay_type=" + pay_type + "",
                                 beforeSend: function (xhr) {
                                     xhr.setRequestHeader("XSRF-TOKEN",
                                         $('input:hidden[name="__RequestVerificationToken"]').val());
@@ -228,8 +84,8 @@
                             swal("已取消 !", "该记录已保留 !", "error");
                         }
                     });
-                }
             }
+        }
 
         function deleteTiShi(id) {
             swal({
@@ -302,16 +158,37 @@
 
         }
 
-        function duiZhang(id)
-        {
-            $("#myModal").modal();
-            document.getElementById("duizhang_id").value = id;
+        function duiZhang() {
+            var pickList = $('#myTable').bootstrapTable('getSelections');
+            console.log(pickList)
+            if (pickList.length == 0) {
+                swal("请先选择操作的发票！", "", "error");
+                return;
+            }
+            var submitId = [];
+            var num = 0;
+            for (var i = 0; i < pickList.length; i++) {
+                if (pickList[i].invoice_price > pickList[i].invoice_real_price) {
+                    swal("金额未付全，不能确认付款！", "发票号为：" + pickList[i].invoice_index, "error");
+                    return;
+                } else {
+                    submitId.push(pickList[i].id);
+                    num++;
+                }
+            }
+            if (num == pickList.length) {
+                $("#myModal").modal();
+                console.log(submitId)
+                var id = submitId.join(',');
+                document.getElementById("duizhang_id").value = id;
+            }
+            
         }
 
     </script>
 </head>
 <body>
-    <div class="container-fluid">
+    <div id="app" class="container-fluid">
         <div class="row">
             <div class="col-lg-12 p-0">
                 <div class="page-header">
@@ -413,9 +290,10 @@
                                     </div>
                                     @if (UserManager.Current.GetLevel >= UserLevelEnum.ProductManager)
                                     {
-                                        <div class="form-group">
-                                            <input type="button" value="新增" class="btn btn-primary" style="width:80px" onclick="window.location.href = '/Invoice/Edit'" />
-                                        </div>
+                                <div class="form-group">
+                                    <input type="button" value="新增" class="btn btn-primary" style="width:80px" onclick="window.location.href = '/Invoice/Edit'" />
+                                    
+                                </div>
                                     }
 
                                 </div>
@@ -425,6 +303,10 @@
                         </div>
                         <br />
                         <div class="card-body">
+                            <div id="toolbar" class="toolbar">
+                                <button class='btn btn-primary' onclick='duiZhang()'>确认付款</button>
+                            </div>
+                            
                             <table id="myTable" class="table table-responsive table-hover ">
                             </table>
                         </div>
@@ -454,7 +336,7 @@
                     </div>
                     <div class="form-group">
                         <label for="txt_parentdepartment">付款时间</label>
-                        <input type="text" id="confirm_time" name="confirm_time" class="form-control"  onclick="WdatePicker({ skin: 'whyGreen',dateFmt:'yyyy-MM-dd' })">
+                        <input type="text" id="confirm_time" name="confirm_time" class="form-control" onclick="WdatePicker({ skin: 'whyGreen',dateFmt:'yyyy-MM-dd' })">
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -464,6 +346,168 @@
             </div>
         </div>
     </div>
+
+    <script>
+        var app = new Vue({
+            el: '#app',
+            mounted(){
+                var _self = this;
+                _self.$nextTick(function () {
+                    setTimeout(function () {
+                        _self.loadL();
+                    }, 500);
+                })
+            },
+            methods: {
+                loadL() {
+                    $("#myTable").bootstrapTable({
+                        url: '/Invoice/GetData',
+                        method: 'GET',
+                        theadClasses: "thead-blue",
+                        pagination: true,
+                        sidePagination: "client",
+                        pageNumber: 1,
+                        pageSize: 20,
+                        pageList: [10, 20, 50],
+                        undefinedText: '---',
+                        paginationDetailHAlign: 'left',
+                        toolbar: '#toolbar',
+                        showFooter: true,
+                        showExport: true, //是否显示导出
+                        exportDataType: "all", //basic', 'all', 'selected'.
+                        exportTypes: ['excel'],
+                        exportOptions: {//导出设置
+                            fileName: '已开发票记录',//下载文件名称
+                        },
+                        columns: [{
+                            checkbox: true
+
+                        }, {
+                            field: 'no',
+                            title: '编号',
+                            align: 'center',
+                            formatter: function (value, row, index) {
+                                return index + 1;
+                            },
+                            footerFormatter: function (data) {
+                                return "汇总";
+                            }
+                        }, {
+                            field: 'id',
+                            title: 'id',
+                            visible: false
+                        }, {
+                            field: 'company_name',
+                            title: '客户名称',
+                            align: 'center',
+                            sortable: true
+                        }, {
+                            field: 'invoice_company',
+                            title: '开票公司',
+                            align: 'center',
+                            sortable: true
+                        }, {
+                            field: 'invoice_index',
+                            title: '发票号',
+                            align: 'center',
+                            sortable: true
+                        }, {
+                            field: 'invoice_type',
+                            title: '发票类型',
+                            align: 'center',
+                            sortable: true,
+                            formatter: function (value, row, index) {
+                                if (row.invoice_type == 0) {
+                                    return "普通发票";
+                                } else {
+                                    return "增值税专用发票";
+                                }
+                            }
+                        }, {
+                            field: 'invoice_time',
+                            title: '开票日期',
+                            align: 'center',
+                            sortable: true,
+                            formatter: function (value, row, index) {
+                                return row.invoice_time.split('T')[0];
+                            }
+                        }, {
+                            field: 'invoice_price',
+                            title: '应付金额',
+                            align: 'center',
+                            sortable: true,
+                            footerFormatter: function (data) {
+                                var count = 0;
+                                $.each(data, function (index, item) {
+                                    count += item.invoice_price;
+                                });
+                                return count.toFixed(2);
+                            }
+                        }, {
+                            field: 'invoice_real_price',
+                            title: '已付金额',
+                            align: 'center',
+                            sortable: true,
+                            footerFormatter: function (data) {
+                                var count = 0;
+                                $.each(data, function (index, item) {
+                                    count += item.invoice_real_price;
+                                });
+                                return count.toFixed(2);
+                            }
+                        }, {
+                            field: 'unnum',
+                            title: '未付金额',
+                            align: 'center',
+                            sortable: true,
+                            formatter: function (value, row, index) {
+                                var res = row.invoice_price - row.invoice_real_price;
+                                return res;
+                            },
+                            footerFormatter: function (data) {
+                                var count = 0;
+                                $.each(data, function (index, item) {
+                                    count += item.invoice_price - item.invoice_real_price;
+                                });
+                                return count.toFixed(2);
+                            }
+                        }, {
+                            field: 'invoice_prepay',
+                            title: '客户预付款',
+                            align: 'center',
+                            sortable: true,
+                            footerFormatter: function (data) {
+                                var count = 0;
+                                $.each(data, function (index, item) {
+                                    count += item.invoice_prepay;
+                                });
+                                return count.toFixed(2);
+                            }
+                        }, {
+                            field: 'remark',
+                            title: '备注',
+                            align: 'center',
+                            sortable: true
+                        }, {
+                            field: 'edit',
+                            title: '操作',
+                            align: 'center',
+                            formatter: function (value, row, index) {
+                                var result = "";
+                                result += "<input type='button' class='btn btn-primary' onclick=\"window.location.href = '/Invoice/Edit?id=" + row.id + "'\" value='编辑' />";
+                                result += "<span style='margin:5px;'></span>";
+                                result += "<input type='button' class='btn btn-primary' onclick=\"deleteTiShi(" + row.id + ")\" value='删除' />";
+                                return result;
+                            }
+                        }
+                        ]
+                    });
+                }
+            }
+
+
+        })
+    </script>
 </body>
 </html>
 

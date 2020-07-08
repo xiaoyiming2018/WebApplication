@@ -235,7 +235,12 @@
                                     <div class="form-group">
                                         <label for="example-input-normal" class="col-sm-4 control-label">单位</label>
                                         <div class="col-sm-4">
-                                            <input type="text" class="form-control" id="unit" name="unit" value="@if (Model != null) {@Model.unit}" />
+                                            <select class="form-control" id="unit" name="unit" >
+                                                <option value="">-请选择-</option>
+                                                <!option value="pcs" @if (Model != null) { if ("pcs" == Model.unit) { <text> selected</text>}}>Pcs</!option>
+                                                <!option value="套" @if (Model != null) { if ("套" == Model.unit) { <text> selected</text>}}>套</!option>
+                                                <!option value="kg" @if (Model != null) { if ("kg" == Model.unit) { <text> selected</text>}}>kg</!option>
+                                            </select>
                                         </div>
                                     </div>
 

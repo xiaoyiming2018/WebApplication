@@ -27,9 +27,9 @@ namespace BLL
         /// </summary>
         /// <param name="name"></param>
         /// <returns></returns>
-        public List<Order> SelectOrderForDropDown(int order_status)
+        public List<Order> SelectOrderForDropDown()
         {
-            List<Order> objList = OS.SelectOrderForDropDown(order_status);
+            List<Order> objList = OS.SelectOrderForDropDown();
             return objList;
         }
 

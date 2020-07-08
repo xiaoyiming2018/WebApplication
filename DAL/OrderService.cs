@@ -48,16 +48,16 @@ namespace DAL
         /// </summary>
         /// <param name="name"></param>
         /// <returns></returns>
-        public List<Order> SelectOrderForDropDown(int order_status)
+        public List<Order> SelectOrderForDropDown()
         {
             try
             {
                 List<Order> objList = new List<Order>();
                 string sql = null;
                 sql = "select a.order_id,b.order_index,b.company_order_index " +
-                    "from jinchen.orderseq_info a,jinchen.order_info b where a.order_id=b.id  and a.flag=0 and a.order_status={0} " +
+                    "from jinchen.orderseq_info a,jinchen.order_info b where a.order_id=b.id  and a.flag=0 " +
                     "group by b.order_index,a.order_id,b.company_order_index order by b.order_index ";
-                sql = string.Format(sql,order_status);
+                sql = string.Format(sql);
 
                 objList = PostgreHelper.GetEntityList<Order>(sql);
 

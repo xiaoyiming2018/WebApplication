@@ -36,16 +36,32 @@
             $(".sidebar ul li:nth-of-type(5) ul li").removeClass()
             $(".sidebar ul li:nth-of-type(5) ul li:nth-of-type(1)").addClass("active");
 
-            $('#submit').click(function () {
+            var deliver_company_head = $('#deliver_company_head').val();
+            if (deliver_company_head!="") {
+                $.ajax({
+                    type: "POST",
+                    url: "/Sale/GetOrderList",
+                    data: { deliver_company_head: deliver_company_head },
+                    success: function (msg) {
+                        $('#order_div').html(msg);
+                    },
+                    error: function (msg) {
+                        swal("获取订单失败！", "请重新操作！", "error");
+                    }
+                });
+            }
+            
+        });
+        function Submit() {
                 var flag = 0;
                 var deliver_index = document.getElementById('deliver_index').value;
                 var deliver_company_head = document.getElementById('deliver_company_head').value;
-                
+
                 if (deliver_index == "" || deliver_company_head == "") {
                     swal("信息不能为空！", "", "error");
                 }
                 else {
-                    
+
                     var inputNum = document.getElementById('inputNum').value;
 
                     var order_idList = document.getElementsByName('order_id');
@@ -115,16 +131,20 @@
                         });
                     }
                 }
-            });
-        });
-
+            }
 
         function getOrderList() {
             var deliver_company_head = $('#deliver_company_head').val();
+            var purchase_person = $('#purchase_person').val();
+            var company_order_index = $('#company_order_index').val();
             $.ajax({
                 type: "POST",
                 url: "/Sale/GetOrderList",
-                data: { deliver_company_head:deliver_company_head },
+                data: {
+                    deliver_company_head: deliver_company_head,
+                    purchase_person: purchase_person,
+                    company_order_index: company_order_index
+                },
                 success: function (msg) {
                     $('#order_div').html(msg);
                 },
@@ -134,8 +154,33 @@
                 });
         }
 
+        function getOrderListSub() {
+            var deliver_company_head = $('#deliver_company_head').val();
+            var purchase_person = $('#purchase_person').val();
+            var company_order_index = $('#company_order_index').val();
+            if (deliver_company_head == "") {
+                swal("请先选择客户名称！", "", "error");
+            } else {
+                $.ajax({
+                    type: "POST",
+                    url: "/Sale/GetOrderList",
+                    data: {
+                        deliver_company_head: deliver_company_head,
+                        purchase_person: purchase_person,
+                        company_order_index: company_order_index
+                    },
+                    success: function (msg) {
+                        $('#order_div').html(msg);
+                    },
+                    error: function (msg) {
+                        swal("获取订单失败！", "请重新操作！", "error");
+                    }
+                });
+            } 
+        }
+
         function doPrint() {
-            
+
             var company_head = document.getElementById('company_head').value;
             if (company_head == "") {
                 swal("请选择送货公司抬头！", "", "error");
@@ -144,7 +189,7 @@
                 $("#deliver_head").html(company_head);
                 window.print();
                 return false;
-            }            
+            }
         };
 
     window.onbeforeprint = function () {
@@ -210,7 +255,7 @@
         function getProductPrice(id) {
             var real_num = $('#real_num' + id + '').val()
             var deliver_price = $('#deliver_price' + id + '').val()
-            
+
             if (real_num >= 0 && deliver_price >= 0) {
                 $.ajax({
                     type: "POST",
@@ -268,9 +313,9 @@
                                         <div class="form-group">
                                             <label for="example-input-normal" class="col-sm-4 control-label">客户名称</label>
                                             <div class="col-sm-3">
-                                                <select class="selectpicker" data-live-search="true" data-live-search-placeholder="搜索" data-size="5" 
-                                                        id="deliver_company_head" name="deliver_company_head" @if (Model != null) { <text> disabled</text>} onchange="getOrderList()" >
-                                                    <option value=""></option>
+                                                <select class="selectpicker" data-live-search="true" data-live-search-placeholder="搜索" data-size="5"
+                                                        id="deliver_company_head" name="deliver_company_head" @if (Model != null) { <text> disabled</text>} onchange="getOrderList()">
+                                                    <option value="">-请选择-</option>
                                                     @{
                                                         CompanyManager CM = new CompanyManager();
                                                         List<Company> sList = CM.SelectAll(0);
@@ -287,13 +332,54 @@
                                             </div>
                                         </div>
 
-                                        <div class="form-group" id="order_div">
+                                        <div class="form-group">
+                                            <label for="example-input-normal" class="col-sm-4 control-label">客户订单号</label>
+                                            <div class="col-sm-3">
+                                                <select class="selectpicker" data-live-search="true" data-live-search-placeholder="搜索" id="company_order_index" 
+                                                        name="company_order_index" style="padding:6px 50px" onchange="getOrderListSub()">
+                                                    <option value="">-请选择-</option>
+                                                    @{
+                                                        OrderManager OM = new OrderManager();
+                                                        List<Order> objList = OM.SelectOrderForDropDown().ToList();
+                                                        if (objList.Count > 0)
+                                                        {
+                                                            for (int i = 0; i < objList.Count; i++)
+                                                            {
+                                                                <!option value="@objList[i].company_order_index">@objList[i].company_order_index</!option>
+                                                            }
+                                                        }
+                                                    }
+                                                </select>
+                                            </div>
                                         </div>
-                                    </div>
-                                    <div class="form-group">
-                                        <label for="example-input-normal" class="col-sm-4 control-label"></label>
-                                        <div class="col-sm-4">
-                                            <input type="button" id="submit" name="submit" class="btn btn-primary" style=" width:28%" value="加入送货单" />
+
+                                        <div class="form-group">
+                                            <label for="example-input-normal" class="col-sm-4 control-label">采购人员</label>
+                                            <div class="col-sm-3">
+                                                <select class="selectpicker" data-live-search="true" data-live-search-placeholder="搜索" id="purchase_person" 
+                                                        name="purchase_person" style="padding:6px 50px" onchange="getOrderListSub()">
+                                                    <option value="">-请选择-</option>
+                                                    @{
+                                                        ContactManager ConM = new ContactManager();
+                                                        List<string> obList = ConM.SelectAllContact().GroupBy(s => s.name).Select(s => s.Key).ToList();
+                                                        if (obList.Count > 0)
+                                                        {
+                                                            for (int i = 0; i < obList.Count; i++)
+                                                            {
+                                                                <!option value="@obList[i]" @if (Model != null) { if (obList[i] == ViewBag.purchase_person) { <text> selected</text>}}>@obList[i]</!option>
+                                                            }
+                                                        }
+                                                    }
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="example-input-normal" class="col-sm-4 control-label"></label>
+                                            <div class="col-sm-4">
+                                                <input type="button" class="btn btn-primary" style=" width:28%" value="加入送货单" onclick="Submit()" />
+                                            </div>
+                                        </div>
+                                        <div class="form-group" id="order_div">
                                         </div>
                                     </div>
 
