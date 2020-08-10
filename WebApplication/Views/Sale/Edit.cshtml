@@ -32,9 +32,9 @@
         var index = 1;
         var TempArr = [];//存储option
         $(function () {
-            $(".sidebar ul li:nth-of-type(5)").addClass("active open")
-            $(".sidebar ul li:nth-of-type(5) ul li").removeClass()
-            $(".sidebar ul li:nth-of-type(5) ul li:nth-of-type(1)").addClass("active");
+            //$(".sidebar ul li:nth-of-type(5)").addClass("active open")
+            //$(".sidebar ul li:nth-of-type(5) ul li").removeClass()
+            //$(".sidebar ul li:nth-of-type(5) ul li:nth-of-type(1)").addClass("active");
 
             var deliver_company_head = $('#deliver_company_head').val();
             if (deliver_company_head!="") {
@@ -335,7 +335,7 @@
                                         <div class="form-group">
                                             <label for="example-input-normal" class="col-sm-4 control-label">客户订单号</label>
                                             <div class="col-sm-3">
-                                                <select class="selectpicker" data-live-search="true" data-live-search-placeholder="搜索" id="company_order_index" 
+                                                <select class="selectpicker" data-live-search="true" data-live-search-placeholder="搜索" id="company_order_index"
                                                         name="company_order_index" style="padding:6px 50px" onchange="getOrderListSub()">
                                                     <option value="">-请选择-</option>
                                                     @{
@@ -356,7 +356,7 @@
                                         <div class="form-group">
                                             <label for="example-input-normal" class="col-sm-4 control-label">采购人员</label>
                                             <div class="col-sm-3">
-                                                <select class="selectpicker" data-live-search="true" data-live-search-placeholder="搜索" id="purchase_person" 
+                                                <select class="selectpicker" data-live-search="true" data-live-search-placeholder="搜索" id="purchase_person"
                                                         name="purchase_person" style="padding:6px 50px" onchange="getOrderListSub()">
                                                     <option value="">-请选择-</option>
                                                     @{
@@ -416,24 +416,24 @@
                                 }
                             </div>
                             <input type="hidden" value="@ViewBag.deliver_index" id="deliver_index" name="deliver_index" />
-                            
+
                             <hr />
                             @*<form class="form-inline" action="/Sale/Edit?deliver_index=@ViewBag.deliver_index" method="post" id="myfrom">
-                                <div class="form-group">
-                                    <label>客户订单号：</label>
-                                    <input id="company_order_index" name="company_order_index" type="text" class="form-control" style="height:36px" value="@ViewBag.company_order_index" />
-                                    <label>名称规格：</label>
-                                    <input id="order_name" name="order_name" type="text" class="form-control" style="height:36px" value="@ViewBag.order_name" />
-                                </div>
-                                <div class="form-group">
-                                    <input type="submit" value="查询" class="btn btn-primary" />
-                                </div>
-                            </form>*@
+                                    <div class="form-group">
+                                        <label>客户订单号：</label>
+                                        <input id="company_order_index" name="company_order_index" type="text" class="form-control" style="height:36px" value="@ViewBag.company_order_index" />
+                                        <label>名称规格：</label>
+                                        <input id="order_name" name="order_name" type="text" class="form-control" style="height:36px" value="@ViewBag.order_name" />
+                                    </div>
+                                    <div class="form-group">
+                                        <input type="submit" value="查询" class="btn btn-primary" />
+                                    </div>
+                                </form>*@
 
                         </div>
-                    <br />
+                        <br />
                         <div class="card-body">
-                            
+
                             @if (Model != null)
                             {
                                 <table class="table table-responsive table-hover ">
@@ -499,13 +499,13 @@
                                                 allNum += item.real_num;
                                                 allmoney += item.deliver_all_price;
                                             }
-                                    <tr>
-                                        <td style="font-weight:bold" colspan="4">汇总</td>
-                                        <td style="font-weight:bold">@allNum</td>
-                                        <td></td>
-                                        <td style="font-weight:bold">@allmoney</td>
-                                        <td colspan="3"></td>
-                                    </tr>
+                                            <tr>
+                                                <td style="font-weight:bold" colspan="4">汇总</td>
+                                                <td style="font-weight:bold">@allNum</td>
+                                                <td></td>
+                                                <td style="font-weight:bold">@allmoney</td>
+                                                <td colspan="3"></td>
+                                            </tr>
                                         }
                                     </tbody>
                                 </table>
@@ -611,7 +611,20 @@
             </div>
         </div>
     }
-    
+
+    <script>
+        var app = new Vue({
+            el: '#vueApp',
+            mounted() {
+                var _self = this;
+                _self.$nextTick(function () {
+                    _self.$refs.Sale.parentNode.parentNode.classList.add("active");
+                    _self.$refs.Sale.parentNode.parentNode.classList.add("open");
+                    _self.$refs.Sale.classList.add("active");
+                })
+            }
+        })
+    </script>
 </body>
 </html >
 

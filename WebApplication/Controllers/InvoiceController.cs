@@ -20,17 +20,22 @@ namespace WebApplication.Controllers
         /// <param name="page">分页页码</param>
         /// <param name="size">每页显示数量</param>
         /// <returns></returns>
-        public IActionResult Index()
+        public IActionResult Index(string start_time, string end_time, string invoice_index, string invoice_company, string company_name,
+            string day, string month, string year)
         {
-            return View();  
-        }
-        public IActionResult GetData(string start_time, string end_time, string invoice_index,string invoice_company, string company_name,
-            string day, string month, string year) {
             ViewBag.start_time = start_time;
             ViewBag.end_time = end_time;
             ViewBag.invoice_index = invoice_index;
             ViewBag.company_name = company_name;
             ViewBag.invoice_company = invoice_company;
+            ViewBag.day = day;
+            ViewBag.month = month;
+            ViewBag.year = year;
+
+            return View();  
+        }
+        public IActionResult GetData(string start_time, string end_time, string invoice_index,string invoice_company, string company_name,
+            string day, string month, string year) {
             if (start_time == null)
             {
                 start_time = "0001-01-01";
@@ -47,19 +52,16 @@ namespace WebApplication.Controllers
             {
                 start_time = DateTime.Now.ToLocalTime().AddHours(8).ToString("yyyy-MM-dd");
                 end_time = DateTime.Now.ToLocalTime().AddHours(8).ToString("yyyy-MM-dd");
-                ViewBag.day = "1";
             }
             if (month == "1")
             {
                 start_time = dt.AddDays(-(dt.Day) + 1).ToString("yyyy-MM-dd");
                 end_time = dt2.AddDays(-dt.Day).ToString("yyyy-MM-dd");
-                ViewBag.month = "1";
             }
             if (year == "1")
             {
                 start_time = dt.AddMonths(-dt.Month + 1).AddDays(-dt.Day + 1).ToString("yyyy-MM-dd");
                 end_time = new DateTime(DateTime.Now.AddHours(8).Year, 12, 31).ToString("yyyy-MM-dd");
-                ViewBag.year = "1";
             }
             string confirm_start_time = "0001-01-01";
             string confirm_end_time = "2222-01-01";
@@ -101,6 +103,16 @@ namespace WebApplication.Controllers
                 {
                     Invoice invoice = IM.SelectById(id);
                     ViewBag.company_name = invoice.company_name;
+
+                    ViewBag.start_time = Convert.ToString(Request.Query["start_time"]);
+                    ViewBag.end_time = Convert.ToString(Request.Query["end_time"]);
+                    ViewBag.invoice_index = Convert.ToString(Request.Query["invoice_index"]);
+                    ViewBag.search_company_name = Convert.ToString(Request.Query["company_name"]);
+                    ViewBag.invoice_company = Convert.ToString(Request.Query["invoice_company"]);
+                    ViewBag.day = Convert.ToString(Request.Query["day"]);
+                    ViewBag.month = Convert.ToString(Request.Query["month"]);
+                    ViewBag.year = Convert.ToString(Request.Query["year"]);
+
                     return View(invoice);
                 }
                 else

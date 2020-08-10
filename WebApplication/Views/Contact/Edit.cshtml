@@ -10,8 +10,8 @@
 
     <script type="text/javascript">
         $(function () {
-            $(".sidebar ul li:nth-of-type(@if(ViewBag.type==0){<text>3</text>}else{<text>1</text>})").addClass("active open")
-            $(".sidebar ul li:nth-of-type(@if(ViewBag.type==0){<text>3</text>}else{<text>1</text>}) ul li:nth-of-type(1)").addClass("active")
+            @*$(".sidebar ul li:nth-of-type(@if(ViewBag.type==0){<text>3</text>}else{<text>1</text>})").addClass("active open")
+            $(".sidebar ul li:nth-of-type(@if(ViewBag.type==0){<text>3</text>}else{<text>1</text>}) ul li:nth-of-type(1)").addClass("active")*@
             $('#submit').click(function () {
                 var id = $('#id').val();
                 var name = $('#name').val();
@@ -55,7 +55,7 @@
 <body>
     <div class="container-fluid">
         <div class="row">
-            
+
             <div class="col-lg-12">
                 <div class="page-header">
                     <div class="page-title">
@@ -98,6 +98,7 @@
                         </div>
                         <div class="card-body">
                             <div class="form-horizontal">
+                                <input type="hidden" id="menuFlag" value="@ViewBag.type" />
                                 <div class="form-group">
                                     <label class="col-sm-2 control-label">公司名称：</label>
                                     <div class="col-sm-3">
@@ -147,7 +148,7 @@
                                     <div class="form-group">
                                         <label for="example-input-normal" class="col-sm-4 control-label">联系人</label>
                                         <div class="col-sm-4">
-                                            <input type="text" class="form-control" id="name" name="name" value="@if (Model != null){@Model.name}" @if (Model != null) { <text> readonly</text>}/>
+                                            <input type="text" class="form-control" id="name" name="name" value="@if (Model != null){@Model.name}" @if (Model != null) { <text> readonly</text>} />
                                         </div>
                                     </div>
 
@@ -185,6 +186,27 @@
             </div><!-- /# row -->
         </div>
     </div><!-- /# container-fluid -->
+    <script>
+        var app = new Vue({
+            el: '#vueApp',
+            mounted() {
+                var _self = this;
+                _self.$nextTick(function () {
+                    var flag = $('#menuFlag').val();
+                    if (flag == 0) {
+                        _self.$refs.Customer.parentNode.parentNode.classList.add("active");
+                        _self.$refs.Customer.parentNode.parentNode.classList.add("open");
+                        _self.$refs.Customer.classList.add("active");
+                    } else {
+                        _self.$refs.Supplier.parentNode.parentNode.classList.add("active");
+                        _self.$refs.Supplier.parentNode.parentNode.classList.add("open");
+                        _self.$refs.Supplier.classList.add("active");
+                    }
+                    
+                })
+            }
+        })
+    </script>
 </body>
 </html>
 

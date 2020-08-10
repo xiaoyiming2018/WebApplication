@@ -275,45 +275,116 @@ namespace Model.Helper
         private static List<T> ReadEntityListByReader<T>(DbDataReader reader) where T : new()
         {
             List<T> listT = new List<T>();
-            List<string> errProperties = new List<string>();
-            PropertyInfo[] propertyInfos = typeof(T).GetProperties(BindingFlags.Instance | BindingFlags.Public);
-            if (reader != null)
-            {
-                using (reader)
-                {
-                    while (reader.Read())
-                    {
-                        T inst = new T();
-                        foreach (var pi in propertyInfos)
-                        {
-                            var objValue = new object();
-                            try
-                            {
-                                if (errProperties.Count > 0 && errProperties.Contains(pi.Name))
-                                {
-                                    continue;//报错的属性忽略，直接跳过
-                                }
-                                objValue = reader[pi.Name];
-                            }
-                            catch (Exception ex)
-                            {
-                                errProperties.Add(pi.Name);//记录报错的属性
-                                continue;
-                            }
+            //获取传入的数据类型
+            Type modelType = typeof(T);
 
-                            if (objValue == DBNull.Value || objValue == null)
-                                continue;
-                            //var si = pi.GetSetMethod();
-                            //if (si == null)
-                            //    continue;
-                            pi.SetValue(inst, objValue, null);
+            //遍历DataReader对象
+            if (reader!=null) {
+                while (reader.Read())
+                {
+                    //使用与指定参数匹配最高的构造函数，来创建指定类型的实例
+                    T model = Activator.CreateInstance<T>();
+                    for (int i = 0; i < reader.FieldCount; i++)
+                    {
+                        //判断字段值是否为空或不存在的值
+                        if (!IsNullOrDBNull(reader[i]))
+                        {
+                            //匹配字段名
+                            PropertyInfo pi = modelType.GetProperty(reader.GetName(i), BindingFlags.GetProperty | BindingFlags.Public | BindingFlags.Instance | BindingFlags.IgnoreCase);
+                            if (pi != null)
+                            {
+                                //绑定实体对象中同名的字段  
+                                pi.SetValue(model, CheckType(reader[i], pi.PropertyType), null);
+                            }
                         }
-                        listT.Add(inst);
                     }
-                    reader.Close();
+                    listT.Add(model);
                 }
+                reader.Close();
             }
+            
+            //List<string> errProperties = new List<string>();
+            //PropertyInfo[] propertyInfos = typeof(T).GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.IgnoreCase);
+            //if (reader != null)
+            //{
+            //    using (reader)
+            //    {
+            //        while (reader.Read())
+            //        {
+            //            T inst = new T();
+            //            foreach (var pi in propertyInfos)
+            //            {
+            //                var objValue = new object();
+            //                try
+            //                {
+            //                    //if (errProperties.Count > 0 && errProperties.Contains(pi.Name))
+            //                    //{
+            //                    //    continue;//报错的属性忽略，直接跳过
+            //                    //}
+            //                    //objValue = reader[pi.Name];
+
+            //                }
+            //                catch (Exception ex)
+            //                {
+            //                    errProperties.Add(pi.Name);//记录报错的属性
+            //                    continue;
+            //                }
+
+            //                if (objValue == DBNull.Value || objValue == null)
+            //                    continue;
+            //                //var si = pi.GetSetMethod();
+            //                //if (si == null)
+            //                //    continue;
+            //                pi.SetValue(inst, objValue, null);
+            //            }
+            //            listT.Add(inst);
+            //        }
+            //        reader.Close();
+            //    }
+            //}
             return listT;
         }
+        /// <summary>
+        /// 对可空类型进行判断转换(*要不然会报错)
+        /// </summary>
+        /// <param name="value">DataReader字段的值</param>
+        /// <param name="conversionType">该字段的类型</param>
+        /// <returns></returns>
+        private static object CheckType(object value, Type conversionType)
+        {
+            if (conversionType.IsGenericType && conversionType.GetGenericTypeDefinition().Equals(typeof(Nullable<>)))
+            {
+                if (value == null)
+                    return null;
+                System.ComponentModel.NullableConverter nullableConverter = new System.ComponentModel.NullableConverter(conversionType);
+                conversionType = nullableConverter.UnderlyingType;
+            }
+            return Convert.ChangeType(value, conversionType);
+        }
+        /// <summary>
+        /// 判断指定对象是否是有效值
+        /// </summary>
+        /// <param name="obj"></param>
+        /// <returns></returns>
+        private static bool IsNullOrDBNull(object obj)
+        {
+            return (obj == null || (obj is DBNull)) ? true : false;
+        }
+
+        //private static bool readerExists(DbDataReader dr, string columnName)
+        //{
+        //    //dr.GetSchemaTable().DefaultView.RowFilter = "ColumnName= '" +columnName + "'";
+        //    dr.GetSchemaTable().DefaultView.RowFilter = "id=1";
+        //    string a = dr.GetSchemaTable().DefaultView.RowFilter; 
+        //    int i = dr.GetSchemaTable().DefaultView.Count;
+        //    var b = dr.GetSchemaTable().DefaultView.Table.Columns;
+
+        //    var hahaha = dr.GetSchemaTable().DefaultView;
+        //    var hahaha1111 = dr.GetSchemaTable();
+
+
+
+        //    return (dr.GetSchemaTable().DefaultView.Count > 0);
+        //}
     }
 }

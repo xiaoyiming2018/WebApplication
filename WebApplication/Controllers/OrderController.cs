@@ -21,13 +21,9 @@ namespace WebApplication.Controllers
         /// <param name="page">分页页码</param>
         /// <param name="size">每页显示数量</param>
         /// <returns></returns>
-        public IActionResult Index()
-        {            
-            return View();
-        }
-
-        public IActionResult GetData(string start_time, string end_time, string deliver_start_time, string deliver_end_time, string company_name,
-            string order_index, string company_order_index, string purchase_person, string order_name) {
+        public IActionResult Index(string start_time, string end_time, string deliver_start_time, string deliver_end_time, string company_name,
+            string order_index, string company_order_index, string purchase_person, string order_name)
+        {
             ViewBag.company_name = company_name;
             ViewBag.order_index = order_index;
             ViewBag.company_order_index = company_order_index;
@@ -38,6 +34,12 @@ namespace WebApplication.Controllers
             ViewBag.end_time = end_time;
             ViewBag.deliver_start_time = deliver_start_time;
             ViewBag.deliver_end_time = deliver_end_time;
+            return View();
+        }
+
+        public IActionResult GetData(string start_time, string end_time, string deliver_start_time, string deliver_end_time, string company_name,
+            string order_index, string company_order_index, string purchase_person, string order_name) {
+
             if (start_time == null)
             {
                 start_time = "0001-01-01";

@@ -37,6 +37,8 @@
     <script src="~/assets/js/sweetalert-dev.js"></script>
     <script src="~/assets/js/lib/sweetalert/sweetalert.min.js"></script>
     <script src="~/lib/vue/vue.min.js"></script>
+    <script src="~/lib/axios/axios.min.js"></script>
+    <script src="~/lib/echarts/echarts.js"></script>
     <script type="text/javascript" src="~/My97DatePicker/WdatePicker.js"></script>
 
 
@@ -56,147 +58,155 @@
 </head>
 
 <body>
+    <div id="vueApp">
+        <div class="sidebar sidebar-hide-to-small sidebar-shrink sidebar-gestures">
+            <div class="nano">
+                <div class="nano-content">
+                    <ul>
 
-    <div class="sidebar sidebar-hide-to-small sidebar-shrink sidebar-gestures">
-        <div class="nano">
-            <div class="nano-content">
-                <ul>
-
-                    <li>
-                        <a class="sidebar-sub-toggle"><i class="ti-truck"></i> 供应商管理 <span class="sidebar-collapse-icon ti-angle-down"></span></a>
-                        <ul>
-                            <li><a href="/Supplier/Index">供应商信息</a></li>
-                        </ul>
-                    </li>
-
-                    <li>
-                        <a class="sidebar-sub-toggle"><i class="ti-shopping-cart"></i>物料购入管理 <span class="sidebar-collapse-icon ti-angle-down"></span></a>
-                        <ul>
-                            <li><a href="/Deliver/Index">物料购入流水账</a></li>
-                            <li><a href="/Deliver/SupplierIndex">供应商结款</a></li>
-                            <li><a href="/Deliver/HistoryIndex">历史购入清单</a></li>
-                        </ul>
-                    </li>
-
-                    <li>
-                        <a class="sidebar-sub-toggle"><i class="ti-id-badge"></i> 客户管理 <span class="sidebar-collapse-icon ti-angle-down"></span></a>
-                        <ul>
-                            <li><a href="/Customer/Index">客户信息</a></li>
-
-                        </ul>
-                    </li>
-
-
-                    <li>
-                        <a class="sidebar-sub-toggle"><i class="ti-receipt"></i> 客户订单管理 <span class="sidebar-collapse-icon ti-angle-down"></span></a>
-                        <ul>
-                            <li><a href="/Order/Index">订单列表</a></li>
-                            <li><a href="/Order/HistoryIndex">历史客户订单</a></li>
-                        </ul>
-                    </li>
-
-
-
-                    <li>
-                        <a class="sidebar-sub-toggle"><i class="ti-clipboard"></i> 销售管理 <span class="sidebar-collapse-icon ti-angle-down"></span></a>
-                        <ul>
-                            <li><a href="/Sale/Index">销售送货开单</a></li>
-                            <li><a href="/SaleReturn/Index">销售退货开单</a></li>
-                            <li><a href="/SaleReturn/ReturnHistoryIndex">历史退货记录</a></li>
-                            <li><a href="/Sale/Payment">销售结款管理</a></li>
-                            <li><a href="/Sale/MoneyIndex">销售对账</a></li>
-                            <li><a href="/DuiZhang/Index">销售发票对账</a></li>
-                            <li><a href="/DuiZhang/HistoryIndex">历史对账记录</a></li>
-                        </ul>
-                    </li>
-
-                    <li>
-                        <a class="sidebar-sub-toggle"><i class="ti-money"></i> 财务管理 <span class="sidebar-collapse-icon ti-angle-down"></span></a>
-                        <ul>
-                            <li><a href="/Invoice/Index">已开发票记录</a></li>
-                            <li><a href="/Invoice/HistoryIndex">已对账发票</a></li>
-                        </ul>
-                    </li>
-
-                    <li>
-                        <a class="sidebar-sub-toggle"><i class="ti-user"></i> 用户管理 <span class="sidebar-collapse-icon ti-angle-down"></span></a>
-                        <ul>
-                            <li><a href="/User/Index">用户列表</a></li>
-                            @*<li><a href="/User/EditPassWord">修改密码</a></li>*@
-                                
-                            <li><a href="/User/Logout">退出登录</a></li>
-                        </ul>
-                    </li>
-
-                    @if (UserManager.Current.GetLevel >= UserLevelEnum.Developer)
-                    {
                         <li>
-                            <a class="sidebar-sub-toggle"><i class="ti-settings"></i> 后台配置 <span class="sidebar-collapse-icon ti-angle-down"></span></a>
+                            <a class="sidebar-sub-toggle"><i class="ti-truck"></i> 供应商管理 <span class="sidebar-collapse-icon ti-angle-down"></span></a>
                             <ul>
-                                <li><a href="/Setting/Index">常用参数配置</a></li>
+                                <li ref="Supplier"><a href="/Supplier/Index">供应商信息</a></li>
                             </ul>
                         </li>
-                    }
-                    <li>
-                        <hr />
-                        <a class="sidebar-sub-toggle" style="color:#00838F"><i class="ti-write"></i>版本号 V1.2.8</a>
+
+                        <li>
+                            <a class="sidebar-sub-toggle"><i class="ti-shopping-cart"></i>物料购入管理 <span class="sidebar-collapse-icon ti-angle-down"></span></a>
+                            <ul>
+                                <li ref="Deliver"><a href="/Deliver/Index">物料购入流水账</a></li>
+                                <li ref="SupplierIndex"><a href="/Deliver/SupplierIndex">供应商结款</a></li>
+                                <li ref="DeliverHistory"><a href="/Deliver/HistoryIndex">历史购入清单</a></li>
+                            </ul>
+                        </li>
+
+                        <li>
+                            <a class="sidebar-sub-toggle"><i class="ti-id-badge"></i> 客户管理 <span class="sidebar-collapse-icon ti-angle-down"></span></a>
+                            <ul>
+                                <li ref="Customer"><a href="/Customer/Index">客户信息</a></li>
+
+                            </ul>
+                        </li>
+
+
+                        <li>
+                            <a class="sidebar-sub-toggle"><i class="ti-receipt"></i> 客户订单管理 <span class="sidebar-collapse-icon ti-angle-down"></span></a>
+                            <ul>
+                                <li ref="Order"><a href="/Order/Index">订单列表</a></li>
+                                <li ref="OrderHistory"><a href="/Order/HistoryIndex">历史客户订单</a></li>
+                            </ul>
+                        </li>
+
+
+
+                        <li>
+                            <a class="sidebar-sub-toggle"><i class="ti-clipboard"></i> 销售管理 <span class="sidebar-collapse-icon ti-angle-down"></span></a>
+                            <ul>
+                                <li ref="Sale"><a href="/Sale/Index">销售送货开单</a></li>
+                                <li ref="SaleReturn"><a href="/SaleReturn/Index">销售退货开单</a></li>
+                                <li ref="ReturnHistoryIndex"><a href="/SaleReturn/ReturnHistoryIndex">历史退货记录</a></li>
+                                <li ref="Payment"><a href="/Sale/Payment">销售结款管理</a></li>
+                                <li ref="MoneyIndex"><a href="/Sale/MoneyIndex">销售对账</a></li>
+                                <li ref="DuiZhang"><a href="/DuiZhang/Index">销售发票对账</a></li>
+                                <li ref="DuiZhangHistory"><a href="/DuiZhang/HistoryIndex">历史对账记录</a></li>
+                            </ul>
+                        </li>
+                        <li>
+                            <a class="sidebar-sub-toggle"><i class="ti-direction-alt"></i> 库存概况 <span class="sidebar-collapse-icon ti-angle-down"></span></a>
+                            <ul>
+                                <li ref="Inventory"><a href="/Inventory/Index">库存总览</a></li>
+                                <li ref="InOut"><a href="/InOut/Index">出入库管理</a></li>
+                                <li ref="Material"><a href="/Material/Index">品名信息维护</a></li>
+                            </ul>
+                        </li>
+                        <li>
+                            <a class="sidebar-sub-toggle"><i class="ti-money"></i> 财务管理 <span class="sidebar-collapse-icon ti-angle-down"></span></a>
+                            <ul>
+                                <li ref="Invoice"><a href="/Invoice/Index">已开发票记录</a></li>
+                                <li ref="InvoiceHistory"><a href="/Invoice/HistoryIndex">已对账发票</a></li>
+                            </ul>
+                        </li>
+
+                        <li>
+                            <a class="sidebar-sub-toggle"><i class="ti-user"></i> 用户管理 <span class="sidebar-collapse-icon ti-angle-down"></span></a>
+                            <ul>
+                                <li ref="User"><a href="/User/Index">用户列表</a></li>
+                                @*<li><a href="/User/EditPassWord">修改密码</a></li>*@
+
+                                <li><a href="/User/Logout">退出登录</a></li>
+                            </ul>
+                        </li>
+
+                        @if (UserManager.Current.GetLevel >= UserLevelEnum.Developer)
+                        {
+                            <li>
+                                <a class="sidebar-sub-toggle"><i class="ti-settings"></i> 后台配置 <span class="sidebar-collapse-icon ti-angle-down"></span></a>
+                                <ul>
+                                    <li ref="Setting"><a href="/Setting/Index">常用参数配置</a></li>
+                                </ul>
+                            </li>
+                        }
+                        <li>
+                            <hr />
+                            <a class="sidebar-sub-toggle" style="color:#00838F"><i class="ti-write"></i>版本号 V1.2.8</a>
+                        </li>
+
+
+                    </ul>
+                </div>
+            </div>
+        </div><!-- /# sidebar -->
+
+        <div class="header">
+            <div class="pull-left">
+                <div class="hamburger sidebar-toggle">
+                    <span class="ti-menu"></span>
+                </div>
+            </div>
+            <div class="pull-left p-l-10"><h4 style="color:white;padding:4px 15px">麦买卖进销存管理系统</h4></div>
+
+            <div class="pull-right p-r-15">
+                <ul>
+                    <li class="header-icon dib">
+                        <img class="avatar-img" src="~/assets/images/avatar/1.jpg" alt="" /> <span class="user-avatar">@UserManager.Current.GetLoginName</span>
+                        <div class="drop-down dropdown-profile" style="width:127.86px">
+                            <div class="dropdown-content-heading">
+                                <span class="text-left">用户权限</span>
+                                <p class="trial-day">
+                                    @{
+                                        if (UserManager.Current.GetLevel == UserLevelEnum.Operator)
+                                        {
+                                            <text>普通员工</text>
+                                        }
+                                        else if (UserManager.Current.GetLevel == UserLevelEnum.ProductManager)
+                                        {
+                                            <text>生管</text>
+                                        }
+                                        else if (UserManager.Current.GetLevel == UserLevelEnum.Boss)
+                                        {
+                                            <text>老板</text>
+                                        }
+                                        else if (UserManager.Current.GetLevel == UserLevelEnum.Developer)
+                                        {
+                                            <text>系统后台人员</text>
+                                        }
+                                    }
+                                </p>
+                            </div>
+
+                        </div>
                     </li>
-
-
                 </ul>
             </div>
         </div>
-    </div><!-- /# sidebar -->
 
-    <div class="header">
-        <div class="pull-left">
-            <div class="hamburger sidebar-toggle">
-                <span class="ti-menu"></span>
-            </div>
-        </div>
-        <div class="pull-left p-l-10"><h4 style="color:white;padding:4px 15px">麦买卖进销存管理系统</h4></div>
-        
-        <div class="pull-right p-r-15">
-            <ul>
-                <li class="header-icon dib">
-                    <img class="avatar-img" src="~/assets/images/avatar/1.jpg" alt="" /> <span class="user-avatar">@UserManager.Current.GetLoginName</span>
-                    <div class="drop-down dropdown-profile" style="width:127.86px">
-                        <div class="dropdown-content-heading">
-                            <span class="text-left">用户权限</span>
-                            <p class="trial-day">
-                                @{
-                                    if (UserManager.Current.GetLevel == UserLevelEnum.Operator)
-                                    {
-                                        <text>普通员工</text>
-                                    }
-                                    else if (UserManager.Current.GetLevel == UserLevelEnum.ProductManager)
-                                    {
-                                        <text>生管</text>
-                                    }
-                                    else if (UserManager.Current.GetLevel == UserLevelEnum.Boss)
-                                    {
-                                        <text>老板</text>
-                                    }
-                                    else if (UserManager.Current.GetLevel == UserLevelEnum.Developer)
-                                    {
-                                        <text>系统后台人员</text>
-                                    }
-                                }
-                            </p>
-                        </div>
-
-                    </div>
-                </li>
-            </ul>
-        </div>
+        <!--主体部分-->
+        <div class="content-wrap">
+            <div class="main">
+                @RenderBody()
+            </div><!-- /# main -->
+        </div><!-- /# content wrap -->
     </div>
-
-    <!--主体部分-->
-    <div class="content-wrap">
-        <div class="main">
-            @RenderBody()
-        </div><!-- /# main -->
-    </div><!-- /# content wrap -->
 
     <script src="~/assets/js/lib/jquery.nanoscroller.min.js"></script><!-- nano scroller -->
     <script src="~/assets/js/lib/sidebar.js"></script><!-- sidebar -->

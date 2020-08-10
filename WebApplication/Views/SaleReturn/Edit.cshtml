@@ -12,10 +12,10 @@
     <script type="text/javascript">
         var TempArr = [];//存储option
         $(function () {
-            $(".sidebar ul li:nth-of-type(5)").addClass("active open")
-            $(".sidebar ul li:nth-of-type(5) ul li").removeClass()
+            //$(".sidebar ul li:nth-of-type(5)").addClass("active open")
+            //$(".sidebar ul li:nth-of-type(5) ul li").removeClass()
 
-            $(".sidebar ul li:nth-of-type(5) ul li:nth-of-type(@if (ViewBag.flag == null) {<text>2</text> } else { <text>3</text>} )").addClass("active")
+            //$(".sidebar ul li:nth-of-type(5) ul li:nth-of-type(@if (ViewBag.flag == null) {<text>2</text> } else { <text>3</text>} )").addClass("active")
             $('#submit').click(function () {
                 var flag = 0;
                 var deliver_index = $('#deliver_index').val()
@@ -218,18 +218,18 @@
                         <div class="card-header">
                             @if (ViewBag.flag == null)
                             {
-                            <h4>
-                                退货开单
-                            </h4>
+                                <h4>
+                                    退货开单
+                                </h4>
                             }
-                                
+
                         </div>
 
                         <div class="card-body">
 
                             <div class="basic-form">
                                 <div class="form-horizontal">
-
+                                    <input type="hidden" id="menuFlag" value="@ViewBag.flag" />
                                     <div class="form-group">
                                         <label for="example-input-normal" class="col-sm-4 control-label">退货单号</label>
                                         <div class="col-sm-4">
@@ -304,7 +304,7 @@
                                                 <th>退货金额</th>
                                             }
                                             <th>备注</th>
-                                            @if (UserManager.Current.GetLevel >= UserLevelEnum.ProductManager && ViewBag.flag==null)
+                                            @if (UserManager.Current.GetLevel >= UserLevelEnum.ProductManager && ViewBag.flag == null)
                                             {
                                                 <th>编辑</th>
                                             }
@@ -320,34 +320,34 @@
                                             int index = 1;
                                             foreach (var item in Model)
                                             {
-                                        <tr>
-                                            <td>@index</td>
-                                            <td>@item.deliver_index</td>
-                                            <td>@item.company_order_index</td>
-                                            <td>@item.order_name</td>
-                                            <td>@item.unit</td>
+                                                <tr>
+                                                    <td>@index</td>
+                                                    <td>@item.deliver_index</td>
+                                                    <td>@item.company_order_index</td>
+                                                    <td>@item.order_name</td>
+                                                    <td>@item.unit</td>
 
-                                            <td>@item.return_num</td>
-                                            @if (UserManager.Current.GetLevel >= UserLevelEnum.ProductManager)
-                                            {
-                                                <td>@item.return_price</td>
-                                                <td>@item.return_all_price</td>
-                                            }
-                                            <td>@item.remark</td>
-                                            @if (UserManager.Current.GetLevel >= UserLevelEnum.ProductManager && ViewBag.flag == null)
-                                            {
-                                                <td>
-                                                    <input type="button" class="btn btn-primary" onclick="window.location.href = '/SaleReturnSeq/Edit?return_index=@ViewBag.return_index&seq_id=@item.seq_id'" value="编辑" />
-                                                </td>
-                                            }
-                                            @if (UserManager.Current.GetLevel >= UserLevelEnum.Boss && ViewBag.flag == null)
-                                            {
-                                                <td>
-                                                    <input type="button" class="btn btn-primary" onclick="deleteTiShi('@ViewBag.return_index',@item.seq_id)" value="删除" />
-                                                </td>
-                                            }
+                                                    <td>@item.return_num</td>
+                                                    @if (UserManager.Current.GetLevel >= UserLevelEnum.ProductManager)
+                                                    {
+                                                        <td>@item.return_price</td>
+                                                        <td>@item.return_all_price</td>
+                                                    }
+                                                    <td>@item.remark</td>
+                                                    @if (UserManager.Current.GetLevel >= UserLevelEnum.ProductManager && ViewBag.flag == null)
+                                                    {
+                                                        <td>
+                                                            <input type="button" class="btn btn-primary" onclick="window.location.href = '/SaleReturnSeq/Edit?return_index=@ViewBag.return_index&seq_id=@item.seq_id'" value="编辑" />
+                                                        </td>
+                                                    }
+                                                    @if (UserManager.Current.GetLevel >= UserLevelEnum.Boss && ViewBag.flag == null)
+                                                    {
+                                                        <td>
+                                                            <input type="button" class="btn btn-primary" onclick="deleteTiShi('@ViewBag.return_index',@item.seq_id)" value="删除" />
+                                                        </td>
+                                                    }
 
-                                        </tr>
+                                                </tr>
                                                 index++;
                                             }
                                         }
@@ -362,7 +362,28 @@
         </div>
     </div><!-- /# container-fluid -->
 
+    <script>
+        var app = new Vue({
+            el: '#vueApp',
+            mounted() {
+                var _self = this;
+                _self.$nextTick(function () {
+                    var flag = $('#menuFlag').val();
+                    if (flag == undefined || flag == null || flag == "") {
+                        _self.$refs.SaleReturn.parentNode.parentNode.classList.add("active");
+                        _self.$refs.SaleReturn.parentNode.parentNode.classList.add("open");
+                        _self.$refs.SaleReturn.classList.add("active");
+                    } else {
+                        _self.$refs.ReturnHistoryIndex.parentNode.parentNode.classList.add("active");
+                        _self.$refs.ReturnHistoryIndex.parentNode.parentNode.classList.add("open");
+                        _self.$refs.ReturnHistoryIndex.classList.add("active");
+                    }
 
+                    
+                })
+            }
+        })
+    </script>
 </body>
 </html>
 

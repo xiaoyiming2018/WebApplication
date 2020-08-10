@@ -260,50 +260,50 @@
                                         int index1 = 1;
                                         foreach (var item in ViewBag.saleList)
                                         {
-                                    <tr>
-                                        <td>@index1</td>
-                                        <td>@item.deliver_index</td>
-                                        <td>@item.order_name</td>
-                                        <td>@item.order_num</td>
-                                        @if (UserManager.Current.GetLevel >= UserLevelEnum.ProductManager)
-                                        {
-                                            <td>@item.order_price</td>
-                                        }
-                                        <td>@item.real_num</td>
-                                        <td>@item.order_time.ToString("yyyy-MM-dd")</td>
-                                        <td>@item.deliver_time.ToString("yyyy-MM-dd")</td>
-                                        <td>@item.real_time.ToString("yyyy-MM-dd")</td>
-                                        @if (UserManager.Current.GetLevel >= UserLevelEnum.ProductManager)
-                                        {
-                                            <td>@item.deliver_price</td>
-                                            <td>@item.deliver_all_price</td>
-                                            @if (item.money_onoff == 0)
-                                            {
-                                                <td style="color:red">未结款</td>
-                                            }
-                                            else
-                                            {
-                                                <td style="color:green">已结款</td>
-                                            }
+                                            <tr>
+                                                <td>@index1</td>
+                                                <td>@item.deliver_index</td>
+                                                <td>@item.order_name</td>
+                                                <td>@item.order_num</td>
+                                                @if (UserManager.Current.GetLevel >= UserLevelEnum.ProductManager)
+                                                {
+                                                    <td>@item.order_price</td>
+                                                }
+                                                <td>@item.real_num</td>
+                                                <td>@item.order_time.ToString("yyyy-MM-dd")</td>
+                                                <td>@item.deliver_time.ToString("yyyy-MM-dd")</td>
+                                                <td>@item.real_time.ToString("yyyy-MM-dd")</td>
+                                                @if (UserManager.Current.GetLevel >= UserLevelEnum.ProductManager)
+                                                {
+                                                    <td>@item.deliver_price</td>
+                                                    <td>@item.deliver_all_price</td>
+                                                    @if (item.money_onoff == 0)
+                                                    {
+                                                        <td style="color:red">未结款</td>
+                                                    }
+                                                    else
+                                                    {
+                                                        <td style="color:green">已结款</td>
+                                                    }
 
-                                            @if (item.money_way == 0)
-                                            {
-                                                <td></td>
-                                            }
-                                            else if (item.money_way == 1)
-                                            {
-                                                <td>月结</td>
-                                            }
-                                            else if (item.money_way == 2)
-                                            {
-                                                <td>现金</td>
-                                            }
-                                            else
-                                            {
-                                                <td>小额支付</td>
-                                            }
-                                        }
-                                    </tr>
+                                                    @if (item.money_way == 0)
+                                                    {
+                                                        <td></td>
+                                                    }
+                                                    else if (item.money_way == 1)
+                                                    {
+                                                        <td>月结</td>
+                                                    }
+                                                    else if (item.money_way == 2)
+                                                    {
+                                                        <td>现金</td>
+                                                    }
+                                                    else
+                                                    {
+                                                        <td>小额支付</td>
+                                                    }
+                                                }
+                                            </tr>
                                             index1++;
                                         }
                                     }
@@ -359,11 +359,20 @@
                                                     <td>@item.return_num</td>
                                                     <td>@item.order_time.ToString("yyyy-MM-dd")</td>
                                                     <td>@item.real_time.ToString("yyyy-MM-dd")</td>
-                                                    <td>@if (item.return_num!=0) {@item.return_time.ToString("yyyy-MM-dd")} else { <text>-</text>}</td>
+                                                    <td>@if (item.return_num != 0)
+                                                    {@item.return_time.ToString("yyyy-MM-dd")}
+                                                else
+                                                { <text>-</text>}</td>
                                                     @if (UserManager.Current.GetLevel >= UserLevelEnum.ProductManager)
                                                     {
-                                                        <td>@if (item.return_num != 0) {@item.return_price}else { <text>-</text>}</td>
-                                                        <td>@if (item.return_num != 0) {@item.return_all_price}else { <text>-</text>}</td>
+                                                        <td>@if (item.return_num != 0)
+                                                        {@item.return_price}
+                                                    else
+                                                    { <text>-</text>}</td>
+                                                        <td>@if (item.return_num != 0)
+                                                        {@item.return_all_price}
+                                                    else
+                                                    { <text>-</text>}</td>
                                                     }
                                                 </tr>
                                                 index2++;
@@ -379,6 +388,19 @@
             </div><!-- /# row -->
         </div>
     </div><!-- /# container-fluid -->
+    <script>
+        var app = new Vue({
+            el: '#vueApp',
+            mounted() {
+                var _self = this;
+                _self.$nextTick(function () {
+                    _self.$refs.Supplier.parentNode.parentNode.classList.add("active");
+                    _self.$refs.Supplier.parentNode.parentNode.classList.add("open");
+                    _self.$refs.Supplier.classList.add("active");
+                })
+            }
+        })
+    </script>
 </body>
 </html>
 

@@ -12,8 +12,6 @@
     <script type="text/javascript">
         var TempArr = [];//存储option
         $(function () {
-            $(".sidebar ul li:nth-of-type(1)").addClass("active open")
-            $(".sidebar ul li:nth-of-type(1) ul li:nth-of-type(1)").addClass("active")
 
             document.getElementById('file').addEventListener('change', function (e) {
                 var files = e.target.files;
@@ -59,8 +57,10 @@
                         },
                         success: function (msg) {
                             if (msg == "Success") {
+                                var company_name = $('#search_company_name').val();
+                                var bank = $('#search_bank').val();
                                 swal({ title: "执行成功!", text: "", type: "success" },
-                                    function () { window.location.href = '/Supplier/Index'; });
+                                    function () { window.location.href = '/Supplier/Index?company_name=' + company_name + '&bank=' + bank; });
 
                             }
                             else if (msg == "Fail") {
@@ -327,8 +327,8 @@
                                 <input type="file" id="file" style="display:none;" accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet">
                                 @if (Model == null)
                                 {
-                                <button class="btn btn-primary" onclick="selectFile()"><i class="ti-download"></i>Excel导入</button>
-                                <button class="btn btn-primary" onclick="exportSpecialExcel()"><i class="ti-upload"></i>模板导出</button>
+                                    <button class="btn btn-primary" onclick="selectFile()"><i class="ti-download"></i>Excel导入</button>
+                                    <button class="btn btn-primary" onclick="exportSpecialExcel()"><i class="ti-upload"></i>模板导出</button>
                                 }
                             </div>
                         </div>
@@ -336,7 +336,9 @@
                         <div class="card-body">
                             <div class="basic-form">
                                 <div class="form-horizontal">
-                                    <input type="hidden" value="@if (Model != null){@Model.id}" id="id" name="id" />
+                                    <input type="hidden" value="@ViewBag.company_name" id="search_company_name" />
+                                    <input type="hidden" value="@ViewBag.bank" id="search_bank" />
+                                    <input type="hidden" value="@if (Model != null){@Model.id}" id="id" />
                                     <div class="form-group">
                                         <label for="example-input-normal" class="col-sm-4 control-label">供应商名称</label>
                                         <div class="col-sm-4">
@@ -460,6 +462,19 @@
             </div><!-- /# row -->
         </div>
     </div><!-- /# container-fluid -->
+    <script>
+        var app = new Vue({
+            el: '#vueApp',
+            mounted() {
+                var _self = this;
+                _self.$nextTick(function () {
+                    _self.$refs.Supplier.parentNode.parentNode.classList.add("active");
+                    _self.$refs.Supplier.parentNode.parentNode.classList.add("open");
+                    _self.$refs.Supplier.classList.add("active");
+                })
+            }
+        })
+    </script>
 </body>
 </html>
 

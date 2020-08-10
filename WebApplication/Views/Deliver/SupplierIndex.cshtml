@@ -11,9 +11,9 @@
 
     <script type="text/javascript">
         $(function () {
-            $(".sidebar ul li:nth-of-type(2)").addClass("active open")
-            $(".sidebar ul li:nth-of-type(2) ul li").removeClass()
-            $(".sidebar ul li:nth-of-type(2) ul li:nth-of-type(2)").addClass("active")
+            //$(".sidebar ul li:nth-of-type(2)").addClass("active open")
+            //$(".sidebar ul li:nth-of-type(2) ul li").removeClass()
+            //$(".sidebar ul li:nth-of-type(2) ul li:nth-of-type(2)").addClass("active")
             $("#myTable").bootstrapTable({
                 url: '/Deliver/GetSupplierData',
                 method: 'GET',
@@ -380,6 +380,19 @@
             </div>
         </div>
     </div>
+    <script>
+        var app = new Vue({
+            el: '#vueApp',
+            mounted() {
+                var _self = this;
+                _self.$nextTick(function () {
+                    _self.$refs.SupplierIndex.parentNode.parentNode.classList.add("active");
+                    _self.$refs.SupplierIndex.parentNode.parentNode.classList.add("open");
+                    _self.$refs.SupplierIndex.classList.add("active");
+                })
+            }
+        })
+    </script>
 </body>
 </html>
 

@@ -9,11 +9,13 @@
 
     <script type="text/javascript">
         $(function () {
-            $(".sidebar ul li:nth-of-type(3)").addClass("active open")
-            $(".sidebar ul li:nth-of-type(3) ul li:nth-of-type(1)").addClass("active");
+            //$(".sidebar ul li:nth-of-type(3)").addClass("active open")
+            //$(".sidebar ul li:nth-of-type(3) ul li:nth-of-type(1)").addClass("active");
 
+            var company_name = $('#search_company_name').val();
+            var bank = $('#search_bank').val();
             $("#myTable").bootstrapTable({
-                url: '/Customer/GetData',
+                url: '/Customer/GetData?company_name=' + company_name + '&bank=' + bank,
                 method: 'GET',
                 theadClasses: "thead-blue",
                 pagination: true,
@@ -75,7 +77,7 @@
                     align: 'center',
                         formatter: function (value, row, index) {
                             var result = "";
-                            result += "<input type='button' class='btn btn-primary' onclick=\"window.location.href = '/Customer/Edit?id=" + row.id + "'\" value='编辑' />";
+                            result += "<input type='button' class='btn btn-primary' onclick='Edit(" + row.id +")' value='编辑' />";
                             return result;
                         }
                     }, {
@@ -88,11 +90,16 @@
                             return result;
                         }
                     }]
-            });
-            
-
+            });            
             
         });
+
+        function Edit(id) {
+            var company_name = $("#company_name").val();
+            var bank = $("#bank").val();
+            window.location.href = '/Customer/Edit?id=' + id + '&company_name=' + company_name + '&bank=' + bank + '';
+        }
+
         function deleteTiShi(id) {
             swal({
                 title: "确定删除 ?",
@@ -169,18 +176,20 @@
                     <div class="card alert">
                         <div class="card-header">
                             <div class="form-inline">
+                                <input type="hidden" value="@ViewBag.company_name" id="search_company_name" />
+                                <input type="hidden" value="@ViewBag.bank" id="search_bank" />
                                 <div class="form-group">
                                     <label>公司名称：</label>
                                     <select class="selectpicker" data-live-search="true" data-live-search-placeholder="搜索" id="company_name" name="company_name" style="padding:6px 50px">
                                         <option value=""></option>
                                         @{
                                             CompanyManager CM = new CompanyManager();
-                                            List<string> objList = CM.SelectAll(type: 0).GroupBy(s=>s.company_name).Select(s=>s.Key).ToList();
+                                            List<string> objList = CM.SelectAll(type: 0).GroupBy(s => s.company_name).Select(s => s.Key).ToList();
                                             if (objList.Count > 0)
                                             {
                                                 for (int i = 0; i < objList.Count; i++)
                                                 {
-                                                    <!option value="@objList[i]" @if (Model != null) { if (objList[i] == ViewBag.company_name) { <text> selected</text>}}>@objList[i]</!option>
+                                                    <!option value="@objList[i]" @if (objList[i] == ViewBag.company_name) { <text> selected</text>}>@objList[i]</!option>
                                                 }
                                             }
                                         }
@@ -195,7 +204,7 @@
                                     </div>
                                 }
                                 <div class="form-group">
-                                    <input type="button" value="查询" class="btn btn-primary" onclick="Search()"/>
+                                    <input type="button" value="查询" class="btn btn-primary" onclick="Search()" />
                                 </div>
                                 <div class="form-group">
                                     @if (UserManager.Current.GetLevel >= UserLevelEnum.Boss)
@@ -207,7 +216,7 @@
                             </div>
                         </div>
                         <div class="card-body">
-                            <table id="myTable"  class="table table-responsive table-hover ">
+                            <table id="myTable" class="table table-responsive table-hover ">
                             </table>
                         </div>
                     </div><!-- /# card -->
@@ -215,6 +224,19 @@
             </div><!-- /# row -->
         </div>
     </div><!-- /# container-fluid -->
+    <script>
+        var app = new Vue({
+            el: '#vueApp',
+            mounted() {
+                var _self = this;
+                _self.$nextTick(function () {
+                    _self.$refs.Customer.parentNode.parentNode.classList.add("active");
+                    _self.$refs.Customer.parentNode.parentNode.classList.add("open");
+                    _self.$refs.Customer.classList.add("active");
+                })
+            }
+        })
+    </script>
 </body>
 </html>
 

@@ -12,9 +12,9 @@
 
     <script type="text/javascript">
         $(function () {
-            $(".sidebar ul li:nth-of-type(5)").addClass("active open");
-            $(".sidebar ul li:nth-of-type(5) ul li").removeClass();
-            $(".sidebar ul li:nth-of-type(5) ul li:nth-of-type(1)").addClass("active");
+            //$(".sidebar ul li:nth-of-type(5)").addClass("active open");
+            //$(".sidebar ul li:nth-of-type(5) ul li").removeClass();
+            //$(".sidebar ul li:nth-of-type(5) ul li:nth-of-type(1)").addClass("active");
 
             $("#myTable").bootstrapTable({
                 url: '/Sale/GetData',
@@ -209,7 +209,7 @@
                         <div class="card-body">
                             <table id="myTable" class="table table-responsive table-hover ">
                             </table>
-                            
+
                         </div>
                     </div><!-- /# card -->
                 </div><!-- /# column -->
@@ -217,7 +217,19 @@
         </div>
     </div><!-- /# container-fluid -->
 
-    
+    <script>
+        var app = new Vue({
+            el: '#vueApp',
+            mounted() {
+                var _self = this;
+                _self.$nextTick(function () {
+                    _self.$refs.Sale.parentNode.parentNode.classList.add("active");
+                    _self.$refs.Sale.parentNode.parentNode.classList.add("open");
+                    _self.$refs.Sale.classList.add("active");
+                })
+            }
+        })
+    </script>
 </body>
 </html>
 

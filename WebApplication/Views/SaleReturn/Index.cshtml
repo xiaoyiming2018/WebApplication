@@ -12,9 +12,9 @@
 
     <script type="text/javascript">
         $(function () {
-            $(".sidebar ul li:nth-of-type(5)").addClass("active open")
-            $(".sidebar ul li:nth-of-type(5) ul li").removeClass()
-            $(".sidebar ul li:nth-of-type(5) ul li:nth-of-type(2)").addClass("active");
+            //$(".sidebar ul li:nth-of-type(5)").addClass("active open")
+            //$(".sidebar ul li:nth-of-type(5) ul li").removeClass()
+            //$(".sidebar ul li:nth-of-type(5) ul li:nth-of-type(2)").addClass("active");
             $("#myTable").bootstrapTable({
                 url: '/SaleReturn/GetData',
                 method: 'GET',
@@ -211,7 +211,7 @@
                                             <option value=""></option>
                                             @{
                                                 SaleReturnManager SM = new SaleReturnManager();
-                                                List<string> saleList = SM.SelectAll(0, "2001-01-01", "2222-01-01").GroupBy(s=>s.return_index).Select(s=>s.Key).ToList();
+                                                List<string> saleList = SM.SelectAll(0, "2001-01-01", "2222-01-01").GroupBy(s => s.return_index).Select(s => s.Key).ToList();
                                                 if (saleList.Count > 0)
                                                 {
                                                     for (int i = 0; i < saleList.Count; i++)
@@ -261,6 +261,19 @@
             </div><!-- /# row -->
         </div>
     </div><!-- /# container-fluid -->
+    <script>
+        var app = new Vue({
+            el: '#vueApp',
+            mounted() {
+                var _self = this;
+                _self.$nextTick(function () {
+                    _self.$refs.SaleReturn.parentNode.parentNode.classList.add("active");
+                    _self.$refs.SaleReturn.parentNode.parentNode.classList.add("open");
+                    _self.$refs.SaleReturn.classList.add("active");
+                })
+            }
+        })
+    </script>
 </body>
 </html>
 

@@ -25,13 +25,14 @@ namespace WebApplication.Controllers
         /// <param name="pageindex"></param>
         /// <param name="pagesize"></param>
         /// <returns>返回查询结果</returns>
-        public IActionResult Index()
+        public IActionResult Index(string company_name, string bank)
         {
-            return View();
-        }
-        public IActionResult GetData(string company_name, string bank) {
             ViewBag.company_name = company_name;
             ViewBag.bank = bank;
+            return View();
+        }
+        public IActionResult GetData(string company_name, string bank)
+        {
             var objList = UM.SelectAll(type: 1, company_name: company_name, bank: bank);
             return Json(objList);
         }
@@ -48,6 +49,8 @@ namespace WebApplication.Controllers
                 if (id > 0)
                 {
                     var obj = UM.SelectSingle(id);
+                    ViewBag.company_name = Convert.ToString(Request.Query["company_name"]);
+                    ViewBag.bank = Convert.ToString(Request.Query["bank"]);
                     return View(obj);
                 }
                 else
@@ -87,7 +90,7 @@ namespace WebApplication.Controllers
             {
                 id = Convert.ToInt32(HttpContext.Request.Form["id"]);
             }
-            Company obj = UM.SelectSingleByName(company_name,1);
+            Company obj = UM.SelectSingleByName(company_name, 1);
 
             if (id <= 0)
             {
@@ -135,7 +138,7 @@ namespace WebApplication.Controllers
 
                     if (count > 0)
                     {
-                        Company res = UM.SelectSingleByName(company_name,1);
+                        Company res = UM.SelectSingleByName(company_name, 1);
                         Contact res1 = new Contact();
                         res1.customer_id = res.id;
                         res1.name = name;
@@ -199,7 +202,7 @@ namespace WebApplication.Controllers
                     objCompany.bank = res[5];
                     objCompany.company_type = 1;
 
-                    Company obj = UM.SelectSingleByName(res[1],1);
+                    Company obj = UM.SelectSingleByName(res[1], 1);
                     if (obj != null)
                     {
                         return Json(obj.company_name);
@@ -213,7 +216,7 @@ namespace WebApplication.Controllers
                     }
                     else
                     {
-                        Company company = UM.SelectSingleByName(res[1],1);
+                        Company company = UM.SelectSingleByName(res[1], 1);
                         Contact contact = new Contact();
                         contact.customer_id = company.id;
                         if (res[6] == "")
@@ -229,7 +232,7 @@ namespace WebApplication.Controllers
                 }
                 else
                 {
-                    Company company = UM.SelectSingleByName(company_name,1);
+                    Company company = UM.SelectSingleByName(company_name, 1);
                     Contact contact = new Contact();
 
                     contact.customer_id = company.id;
@@ -265,7 +268,7 @@ namespace WebApplication.Controllers
             {
                 int id = Convert.ToInt32(Request.Query["id"]);//此id即为contact中的customer_id
                 List<Purchase> purchases = PM.SelectBySupplierId(id);//supplier_id即为company_info 中的id
-                if (purchases.Count>0)
+                if (purchases.Count > 0)
                 {
                     return Json("Existence");
                 }
@@ -283,7 +286,7 @@ namespace WebApplication.Controllers
                     }
                 }
 
-                
+
             }
             catch (Exception ex)
             {

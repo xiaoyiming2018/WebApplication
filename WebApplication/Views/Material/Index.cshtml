@@ -1,0 +1,402 @@
+﻿@{
+    @model IList<Model.Material>
+    @using Model;
+    @using BLL;
+
+}
+
+<script type="text/javascript">
+
+    function Edit(id, material_name, price, picture) {
+        $("#id_edit").val(id);
+        $("#material_name_edit").val(material_name);
+        $("#price_edit").val(price);
+        $("#picture_edit").val(picture);
+    }
+
+    function confirmEdit() {
+        var id = $('#id_edit').val();
+        var material_name = $('#material_name_edit').val();
+        var price = $('#price_edit').val();
+        var picture = $('#picture_edit').val();
+        $.ajax({
+                type: "POST",
+                url: "/Material/InsertData",
+                beforeSend: function (xhr) {
+                    xhr.setRequestHeader("XSRF-TOKEN",
+                        $('input:hidden[name="__RequestVerificationToken"]').val());
+                },
+                data: {
+                    id: id, material_name: material_name, price: price, picture: picture
+                },
+                success: function (msg) {
+                    if (msg == "Success") {
+                        swal("编辑成功 !", "", "success");
+                        //console.log($(".search-input").val());
+                        $("#myTable").bootstrapTable('refresh', { url: "/Material/GetData" });
+                    } else {
+                        swal("添加失败 !", "", "error");
+                    }
+                },
+                error: function (msg) {
+                    swal("数据获取失败 !", "该记录已保留 !", "error");
+                }
+            });
+    }
+
+    function confirmInsert() {  
+        var material_name = $('#material_name').val();
+        var price = $('#price').val();
+        var picture = $('#picture').val();
+        if (material_name == "" || price == "") {
+            swal("信息不能为空！", "", "error");
+        }
+        else {
+            $.ajax({
+                type: "POST",
+                url: "/Material/InsertData",
+                beforeSend: function (xhr) {
+                    xhr.setRequestHeader("XSRF-TOKEN",
+                        $('input:hidden[name="__RequestVerificationToken"]').val());
+                },
+                data: {
+                   id:0, material_name: material_name, price: price, picture: picture
+                },
+                success: function (msg) {
+                    if (msg == "Success") {
+                        swal("添加成功 !", "", "success");
+                        console.log($(".search-input").val());
+                        $("#myTable").bootstrapTable('refresh', { url: "/Material/GetData" });
+                    }
+                    else if (msg == "Existence") {
+                        swal("提交的名品已存在 !", "请重新填写品名", "error");
+                    } else {
+                        swal("添加失败 !", "", "error");
+                    }
+                },
+                error: function (msg) {
+                    swal("数据获取失败 !", "该记录已保留 !", "error");
+                }
+            });
+
+        }
+    }
+
+    function deleteTiShi() {
+        var mySelect = $("#myTable").bootstrapTable("getSelections");
+        if (mySelect.length < 1) {
+            swal("执行失败 !", "请先选择要删除的数据 !", "error");
+        } else {
+            swal({
+                title: "确定删除 ?",
+                text: "删除后将无法恢复 !",
+                type: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#DD6B55",
+                confirmButtonText: "删除",
+                cancelButtonText: "取消",
+                closeOnConfirm: false,//true表示不需要点击确认,fasle需要点击确认后再关闭对话框
+                closeOnCancel: false //true表示不需要点击确认,fasle需要点击确认后再关闭对话框
+            },
+                function (isConfirm) {
+                    if (isConfirm) {
+                        var delList = new Array();
+                        for (let i = 0; i < mySelect.length; i++) {
+                            delList.push(mySelect[i].id);
+                        }
+                        //var delId = delList.join(',');
+                        $.ajax({
+                            type: "POST",
+                            url: "/Material/Del",
+                            beforeSend: function (xhr) {
+                                xhr.setRequestHeader("XSRF-TOKEN",
+                                    $('input:hidden[name="__RequestVerificationToken"]').val());
+                            },
+                            data: {
+                                delList: delList
+                            },
+                            success: function (msg) {
+                                if (msg == "Success") {
+                                    swal("已删除 !","该条记录已删除 !",  "success" ),
+                                    $("#myTable").bootstrapTable('refresh', { url: "/Material/GetData" });
+                                }
+                                else {
+                                    swal("执行失败 !", "该记录已保留 !", "error");
+                                }
+                            },
+                            error: function (msg) {
+                                swal("数据获取失败 !", "该记录已保留 !", "error");
+                            }
+                        });
+                    }
+                    else {
+                        swal("已取消 !", "该记录已保留 !", "error");
+                    }
+                });
+        }
+
+    }
+
+    function upload(flag) {
+        var fileUpload = $("#files" + flag + "").get(0);
+        var files = fileUpload.files;
+        var data = new FormData();
+        for (var i = 0; i < files.length; i++) {
+            data.append(files[i].name, files[i]);
+        }
+        if (files.length <= 0) {
+            swal("请先上传再提交！", "", "error");
+        }
+        else {
+            $.ajax({
+                type: "POST",
+                url: "/api/File",
+                contentType: false,
+                processData: false,
+                data: data,
+                success: function (data) {
+                    if (data == "Fail") {
+                        swal("上传文件有误！", "上传文件只支持pdf文档", "error");
+                    }
+                    else {
+                        if (flag == 1) {
+                            var filecode = document.getElementById("picture");
+                            filecode.value = data;
+                        } else {
+                            var filecode = document.getElementById("picture_edit");
+                            filecode.value = data;
+                        }
+                        
+                        swal("上传成功！", "", "success");
+                    }
+
+                },
+                error: function (data) {
+                    swal("上传失败！", "" + data + "", "error");
+
+                }
+            });
+        }
+    }
+
+    function insertAction() {
+        $("#material_name").val("");
+        $("#price").val("");
+        $("#picture").val("");
+    }
+</script>
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-lg-12 p-0">
+            <div class="page-header">
+                <div class="page-title">
+                    <ol class="breadcrumb text-left">
+                        <li><a href="/Supplier/Index">主页</a></li>
+                        <li><a href="/Inventory/Index">库存概况</a></li>
+                        <li class="active">品名信息维护</li>
+                    </ol>
+                </div>
+            </div>
+        </div><!-- /# column -->
+    </div><!-- /# row -->
+    <div class="main-content">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="card alert">
+                    @*<div class="card-header">
+                            <div class="form-horizontal">
+                                <div class="form-inline">
+                                    <div class="form-group">
+                                        <label>品名：</label>
+                                        <input type="text" class="form-control" v-model="material_name"  />
+                                    </div>
+                                </div>
+                                <br />
+                            </div>
+
+                        </div>
+                        <br />*@
+                    <div class="card-body">
+                        <div id="toolbar" class="toolbar">
+                            <button class="btn btn-primary" data-toggle="modal" data-target="#insertData" onclick="insertAction()">新增</button>
+                            <button class="btn btn-primary" onclick="deleteTiShi()">删除</button>
+                        </div>
+
+                        <table id="myTable" class="table table-responsive table-hover ">
+                        </table>
+                    </div>
+                </div><!-- /# card -->
+            </div><!-- /# column -->
+        </div><!-- /# row -->
+    </div>
+</div><!-- /# container-fluid -->
+
+<div class="modal fade" id="insertData" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document" style="width:30%">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="myModalLabel">新增品名</h4>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="">品名</label>
+                    <input type="text" id="material_name" name="material_name" class="form-control">
+                </div>
+                <div class="form-group">
+                    <label for="">单价</label>
+                    <input type="text" id="price" name="price" class="form-control">
+                </div>
+                <div class="form-group">
+                    <label for="">图纸</label>
+                    <div class="">
+                        <input type="file" id="files1" name="files1" placeholder="file" style="padding-top:12px" />
+                        <input type="hidden" id="picture" name="picture" value="" />
+                        <input type="button" id="btn_fileUpload" name="btn_fileUpload" class="btn btn-primary" value="上传" onclick="upload(1)" />
+                    </div>
+
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                <button type="button" id="btn_submit" class="btn btn-primary" data-dismiss="modal" onclick="confirmInsert()">确认</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="editData" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document" style="width:30%">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="myModalLabel">编辑品名</h4>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="id_edit" />
+                <div class="form-group">
+                    <label for="">品名</label>
+                    <input type="text" id="material_name_edit" name="material_name_edit" class="form-control" disabled>
+                </div>
+                <div class="form-group">
+                    <label for="">单价</label>
+                    <input type="text" id="price_edit" name="price_edit" class="form-control">
+                </div>
+                <div class="form-group">
+                    <label for="">图纸</label>
+                    <div class="">
+                        <input type="file" id="files2" name="files2" placeholder="file" style="padding-top:12px" />
+                        <input type="hidden" id="picture_edit" name="picture_edit" value="" />
+                        <input type="button" class="btn btn-primary" value="上传" onclick="upload(2)" />
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                <button type="button" id="btn_submit" class="btn btn-primary" data-dismiss="modal" onclick="confirmEdit()">确认</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    var app = new Vue({
+        el: '#vueApp',
+        data: {
+            material_name: ''
+        },
+        mounted() {
+            var _self = this;
+            _self.$nextTick(function () {
+                _self.$refs.Material.parentNode.parentNode.classList.add("active");
+                _self.$refs.Material.parentNode.parentNode.classList.add("open");
+                _self.$refs.Material.classList.add("active");
+                _self.LoadL();
+            })
+        },
+        methods: {
+            LoadL() {
+                $("#myTable").bootstrapTable({
+                    url: '/Material/GetData',
+                    method: 'GET',
+                    theadClasses: "thead-blue",
+                    pagination: true,
+                    sidePagination: "client",
+                    pageNumber: 1,
+                    pageSize: 20,
+                    pageList: [10, 20, 50],
+                    undefinedText: '---',
+                    paginationDetailHAlign: 'left',
+                    toolbar: '#toolbar',
+                    search: true,
+                    showFooter: false,
+                    showExport: true, //是否显示导出
+                    exportDataType: "all", //basic', 'all', 'selected'.
+                    exportTypes: ['excel'],
+                    exportOptions: {//导出设置
+                        fileName: '库存',//下载文件名称
+                    },
+                    columns: [{
+                        checkbox: true
+
+                    }, {
+                        field: 'no',
+                        title: '编号',
+                        align: 'center',
+                        formatter: function (value, row, index) {
+                            return index + 1;
+                        },
+                        searchable: false,
+                    }, {
+                        field: 'id',
+                        title: 'id',
+                        visible: false
+                    }, {
+                        field: 'material_name',
+                        title: '品名',
+                        align: 'center',
+                        sortable: true,
+                        searchable: true,
+                    }, {
+                        field: 'price',
+                        title: '单价',
+                        align: 'center',
+                        sortable: true,
+                        searchable: false,
+                    }, {
+                        field: 'picture',
+                        title: '图纸',
+                        align: 'center',
+                        sortable: true,
+                        formatter: function (value, row, index) {
+                            var result = "";
+                            if (row.picture == "" || row.picture == null || row.picture == undefined) {
+                                result += "<a href='#' >暂无图纸</a>";
+
+                            } else {
+                                result += "<a href='/src/Files" + row.picture + "' target='_blank'>查看</a>";
+                            }
+
+                            return result;
+                        },
+                        searchable: false,
+                    }, {
+                        field: 'edit',
+                        title: '操作',
+                        align: 'center',
+                        formatter: function (value, row, index) {
+                            var result = "";
+                            result += "<input type='button' class='btn btn-primary' data-toggle='modal' data-target='#editData' onclick=\"Edit(" + row.id + ",'" + row.material_name + "'," + row.price + ",'" + row.picture + "')\" value='编辑' />";
+                            return result;
+                        },
+                        searchable: false,
+                    }
+                    ]
+                });
+            }
+        }
+    })
+</script>
+
+

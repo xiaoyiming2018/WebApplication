@@ -22,15 +22,15 @@ namespace WebApplication.Controllers
         /// <param name="page">分页页码</param>
         /// <param name="size">每页显示数量</param>
         /// <returns></returns>
-        public IActionResult Index()
-        {            
+        public IActionResult Index(string company_name, string bank)
+        {
+            ViewBag.company_name = company_name;
+            ViewBag.bank = bank;
             return View();
             
         }
         public IActionResult GetData(string company_name, string bank)
         {
-            ViewBag.company_name = company_name;
-            ViewBag.bank = bank;
             var objList = UM.SelectAll(type: 0, company_name: company_name, bank: bank);
             return Json(objList);
         }
@@ -45,6 +45,8 @@ namespace WebApplication.Controllers
                 int id = Convert.ToInt32(Request.Query["id"]);
                 if (id > 0)
                 {
+                    ViewBag.company_name = Convert.ToString(Request.Query["company_name"]);
+                    ViewBag.bank = Convert.ToString(Request.Query["bank"]);
                     var obj = UM.SelectSingle(id);
                     return View(obj);
                 }

@@ -11,8 +11,8 @@
 
     <script type="text/javascript">
         $(function () {
-            $(".sidebar ul li:nth-of-type(4)").addClass("active open")
-            $(".sidebar ul li:nth-of-type(4) ul li:nth-of-type(1)").addClass("active")
+            //$(".sidebar ul li:nth-of-type(4)").addClass("active open")
+            //$(".sidebar ul li:nth-of-type(4) ul li:nth-of-type(1)").addClass("active")
             $('#submit').click(function () {
 
                 var order_index = $('#order_index').val();
@@ -50,8 +50,22 @@
                         },
                         success: function (msg) {
                             if (msg == "Success") {
+                                var company_name = $("#search_company_name").val();
+                                var order_index = $("#search_order_index").val();
+                                var company_order_index = $("#search_company_order_index").val();
+                                var purchase_person = $("#search_purchase_person").val();
+                                var order_name = $("#search_order_name").val();
+                                var start_time = $("#search_start_time").val();
+                                var end_time = $("#search_end_time").val();
+                                var deliver_start_time = $("#search_deliver_start_time").val();
+                                var deliver_end_time = $("#search_deliver_end_time").val();
+
+                                var searchUrl = "/Order/Index?start_time=" + start_time + "&end_time=" + end_time + "&deliver_start_time=" + deliver_start_time + "&deliver_end_time=" + deliver_end_time
+                                    + "&company_name=" + company_name + "&order_index=" + order_index + "&company_order_index=" + company_order_index + "&purchase_person=" + purchase_person
+                                    + "&order_name=" + order_name;
+
                                 swal({ title: "执行成功!", text: "", type: "success" },
-                                    function () { window.location.href = '/Order/Index'; });
+                                    function () { window.location.href = searchUrl; });
 
                             }
                             else {
@@ -151,9 +165,19 @@
                         <div class="card-header">
                             <h4>订单详情</h4>
                         </div>
-                    <br />
+                        <br />
                         <div class="card-body">
                             <div class="form-horizontal">
+                                <input type="hidden" id="search_company_name" value="@ViewBag.search_company_name" />
+                                <input type="hidden" id="search_order_index" value="@ViewBag.search_order_index" />
+                                <input type="hidden" id="search_company_order_index" value="@ViewBag.search_company_order_index" />
+                                <input type="hidden" id="search_purchase_person" value="@ViewBag.search_purchase_person" />
+                                <input type="hidden" id="search_order_name" value="@ViewBag.search_order_name" />
+                                <input type="hidden" id="search_start_time" value="@ViewBag.search_start_time" />
+                                <input type="hidden" id="search_end_time" value="@ViewBag.search_end_time" />
+                                <input type="hidden" id="search_deliver_start_time" value="@ViewBag.search_deliver_start_time" />
+                                <input type="hidden" id="search_deliver_end_time" value="@ViewBag.search_deliver_end_time" />
+
                                 <div class="form-group">
                                     <label class="col-sm-1 control-label">订单序号：</label>
                                     <div class="col-sm-2">
@@ -235,7 +259,7 @@
                                     <div class="form-group">
                                         <label for="example-input-normal" class="col-sm-4 control-label">单位</label>
                                         <div class="col-sm-4">
-                                            <select class="form-control" id="unit" name="unit" >
+                                            <select class="form-control" id="unit" name="unit">
                                                 <option value="">-请选择-</option>
                                                 <!option value="pcs" @if (Model != null) { if ("pcs" == Model.unit) { <text> selected</text>}}>Pcs</!option>
                                                 <!option value="套" @if (Model != null) { if ("套" == Model.unit) { <text> selected</text>}}>套</!option>
@@ -316,6 +340,19 @@
             </div><!-- /# row -->
         </div>
     </div><!-- /# container-fluid -->
+    <script>
+        var app = new Vue({
+            el: '#vueApp',
+            mounted() {
+                var _self = this;
+                _self.$nextTick(function () {
+                    _self.$refs.Order.parentNode.parentNode.classList.add("active");
+                    _self.$refs.Order.parentNode.parentNode.classList.add("open");
+                    _self.$refs.Order.classList.add("active");
+                })
+            }
+        })
+    </script>
 </body>
 </html>
 

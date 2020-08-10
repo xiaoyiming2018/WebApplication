@@ -13,8 +13,8 @@
     <script type="text/javascript">
         $(function () {
 
-            $(".sidebar ul li:nth-of-type(@if(ViewBag.type==0){<text>3</text>}else{<text>1</text>})").addClass("active open")
-            $(".sidebar ul li:nth-of-type(@if(ViewBag.type==0){<text>3</text>}else{<text>1</text>}) ul li:nth-of-type(1)").addClass("active")
+            @*$(".sidebar ul li:nth-of-type(@if(ViewBag.type==0){<text>3</text>}else{<text>1</text>})").addClass("active open")
+            $(".sidebar ul li:nth-of-type(@if(ViewBag.type==0){<text>3</text>}else{<text>1</text>}) ul li:nth-of-type(1)").addClass("active")*@
         });
 
         function deleteTiShi(id, customer_id, type) {
@@ -73,12 +73,12 @@
                             <li><a href="/Supplier/Index">主页</a></li>
                             @if (ViewBag.type == 0)
                             {
-                            <li><a href="/Customer/Index">客户管理</a></li>
+                                <li><a href="/Customer/Index">客户管理</a></li>
                             }
                             else
                             {
-                            <li><a href="/Supplier/Index">供应商管理</a></li>
-                            }                           
+                                <li><a href="/Supplier/Index">供应商管理</a></li>
+                            }
                             <li class="active">联系人信息</li>
                         </ol>
                     </div>
@@ -102,6 +102,7 @@
                         </div>
                         <div class="card-body">
                             <div class="form-horizontal">
+                                <input type="hidden" id="menuFlag" value="@ViewBag.type" />
                                 <div class="form-group">
                                     <label class="col-sm-2 control-label">公司名称：</label>
                                     <div class="col-sm-3">
@@ -148,9 +149,9 @@
                                 <div class="form-group">
                                     @if (UserManager.Current.GetLevel >= UserLevelEnum.Boss)
                                     {
-                                    <input type="button" value="新增" class="btn btn-primary" onclick="window.location.href = '/Contact/Edit?customer_id=@ViewBag.customer_id&type=@ViewBag.type'" />
+                                        <input type="button" value="新增" class="btn btn-primary" onclick="window.location.href = '/Contact/Edit?customer_id=@ViewBag.customer_id&type=@ViewBag.type'" />
                                     }
-                                    
+
                                 </div>
                             </form>
                         </div>
@@ -172,26 +173,26 @@
                                 </thead>
                                 <tbody>
                                     @{
-                                    int index = 1;
-                                    foreach (var item in Model)
-                                    {
-                                    <tr>
-                                        <td>@index</td>
-                                        <td>@item.name</td>
-                                        <td>@item.position</td>
-                                        <td>@item.telephone</td>
-                                        <td>@item.email</td>
-                                        @if (UserManager.Current.GetLevel >= UserLevelEnum.Boss)
+                                        int index = 1;
+                                        foreach (var item in Model)
                                         {
-                                            <td>
-                                                <input type="button" class="btn btn-primary" onclick="window.location.href = '/Contact/Edit?id=@item.id&customer_id=@ViewBag.customer_id&type=@ViewBag.type'" value="编辑" />
-                                            </td>
-                                            <td>
-                                                <input type="button" class="btn btn-primary" onclick="deleteTiShi(@item.id,@ViewBag.customer_id,@ViewBag.type)" value="删除" />
-                                            </td>
+                                            <tr>
+                                                <td>@index</td>
+                                                <td>@item.name</td>
+                                                <td>@item.position</td>
+                                                <td>@item.telephone</td>
+                                                <td>@item.email</td>
+                                                @if (UserManager.Current.GetLevel >= UserLevelEnum.Boss)
+                                                {
+                                                    <td>
+                                                        <input type="button" class="btn btn-primary" onclick="window.location.href = '/Contact/Edit?id=@item.id&customer_id=@ViewBag.customer_id&type=@ViewBag.type'" value="编辑" />
+                                                    </td>
+                                                    <td>
+                                                        <input type="button" class="btn btn-primary" onclick="deleteTiShi(@item.id,@ViewBag.customer_id,@ViewBag.type)" value="删除" />
+                                                    </td>
 
-                                        }                                       
-                                    </tr>
+                                                }
+                                            </tr>
                                             index++;
                                         }
                                     }
@@ -203,6 +204,26 @@
             </div><!-- /# row -->
         </div>
     </div><!-- /# container-fluid -->
+    <script>
+        var app = new Vue({
+            el: '#vueApp',
+            mounted() {
+                var _self = this;
+                _self.$nextTick(function () {
+                    var flag = $('#menuFlag').val();
+                    if (flag == 0) {
+                        _self.$refs.Customer.parentNode.parentNode.classList.add("active");
+                        _self.$refs.Customer.parentNode.parentNode.classList.add("open");
+                        _self.$refs.Customer.classList.add("active");
+                    } else {
+                        _self.$refs.Supplier.parentNode.parentNode.classList.add("active");
+                        _self.$refs.Supplier.parentNode.parentNode.classList.add("open");
+                        _self.$refs.Supplier.classList.add("active");
+                    }
+                })
+            }
+        })
+    </script>
 </body>
 </html>
 

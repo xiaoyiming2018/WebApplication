@@ -13,8 +13,8 @@
     <script type="text/javascript">
 
         $(function () {
-            $(".sidebar ul li:nth-of-type(8)").addClass("active open")
-            $(".sidebar ul li:nth-of-type(8) ul li:nth-of-type(1)").addClass("active")
+            //$(".sidebar ul li:nth-of-type(8)").addClass("active open")
+            //$(".sidebar ul li:nth-of-type(8) ul li:nth-of-type(1)").addClass("active")
 
         });     
 
@@ -644,6 +644,19 @@
             </div><!-- /.modal-content -->
         </div><!-- /.modal -->
     </div>
+    <script>
+        var app = new Vue({
+            el: '#vueApp',
+            mounted() {
+                var _self = this;
+                _self.$nextTick(function () {
+                    _self.$refs.Setting.parentNode.parentNode.classList.add("active");
+                    _self.$refs.Setting.parentNode.parentNode.classList.add("open");
+                    _self.$refs.Setting.classList.add("active");
+                })
+            }
+        })
+    </script>
 </body>
 </html>
 

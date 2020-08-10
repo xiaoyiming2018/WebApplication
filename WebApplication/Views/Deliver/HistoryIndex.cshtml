@@ -10,9 +10,9 @@
     <meta name="viewport" content="width=device-width" />
     <script type="text/javascript">
         $(function () {
-            $(".sidebar ul li:nth-of-type(2)").addClass("active open")
-            $(".sidebar ul li:nth-of-type(2) ul li").removeClass()
-            $(".sidebar ul li:nth-of-type(2) ul li:nth-of-type(3)").addClass("active")
+            //$(".sidebar ul li:nth-of-type(2)").addClass("active open")
+            //$(".sidebar ul li:nth-of-type(2) ul li").removeClass()
+            //$(".sidebar ul li:nth-of-type(2) ul li:nth-of-type(3)").addClass("active")
             $("#myTable").bootstrapTable({
                 url: '/Deliver/GetHistoryData',
                 method: 'GET',
@@ -425,6 +425,19 @@
             </div><!-- /# row -->
         </div>
     </div><!-- /# container-fluid -->
+    <script>
+        var app = new Vue({
+            el: '#vueApp',
+            mounted() {
+                var _self = this;
+                _self.$nextTick(function () {
+                    _self.$refs.DeliverHistory.parentNode.parentNode.classList.add("active");
+                    _self.$refs.DeliverHistory.parentNode.parentNode.classList.add("open");
+                    _self.$refs.DeliverHistory.classList.add("active");
+                })
+            }
+        })
+    </script>
 </body>
 </html>
 

@@ -12,9 +12,9 @@
     <meta name="viewport" content="width=device-width" />
     <script type="text/javascript">
         $(function () {
-            $(".sidebar ul li:nth-of-type(5)").addClass("active open")
-            $(".sidebar ul li:nth-of-type(5) ul li").removeClass()
-            $(".sidebar ul li:nth-of-type(5) ul li:nth-of-type(1)").addClass("active")
+            //$(".sidebar ul li:nth-of-type(5)").addClass("active open")
+            //$(".sidebar ul li:nth-of-type(5) ul li").removeClass()
+            //$(".sidebar ul li:nth-of-type(5) ul li:nth-of-type(1)").addClass("active")
         });
 
         function doPrint() {
@@ -123,8 +123,8 @@
                                 </div>
                             </div>
                             <br />
-                            
-                            
+
+
                         </div>
                         <div class="card-body">
                             <table class="table table-responsive table-hover ">
@@ -152,24 +152,24 @@
                                         int index = 1;
                                         foreach (var item in Model)
                                         {
-                                    <tr>
-                                        <td>@index</td>
-                                        <td>@item.order_name</td>
-                                        <td>@item.order_num</td>
-                                        <td>@item.order_time.ToString("yyyy-MM-dd")</td>
-                                        <td>@item.deliver_time.ToString("yyyy-MM-dd")</td>
+                                            <tr>
+                                                <td>@index</td>
+                                                <td>@item.order_name</td>
+                                                <td>@item.order_num</td>
+                                                <td>@item.order_time.ToString("yyyy-MM-dd")</td>
+                                                <td>@item.deliver_time.ToString("yyyy-MM-dd")</td>
 
-                                        <td>@item.real_num</td>
-                                        <td>@item.real_time.ToString("yyyy-MM-dd")</td>
-                                        @if (UserManager.Current.GetLevel >= UserLevelEnum.ProductManager)
-                                        {
-                                            <td>@item.deliver_price</td>
-                                            <td>@item.deliver_all_price</td>
-                                            <td>@item.purchase_person</td>
-                                            <td>@item.unit</td>
-                                        }
+                                                <td>@item.real_num</td>
+                                                <td>@item.real_time.ToString("yyyy-MM-dd")</td>
+                                                @if (UserManager.Current.GetLevel >= UserLevelEnum.ProductManager)
+                                                {
+                                                    <td>@item.deliver_price</td>
+                                                    <td>@item.deliver_all_price</td>
+                                                    <td>@item.purchase_person</td>
+                                                    <td>@item.unit</td>
+                                                }
 
-                                    </tr>
+                                            </tr>
                                             index++;
                                         }
                                     }
@@ -228,7 +228,7 @@
                 </tbody>
             </table>
 
-            <table class="table table-responsive table-hover " >
+            <table class="table table-responsive table-hover ">
                 <thead>
                     <tr>
                         <th>序号</th>
@@ -280,6 +280,19 @@
             </table>
         </div>
     </div>
+    <script>
+        var app = new Vue({
+            el: '#vueApp',
+            mounted() {
+                var _self = this;
+                _self.$nextTick(function () {
+                    _self.$refs.Sale.parentNode.parentNode.classList.add("active");
+                    _self.$refs.Sale.parentNode.parentNode.classList.add("open");
+                    _self.$refs.Sale.classList.add("active");
+                })
+            }
+        })
+    </script>
 </body>
 </html>
 

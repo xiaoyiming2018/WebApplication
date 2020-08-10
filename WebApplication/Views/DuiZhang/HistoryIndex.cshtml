@@ -12,9 +12,9 @@
     <script src="~/js/xlsx.core.min.js"></script>
     <script type="text/javascript">
         $(function () {
-            $(".sidebar ul li:nth-of-type(5)").addClass("active open")
-            $(".sidebar ul li:nth-of-type(5) ul li").removeClass()
-            $(".sidebar ul li:nth-of-type(5) ul li:nth-of-type(7)").addClass("active");
+            //$(".sidebar ul li:nth-of-type(5)").addClass("active open")
+            //$(".sidebar ul li:nth-of-type(5) ul li").removeClass()
+            //$(".sidebar ul li:nth-of-type(5) ul li:nth-of-type(7)").addClass("active");
 
             $("#myTable").bootstrapTable({
                 url: '/DuiZhang/GetHistoryData',
@@ -493,7 +493,7 @@
                                         <label>对账结束时间：</label>
                                         <input id="dz_end_time" name="dz_end_time" type="text" autocomplete="off" class="form-control" style="width:180px" onclick="WdatePicker({ skin: 'whyGreen',dateFmt:'yyyy-MM-dd' })" value="@ViewBag.dz_end_time" />
                                     </div>
-                                    
+
                                 </div>
                                 <br />
                             </div>
@@ -563,6 +563,19 @@
             </table>
         </div>
     </div>
+    <script>
+        var app = new Vue({
+            el: '#vueApp',
+            mounted() {
+                var _self = this;
+                _self.$nextTick(function () {
+                    _self.$refs.DuiZhangHistory.parentNode.parentNode.classList.add("active");
+                    _self.$refs.DuiZhangHistory.parentNode.parentNode.classList.add("open");
+                    _self.$refs.DuiZhangHistory.classList.add("active");
+                })
+            }
+        })
+    </script>
 </body>
 </html>
 

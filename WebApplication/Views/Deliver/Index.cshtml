@@ -12,12 +12,21 @@
 
     <script type="text/javascript">
         $(function () {
-            $(".sidebar ul li:nth-of-type(2)").addClass("active open")
-            $(".sidebar ul li:nth-of-type(2) ul li").removeClass()
-            $(".sidebar ul li:nth-of-type(2) ul li:nth-of-type(1)").addClass("active")
+            //$(".sidebar ul li:nth-of-type(2)").addClass("active open")
+            //$(".sidebar ul li:nth-of-type(2) ul li").removeClass()
+            //$(".sidebar ul li:nth-of-type(2) ul li:nth-of-type(1)").addClass("active")
 
+            var start_time = $("#search_start_time").val();
+            var end_time = $("#search_end_time").val();
+            var company_name = $("#search_company_name").val();
+            var purchase_index = $("#search_purchase_index").val();
+            var material_name = $("#search_material_name").val();
+            var deliver_index = $("#search_deliver_index").val();
+            var category = $("#search_category").val();
+            var searchUrl = "/Deliver/GetData?start_time=" + start_time + "&end_time=" + end_time + "&company_name=" + company_name + "&purchase_index=" + purchase_index
+                + "&material_name=" + material_name + "&deliver_index=" + deliver_index + "&category=" + category;
             $("#myTable").bootstrapTable({
-                url: '/Deliver/GetData',
+                url: searchUrl,
                 method: 'GET',
                 theadClasses: "thead-blue",
                 pagination: true,
@@ -159,7 +168,7 @@
                     align: 'center',
                         formatter: function (value, row, index) {
                             var result = "";
-                            result += "<input type='button' class='btn btn-primary' onclick=\"window.location.href = '/Deliver/EditDetail?id=" + row.id + "'\" value='编辑' />";
+                            result += "<input type='button' class='btn btn-primary' onclick='Edit(" + row.id + ")' value='编辑' />";
                             return result;
                         }
                     }, {
@@ -176,6 +185,18 @@
 
             
         });
+
+        function Edit(id) {
+            var start_time = $("#start_time").val();
+            var end_time = $("#end_time").val();
+            var company_name = $("#company_name").val();
+            var purchase_index = $("#purchase_index").val();
+            var material_name = $("#material_name").val();
+            var deliver_index = $("#deliver_index").val();
+            var category = $("#category").val();
+            window.location.href = "/Deliver/EditDetail?id=" + id + "&start_time=" + start_time + "&end_time=" + end_time + "&company_name=" + company_name + "&purchase_index=" + purchase_index
+                + "&material_name=" + material_name + "&deliver_index=" + deliver_index + "&category=" + category;
+        }
 
         function deleteTiShi(id) {
             swal({
@@ -256,18 +277,25 @@
                         <div class="card-header">
                             <div class="form-horizontal">
                                 <div class="form-inline">
+                                    <input type="hidden" id="search_purchase_index" value="@ViewBag.purchase_index" />
+                                    <input type="hidden" id="search_start_time" value="@ViewBag.start_time" />
+                                    <input type="hidden" id="search_end_time" value="@ViewBag.end_time" />
+                                    <input type="hidden" id="search_company_name" value="@ViewBag.company_name" />
+                                    <input type="hidden" id="search_material_name" value="@ViewBag.material_name" />
+                                    <input type="hidden" id="search_deliver_index" value="@ViewBag.deliver_index" />
+                                    <input type="hidden" id="search_category" value="@ViewBag.category" />
                                     <div class="form-group">
                                         <label>购入单号：</label>
                                         <select class="selectpicker" data-live-search="true" data-live-search-placeholder="搜索" id="purchase_index" name="purchase_index" style="padding:6px 50px">
                                             <option value=""></option>
                                             @{
                                                 PurchaseManager PM = new PurchaseManager();
-                                                List<string> deliverList = PM.SelectDeliverAll("2001-01-01", "2222-01-01").GroupBy(s=>s.purchase_index).Select(s=>s.Key).ToList();
+                                                List<string> deliverList = PM.SelectDeliverAll("2001-01-01", "2222-01-01").GroupBy(s => s.purchase_index).Select(s => s.Key).ToList();
                                                 if (deliverList.Count > 0)
                                                 {
                                                     for (int i = 0; i < deliverList.Count; i++)
                                                     {
-                                                        <!option value="@deliverList[i]" @if (Model != null) { if (deliverList[i] == ViewBag.purchase_index) { <text> selected</text>}}>@deliverList[i]</!option>
+                                                        <!option value="@deliverList[i]" @if (deliverList[i] == ViewBag.purchase_index) { <text> selected</text>}>@deliverList[i]</!option>
                                                     }
                                                 }
                                             }
@@ -284,7 +312,7 @@
                                                 {
                                                     for (int i = 0; i < objList.Count; i++)
                                                     {
-                                                        <!option value="@objList[i].company_name" @if (Model != null) { if (objList[i].company_name == ViewBag.company_name) { <text> selected</text>}}>@objList[i].company_name</!option>
+                                                        <!option value="@objList[i].company_name" @if (objList[i].company_name == ViewBag.company_name) { <text> selected</text>}>@objList[i].company_name</!option>
                                                     }
                                                 }
                                             }
@@ -310,7 +338,7 @@
                                                 {
                                                     for (int i = 0; i < sList.Count; i++)
                                                     {
-                                                        <!option value="@sList[i].config_list" @if (Model != null) { if (sList[i].config_list == ViewBag.category) { <text> selected</text>}}>@sList[i].config_list</!option>
+                                                        <!option value="@sList[i].config_list" @if (sList[i].config_list == ViewBag.category) { <text> selected</text>}>@sList[i].config_list</!option>
                                                     }
                                                 }
                                             }
@@ -352,6 +380,19 @@
             </div><!-- /# row -->
         </div>
     </div><!-- /# container-fluid -->
+    <script>
+        var app = new Vue({
+            el: '#vueApp',
+            mounted() {
+                var _self = this;
+                _self.$nextTick(function () {
+                    _self.$refs.Deliver.parentNode.parentNode.classList.add("active");
+                    _self.$refs.Deliver.parentNode.parentNode.classList.add("open");
+                    _self.$refs.Deliver.classList.add("active");
+                })
+            }
+        })
+    </script>
 </body>
 </html>
 

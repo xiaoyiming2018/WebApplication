@@ -100,7 +100,7 @@
                         <div class="card-header">
                             <h4>订单详情</h4>
                         </div>
-                    <br />
+                        <br />
                         <div class="card-body">
                             <div class="form-horizontal">
                                 <div class="form-group">
@@ -140,7 +140,7 @@
                                     }
                                     <div class="checkbox">
                                         <label>
-                                            <input id="activation" name="activation" type="checkbox"  onclick="active()" @if (ViewBag.activation=="on") { <text>checked="checked"</text>} />
+                                            <input id="activation" name="activation" type="checkbox" onclick="active()" @if (ViewBag.activation == "on") { <text> checked="checked" </text> } />
                                             送货时间查询激活
                                         </label>
                                     </div>
@@ -158,15 +158,15 @@
                                             <input id="end_time" name="end_time" type="text" autocomplete="off" class="form-control" style="height:36px" onclick="WdatePicker({ skin: 'whyGreen',dateFmt:'yyyy-MM-dd' })" value="@ViewBag.end_time" />
                                         </div>
                                     </div>
-                                    
+
                                     <div class="form-group">
                                         <input type="submit" value="查询" class="btn btn-primary" style="width:80px" />
                                     </div>
                                     <div class="form-group">
                                         @*@if (UserManager.Current.GetLevel >= UserLevelEnum.Boss)
-                                        {
-                                            <input type="button" value="新增" class="btn btn-primary" style="width:80px" onclick="window.location.href = '/OrderSeq/Edit?order_id=@ViewBag.order_id'" />
-                                        }*@
+                                            {
+                                                <input type="button" value="新增" class="btn btn-primary" style="width:80px" onclick="window.location.href = '/OrderSeq/Edit?order_id=@ViewBag.order_id'" />
+                                            }*@
 
                                     </div>
                                 </div>
@@ -207,49 +207,49 @@
                                 </thead>
                                 <tbody>
                                     @{
-                                    int index = 1;
-                                    foreach (var item in Model)
-                                    {
-                                    <tr>
-                                        <td>@index</td>
-                                        <td>@item.order_name</td>
-                                        <td>@item.order_num</td>
-                                        <td>@item.order_time.ToString("yyyy-MM-dd")</td>
-                                        <td>@item.deliver_time.ToString("yyyy-MM-dd")</td>
-                                        @if (UserManager.Current.GetLevel >= UserLevelEnum.ProductManager)
+                                        int index = 1;
+                                        foreach (var item in Model)
                                         {
-                                            <td>@item.order_price</td>
-                                            <td>@item.order_all_price</td>
-                                            <td>@item.purchase_person</td>
-                                            <td>@item.unit</td>
-                                        }
-                                        <td style="color:darkseagreen">@item.open_num</td>
-                                        <td style="color:red">@item.tui_num</td>
-                                        <td style="color:orange">@item.remain_num</td>
-                                        <td>
-                                        @if (!string.IsNullOrEmpty(item.order_picture))
-                                        {
-                                            <a href="/src/Files/@item.order_picture" target="_blank">查看</a>
-                                        }
-                                        else
-                                        {
-                                            <a href="javascript:return false;" target="_blank">暂无图纸</a>
-                                        }
-                                        </td>
-                                        @if (UserManager.Current.GetLevel >= UserLevelEnum.ProductManager)
-                                        {
-                                            <td>
-                                                <input type="button" class="btn btn-primary" onclick="window.location.href = '/OrderSeq/Edit?order_id=@ViewBag.order_id&seq_id=@item.seq_id'" value="编辑" />
-                                            </td>
-                                        }
-                                        @if (UserManager.Current.GetLevel >= UserLevelEnum.Boss)
-                                        {
-                                            <td>
-                                                <input type="button" class="btn btn-primary" onclick="deleteTiShi(@ViewBag.order_id,@item.seq_id)" value="删除" />
-                                            </td>
-                                        }
+                                            <tr>
+                                                <td>@index</td>
+                                                <td>@item.order_name</td>
+                                                <td>@item.order_num</td>
+                                                <td>@item.order_time.ToString("yyyy-MM-dd")</td>
+                                                <td>@item.deliver_time.ToString("yyyy-MM-dd")</td>
+                                                @if (UserManager.Current.GetLevel >= UserLevelEnum.ProductManager)
+                                                {
+                                                    <td>@item.order_price</td>
+                                                    <td>@item.order_all_price</td>
+                                                    <td>@item.purchase_person</td>
+                                                    <td>@item.unit</td>
+                                                }
+                                                <td style="color:darkseagreen">@item.open_num</td>
+                                                <td style="color:red">@item.tui_num</td>
+                                                <td style="color:orange">@item.remain_num</td>
+                                                <td>
+                                                    @if (!string.IsNullOrEmpty(item.order_picture))
+                                                    {
+                                                        <a href="/src/Files/@item.order_picture" target="_blank">查看</a>
+                                                    }
+                                                    else
+                                                    {
+                                                        <a href="javascript:return false;" target="_blank">暂无图纸</a>
+                                                    }
+                                                </td>
+                                                @if (UserManager.Current.GetLevel >= UserLevelEnum.ProductManager)
+                                                {
+                                                    <td>
+                                                        <input type="button" class="btn btn-primary" onclick="window.location.href = '/OrderSeq/Edit?order_id=@ViewBag.order_id&seq_id=@item.seq_id'" value="编辑" />
+                                                    </td>
+                                                }
+                                                @if (UserManager.Current.GetLevel >= UserLevelEnum.Boss)
+                                                {
+                                                    <td>
+                                                        <input type="button" class="btn btn-primary" onclick="deleteTiShi(@ViewBag.order_id,@item.seq_id)" value="删除" />
+                                                    </td>
+                                                }
 
-                                    </tr>
+                                            </tr>
                                             index++;
                                         }
                                     }
@@ -261,6 +261,19 @@
             </div><!-- /# row -->
         </div>
     </div><!-- /# container-fluid -->
+    <script>
+        var app = new Vue({
+            el: '#vueApp',
+            mounted() {
+                var _self = this;
+                _self.$nextTick(function () {
+                    _self.$refs.Supplier.parentNode.parentNode.classList.add("active");
+                    _self.$refs.Supplier.parentNode.parentNode.classList.add("open");
+                    _self.$refs.Supplier.classList.add("active");
+                })
+            }
+        })
+    </script>
 </body>
 </html>
 

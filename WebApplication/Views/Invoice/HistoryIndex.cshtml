@@ -346,6 +346,19 @@
             </div><!-- /# row -->
         </div>
     </div><!-- /# container-fluid -->
+    <script>
+        var app = new Vue({
+            el: '#vueApp',
+            mounted() {
+                var _self = this;
+                _self.$nextTick(function () {
+                    _self.$refs.InvoiceHistory.parentNode.parentNode.classList.add("active");
+                    _self.$refs.InvoiceHistory.parentNode.parentNode.classList.add("open");
+                    _self.$refs.InvoiceHistory.classList.add("active");
+                })
+            }
+        })
+    </script>
 </body>
 </html>
 

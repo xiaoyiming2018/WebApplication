@@ -14,11 +14,9 @@
         var TempArr = [];//存储option
         var index = 1;
         $(function () {
-            $(".sidebar ul li:nth-of-type(2)").addClass("active open")
-            $(".sidebar ul li:nth-of-type(2) ul li:nth-of-type(1)").addClass("active")
-            $(".sidebar ul li:nth-of-type(2) ul li:nth-of-type(2)").removeClass("active open")
-
-            
+            //$(".sidebar ul li:nth-of-type(2)").addClass("active open")
+            //$(".sidebar ul li:nth-of-type(2) ul li:nth-of-type(1)").addClass("active")
+            //$(".sidebar ul li:nth-of-type(2) ul li:nth-of-type(2)").removeClass("active open")
 
 
             $('#submit').click(function () {
@@ -116,7 +114,7 @@
                         success: function (msg) {
                             if (msg == "Success") {
                                 swal({ title: "执行成功!", text: "", type: "success" },
-                                    function () { window.location.href = '/Deliver/Index'; });
+                                    function () { window.location.href = "/Deliver/Index"; });
                             }
                             else {
                                 swal("执行失败！", "", "error");
@@ -404,7 +402,7 @@
                                                 </select>
                                             </div>
                                         </div>
-                                        
+
                                         <div id="show" style="display:none">
                                             <br />
                                             <div class="form-group">
@@ -414,7 +412,7 @@
                                                 </div>
                                             </div>
                                         </div>
-                                        
+
 
                                     </div>
                                     <br />
@@ -526,9 +524,18 @@
         </div>
     </div><!-- /# container-fluid -->
 
-    <script language="javascript">
-
-
+    <script>
+        var app = new Vue({
+            el: '#vueApp',
+            mounted() {
+                var _self = this;
+                _self.$nextTick(function () {
+                    _self.$refs.Deliver.parentNode.parentNode.classList.add("active");
+                    _self.$refs.Deliver.parentNode.parentNode.classList.add("open");
+                    _self.$refs.Deliver.classList.add("active");
+                })
+            }
+        })
     </script>
 </body>
 </html>

@@ -1,0 +1,538 @@
+﻿@{
+    @model IList<Model.Order>
+    @using Model;
+    @using BLL;
+
+}
+@using AspNetCoreMvcPager;
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+
+    <script type="text/javascript">
+        $(function () {
+
+            $("#myTable").bootstrapTable({
+                url: '/InOut/GetData',
+                method: 'GET',
+                theadClasses: "thead-blue",
+                pagination: true,
+                sidePagination: "client",
+                pageNumber: 1,
+                pageSize: 20,
+                pageList: [10, 20, 50],
+                undefinedText: '---',
+                paginationDetailHAlign: 'left',
+                toolbar: '#toolbar',
+                showFooter: true,
+                showExport: true, //是否显示导出
+                exportDataType: "all", //basic', 'all', 'selected'.
+                exportTypes: ['excel'],
+                exportOptions: {//导出设置
+                    fileName: '出入库详情',//下载文件名称
+                },
+                columns: [{
+                    checkbox: true
+                }, {
+                    field: 'no',
+                    title: '编号',
+                    align: 'center',
+                    formatter: function (value, row, index) {
+                        return index + 1;
+                    },
+                    footerFormatter: function (data) {
+                        return "汇总";
+                    }
+                }, {
+                    field: 'id',
+                    title: 'id',
+                    visible: false
+                }, {
+                    field: 'flag',
+                    title: '出入库类别',
+                    align: 'center',
+                    sortable: true,
+                    formatter: function (value, row, index) {
+                        var result = "";
+                        if (row.flag == 1) {
+                            result += "<span style='background-color:green;color:white;padding:5px 25px' >入库</span>";
+
+                        } else {
+                            result += "<span style='background-color:red;color:white;padding:5px 25px' >出库</span>";
+                        }
+
+                        return result;
+                    }
+                }, {
+                    field: 'material_name',
+                    title: '品名',
+                    align: 'center',
+                    sortable: true
+                }, {
+                    field: 'inout_num',
+                    title: '数量',
+                    align: 'center',
+                    sortable: true,
+                    footerFormatter: function (data) {
+                        var count = 0;
+                        $.each(data, function (index, item) {
+                            count += item.inout_num * item.flag;;
+                        });
+                        return "结存数量:" + count.toFixed(2);
+                    }
+                }, {
+                    field: 'inout_price',
+                    title: '单价',
+                    align: 'center',
+                    sortable: true
+                }, {
+                    field: 'inout_all_price',
+                    title: '总价',
+                    align: 'center',
+                    sortable: true,
+                    footerFormatter: function (data) {
+                        var count = 0;
+                        $.each(data, function (index, item) {
+                            count += item.inout_all_price *item.flag;
+                        });
+                        return "结存金额:" +count.toFixed(2);
+                    }
+                }, {
+                    field: 'picture',
+                    title: '图纸',
+                    align: 'center',
+                    sortable: true,
+                    formatter: function (value, row, index) {
+                        var result = "";
+                        if (row.picture == "" || row.picture == null || row.picture == undefined) {
+                            result += "<a href='#' >暂无图纸</a>";
+
+                        } else {
+                            result += "<a href='/src/Files" + row.picture + "' target='_blank'>查看</a>";
+                        }
+
+                        return result;
+                    }
+                }, {
+                    field: 'remarks',
+                    title: '备注',
+                    align: 'center',
+                    sortable: true,
+                }, {
+                    field: 'create_time',
+                    title: '创建时间',
+                    align: 'center',
+                    sortable: true,
+                    formatter: function (value, row, index) {
+                        return row.create_time.split('T')[0];
+                    }
+                }, {
+                    field: 'edit',
+                    title: '操作',
+                    align: 'center',
+                    formatter: function (value, row, index) {
+                        var result = "";
+                        result += "<input type='button'  class='btn btn-primary' data-toggle='modal' data-target='#insertData' " +
+                            "onclick =\"Edit(" + row.id + "," + row.material_id + "," + row.flag + "," + row.inout_price + "," + row.inout_all_price + "," + row.inout_num + ",'" + row.remarks + "')\" value='编辑' />";
+                        return result;
+                    },
+                    searchable: false,
+                }]
+            });
+        });
+        function CheckOrCancleAll(obj) {
+            if (obj.is(":checked")) {
+                $('input.form-control').prop('checked', false);
+                obj.prop('checked', true);
+                if (obj.attr('name') == "day") {
+                    document.getElementById("day").value = "1";
+                    document.getElementById("month").value = "0";
+                    document.getElementById("year").value = "0";
+                }
+                else if (obj.attr('name') == "month") {
+                    document.getElementById("day").value = "0";
+                    document.getElementById("month").value = "1";
+                    document.getElementById("year").value = "0";
+                }
+                else if (obj.attr('name') == "year") {
+                    document.getElementById("day").value = "0";
+                    document.getElementById("month").value = "0";
+                    document.getElementById("year").value = "1";
+                }
+            }
+            else {
+                document.getElementById("day").value = "0";
+                document.getElementById("month").value = "0";
+                document.getElementById("year").value = "0";
+            }
+        }
+
+        function Search() {
+            var start_time = $("#start_time").val();
+            var end_time = $("#end_time").val();
+            var flag = $("#search_flag").val();
+            var material_name = $("#material_name").val();
+            var day = $("#day").val();
+            var month = $("#month").val();
+            var year = $("#year").val();
+
+            var searchUrl = "/InOut/GetData?start_time=" + start_time + "&end_time=" + end_time + "&material_name=" + material_name + "&day=" + day + "&month=" + month + "&year=" + year + "&flag=" + flag;
+            $("#myTable").bootstrapTable('refresh', { url: searchUrl });
+        }
+
+        function ConfirmInsert() {
+            var inout_id = $('#inout_id').val();
+            if (inout_id=="") {
+                inout_id = 0;
+            }
+            var flag = $('#flag').val();
+            var material_id = $('#material_id').val();
+            var inout_price = $('#inout_price').val();
+            var inout_num = $('#inout_num').val();
+            var remain_num = $('#remain_num').val();
+
+            var inout_all_price = $('#inout_all_price').val();
+            var remarks = $('#remarks').val();
+            if (flag == "" || inout_price == "" || inout_num == "" || material_id == "") {
+                swal("信息不能为空！", "", "error");
+            } else if (flag == "-1" && inout_num > remain_num && inout_id==0) {
+                swal("库存不足！", "该品名的剩余库存小于出货数量", "error");
+            }
+            else {
+                $.ajax({
+                    type: "POST",
+                    url: "/InOut/InsertData",
+                    beforeSend: function (xhr) {
+                        xhr.setRequestHeader("XSRF-TOKEN",
+                            $('input:hidden[name="__RequestVerificationToken"]').val());
+                    },
+                    data: {
+                        id: inout_id, material_id: material_id, inout_price: inout_price, inout_all_price: inout_all_price,
+                        inout_num: inout_num, remarks: remarks, flag: flag
+                    },
+                    success: function (msg) {
+                        if (msg == "Success") {
+                            if (parseInt(inout_id) > 0) {
+                                swal("编辑成功 !", "", "success");
+                            } else {
+                                swal("添加成功 !", "", "success");
+                            } 
+                            $("#myTable").bootstrapTable('refresh', { url: "/InOut/GetData" });
+                        } else {
+                            swal("添加失败 !", "", "error");
+                        }
+                    },
+                    error: function (msg) {
+                        swal("数据获取失败 !", "该记录已保留 !", "error");
+                    }
+                });
+
+            }
+
+        }
+
+        function deleteTiShi() {
+            var mySelect = $("#myTable").bootstrapTable("getSelections");
+            if (mySelect.length < 1) {
+                swal("执行失败 !", "请先选择要删除的数据 !", "error");
+            } else {
+                swal({
+                    title: "确定删除 ?",
+                    text: "删除后将无法恢复 !",
+                    type: "warning",
+                    showCancelButton: true,
+                    confirmButtonColor: "#DD6B55",
+                    confirmButtonText: "删除",
+                    cancelButtonText: "取消",
+                    closeOnConfirm: false,//true表示不需要点击确认,fasle需要点击确认后再关闭对话框
+                    closeOnCancel: false //true表示不需要点击确认,fasle需要点击确认后再关闭对话框
+                },
+                    function (isConfirm) {
+                        if (isConfirm) {
+                            var delList = new Array();
+                            for (let i = 0; i < mySelect.length; i++) {
+                                delList.push(mySelect[i].id);
+                            }
+                            $.ajax({
+                                type: "POST",
+                                url: "/InOut/Del",
+                                beforeSend: function (xhr) {
+                                    xhr.setRequestHeader("XSRF-TOKEN",
+                                        $('input:hidden[name="__RequestVerificationToken"]').val());
+                                },
+                                data: {
+                                    delList: delList
+                                },
+                                success: function (msg) {
+                                    if (msg == "Success") {
+                                        swal("已删除 !", "该条记录已删除 !", "success"),
+                                            $("#myTable").bootstrapTable('refresh', { url: "/InOut/GetData" });
+                                    }
+                                    else {
+                                        swal("执行失败 !", "该记录已保留 !", "error");
+                                    }
+                                },
+                                error: function (msg) {
+                                    swal("数据获取失败 !", "该记录已保留 !", "error");
+                                }
+                            });
+                        }
+                        else {
+                            swal("已取消 !", "该记录已保留 !", "error");
+                        }
+                    });
+            }
+
+        }
+
+        function insertAction() {
+            $("#myModalLabel").innerHTML = "新增出入库";
+            $("#flag").val("");
+            $("#material_id").selectpicker('val', "");
+            $("#inout_id").val("");
+            $("#inout_num").val("");
+            $("#inout_price").val("");
+            $("#inout_all_price").val("");
+            $("#remarks").val("");
+            $("#remain_num").val("");
+        }
+        function Edit(id, material_id, flag, inout_price, inout_all_price, inout_num, remarks) {
+            $("#flag").val(flag);
+            $("#flag").attr("disabled", "disabled");
+
+            $("#material_id").selectpicker('val', material_id);
+            $("#inout_id").val(id);
+            $("#inout_num").val(inout_num);
+            $("#inout_price").val(inout_price);
+            $("#inout_all_price").val(inout_all_price);
+            $("#remarks").val(remarks);
+            GetRemainNum(material_id);
+        }
+
+        function SelectChange() {
+            var material_id = $("#material_id").val();
+            $.ajax({
+                type: "POST",
+                url: "/InOut/SelectChange",
+                beforeSend: function (xhr) {
+                    xhr.setRequestHeader("XSRF-TOKEN",
+                        $('input:hidden[name="__RequestVerificationToken"]').val());
+                },
+                data: {
+                    material_id: material_id
+                },
+                success: function (msg) {
+                    $("#inout_price").val(msg.price);
+
+                    GetAllPrice();
+                },
+                error: function (msg) {
+                    swal("数据获取失败 !", "该记录已保留 !", "error");
+                }
+            });
+            GetRemainNum(material_id);
+        }
+        //获取某品名的剩余库存
+        function GetRemainNum(material_id) {
+            $.ajax({
+                type: "POST",
+                url: "/InOut/GetRemainNum",
+                beforeSend: function (xhr) {
+                    xhr.setRequestHeader("XSRF-TOKEN",
+                        $('input:hidden[name="__RequestVerificationToken"]').val());
+                },
+                data: {
+                    material_id: material_id
+                },
+                success: function (msg) {
+                    $("#remain_num").val(msg);
+                },
+                error: function (msg) {
+                    swal("数据获取失败 !", "该记录已保留 !", "error");
+                }
+            });
+        }
+
+        function GetAllPrice() {
+            var inout_num = $("#inout_num").val();
+            var inout_price = $("#inout_price").val();
+            var inout_all_price = inout_num * inout_price;
+            $("#inout_all_price").val(inout_all_price.toFixed(2));
+        }
+    </script>
+</head>
+<body>
+    <div class="container-fluid" id="wrap">
+        <div class="row">
+            <div class="col-lg-12 p-0">
+                <div class="page-header">
+                    <div class="page-title">
+                        <ol class="breadcrumb text-left">
+                            <li><a href="/Supplier/Index">主页</a></li>
+                            <li><a href="/Order/Index">订单管理</a></li>
+                            <li><a href="/Order/HistoryIndex">历史客户订单</a></li>
+                            <li class="active">订单列表</li>
+                        </ol>
+                    </div>
+                </div>
+            </div><!-- /# column -->
+        </div><!-- /# row -->
+        <div class="main-content">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="card alert">
+                        <div class="card-header">
+                            <div class="form-horizontal">
+                                <div class="form-inline">
+                                    <div class="form-group">
+                                        <label>&emsp;&emsp;品名：</label>
+                                        <select class="selectpicker" data-live-search="true" data-live-search-placeholder="搜索" id="material_name" name="material_name" 
+                                                style="padding:6px 50px">
+                                            <option value="">-请选择-</option>
+                                            @{
+                                                MaterialManager CM = new MaterialManager();
+                                                List<Material> objList = CM.SelectAll();
+                                                if (objList.Count > 0)
+                                                {
+                                                    for (int i = 0; i < objList.Count; i++)
+                                                    {
+                                                        <!option value="@objList[i].material_name">
+                                                        @objList[i].material_name</!option>
+                                                    }
+                                                }
+                                            }
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>&emsp;&emsp;出入库类别：</label>
+                                        <select class="selectpicker" id="search_flag" style="padding:6px 50px">
+                                            <option value=""></option>
+                                            <option value="1">入库</option>
+                                            <option value="-1">出库</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>开始时间：</label>
+                                        <input id="start_time" name="start_time" type="text" class="form-control" autocomplete="off" style="width:160px" onclick="WdatePicker({ skin: 'whyGreen',dateFmt:'yyyy-MM-dd' })" />
+                                    </div>
+                                    <div class="form-group">
+                                        <label>结束时间：</label>
+                                        <input id="end_time" name="end_time" type="text" class="form-control" autocomplete="off" style="width:160px" onclick="WdatePicker({ skin: 'whyGreen',dateFmt:'yyyy-MM-dd' })" />
+                                    </div>
+                                </div>
+                                <br />
+                                <div class="form-inline">
+                                    <div class="form-group">
+                                        <label>本日</label>
+                                        <input id="day" name="day" type="checkbox" class="form-control" onclick="CheckOrCancleAll($(this))" style="width:16px" value="0" />
+                                    </div>
+                                    <div class="form-group">
+                                        <label>本月</label>
+                                        <input id="month" name="month" type="checkbox" class="form-control" onclick="CheckOrCancleAll($(this))" style="width:16px" value="0" />
+                                    </div>
+                                    <div class="form-group">
+                                        <label>本年</label>
+                                        <input id="year" name="year" type="checkbox" class="form-control" onclick="CheckOrCancleAll($(this))" style="width:16px" value="0" />
+                                    </div>
+                                    <div class="form-group">
+                                        <input type="button" value="查询" class="btn btn-primary" style="width:80px" onclick="Search()" />
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div id="toolbar" class="toolbar">
+                                <button class="btn btn-primary" data-toggle="modal" data-target="#insertData" onclick="insertAction()">新增</button>
+                                <button class="btn btn-primary" onclick="deleteTiShi()">删除</button>
+                            </div>
+                            <table id="myTable" class="table table-responsive table-hover ">
+                            </table>
+
+                            <div class="modal fade" id="insertData" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+                                <div class="modal-dialog" role="document" style="width:30%">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                            <h4 class="modal-title" id="myModalLabel">新增出入库</h4>
+                                        </div>
+                                        <div class="modal-body">
+                                            <input type="hidden" id="inout_id" />
+                                            <div class="form-group">
+                                                <label for="">出入库选择</label>
+                                                <select class="form-control" id="flag">
+                                                    <option value=""></option>
+                                                    <option value="1">入库</option>
+                                                    <option value="-1">出库</option>
+                                                </select>
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="">品名</label>
+                                                <select class="selectpicker form-control" data-live-search="true" data-live-search-placeholder="搜索"
+                                                        id="material_id" name="material_id" onchange="SelectChange()">
+                                                    <option value=""></option>
+                                                    @{
+                                                        MaterialManager MM = new MaterialManager();
+                                                        List<Material> objListM = MM.SelectAll();
+                                                        if (objListM.Count > 0)
+                                                        {
+                                                            for (int i = 0; i < objListM.Count; i++)
+                                                            {
+                                                                <!option value="@objListM[i].id">@objListM[i].material_name</!option>
+                                                            }
+                                                        }
+                                                    }
+                                                </select>
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="">数量</label>
+                                                <input type="text" id="inout_num" name="inout_num" class="form-control" onchange="GetAllPrice()" />
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="">剩余库存</label>
+                                                <input type="text" id="remain_num" name="remain_num" class="form-control" disabled />
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="">单价</label>
+                                                <input type="text" id="inout_price" name="inout_price" class="form-control" onchange="GetAllPrice()" />
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="">总价</label>
+                                                <input type="text" id="inout_all_price" name="inout_all_price" class="form-control" />
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="">备注</label>
+                                                <input type="text" id="remarks" name="remarks" class="form-control" />
+                                            </div>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                                            <button type="button" id="btn_submit" class="btn btn-primary" data-dismiss="modal" onclick="ConfirmInsert()">确认</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div><!-- /# card -->
+                </div><!-- /# column -->
+            </div><!-- /# row -->
+        </div>
+    </div><!-- /# container-fluid -->
+    <script>
+        var app = new Vue({
+            el: '#vueApp',
+            mounted() {
+                var _self = this;
+                _self.$nextTick(function () {
+                    _self.$refs.InOut.parentNode.parentNode.classList.add("active");
+                    _self.$refs.InOut.parentNode.parentNode.classList.add("open");
+                    _self.$refs.InOut.classList.add("active");
+                })
+            }
+        })
+    </script>
+</body>
+</html>
+
+

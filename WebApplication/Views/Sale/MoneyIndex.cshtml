@@ -12,9 +12,9 @@
 
     <script type="text/javascript">
         $(function () {
-            $(".sidebar ul li:nth-of-type(5)").addClass("active open");
-            $(".sidebar ul li:nth-of-type(5) ul li").removeClass();
-            $(".sidebar ul li:nth-of-type(5) ul li:nth-of-type(5)").addClass("active");
+            //$(".sidebar ul li:nth-of-type(5)").addClass("active open");
+            //$(".sidebar ul li:nth-of-type(5) ul li").removeClass();
+            //$(".sidebar ul li:nth-of-type(5) ul li:nth-of-type(5)").addClass("active");
 
             $("#myTable").bootstrapTable({
                 url: '/Sale/GetMoneyIndexData',
@@ -371,7 +371,7 @@
                                 <div class="form-inline">
                                     <div class="form-group">
                                         <label>采购人员：</label>
-                                        
+
                                         <select class="selectpicker" data-live-search="true" data-live-search-placeholder="搜索" id="purchase_person" name="purchase_person" style="padding:6px 50px">
                                             <option value=""></option>
                                             @{
@@ -384,7 +384,7 @@
                                                 }
                                             }
                                         </select>
-                                        
+
                                     </div>
                                     <div class="form-group">
                                         <input type="button" value="查询" class="btn btn-primary" style="width:80px" onclick="Search()" />
@@ -445,6 +445,19 @@
             <div class="card-body" id="picker_list1">
             </div>
         </div>*@
+    <script>
+        var app = new Vue({
+            el: '#vueApp',
+            mounted() {
+                var _self = this;
+                _self.$nextTick(function () {
+                    _self.$refs.MoneyIndex.parentNode.parentNode.classList.add("active");
+                    _self.$refs.MoneyIndex.parentNode.parentNode.classList.add("open");
+                    _self.$refs.MoneyIndex.classList.add("active");
+                })
+            }
+        })
+    </script>
 </body>
 </html>
 

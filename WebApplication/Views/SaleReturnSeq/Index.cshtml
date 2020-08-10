@@ -12,9 +12,9 @@
     <meta name="viewport" content="width=device-width" />
     <script type="text/javascript">
         $(function () {
-            $(".sidebar ul li:nth-of-type(5)").addClass("active open")
+            @*$(".sidebar ul li:nth-of-type(5)").addClass("active open")
             $(".sidebar ul li:nth-of-type(5) ul li").removeClass()
-            $(".sidebar ul li:nth-of-type(5) ul li:nth-of-type(@if (ViewBag.flag == "History") {<text>3</text> } else {<text>2</text> })").addClass("active")
+            $(".sidebar ul li:nth-of-type(5) ul li:nth-of-type(@if (ViewBag.flag == "History") {<text>3</text> } else {<text>2</text> })").addClass("active")*@
         });
 
         function doPrint() {
@@ -57,7 +57,7 @@
                             {
                                 <li><a href="/SaleReturn/Index">销售退货开单</a></li>
                             }
-                            
+
                             <li class="active">退货详情</li>
                         </ol>
                     </div>
@@ -74,6 +74,7 @@
                         <br />
                         <div class="card-body">
                             <div class="form-horizontal">
+                                <input type="hidden" id="menuFlag" value="@ViewBag.flag" />
                                 <div class="form-group">
                                     <label class="col-sm-2 control-label">退货单号：</label>
                                     <div class="col-sm-2">
@@ -144,26 +145,35 @@
                                         int index = 1;
                                         foreach (var item in Model)
                                         {
-                                    <tr>
-                                        <td>@index</td>
-                                        <td>@item.order_name</td>
-                                        <td>@item.order_num</td>
-                                        <td>@item.order_time.ToString("yyyy-MM-dd")</td>
-                                        <td>@item.deliver_time.ToString("yyyy-MM-dd")</td>
+                                            <tr>
+                                                <td>@index</td>
+                                                <td>@item.order_name</td>
+                                                <td>@item.order_num</td>
+                                                <td>@item.order_time.ToString("yyyy-MM-dd")</td>
+                                                <td>@item.deliver_time.ToString("yyyy-MM-dd")</td>
 
-                                        <td>@item.real_num</td>
-                                        <td>@item.real_time.ToString("yyyy-MM-dd")</td>
-                                        <td>@item.return_num</td>
-                                        <td>@if (item.return_num!=0) {@item.return_time.ToString("yyyy-MM-dd") } else { <text>-</text>}</td>
-                                        @if (UserManager.Current.GetLevel >= UserLevelEnum.ProductManager)
-                                        {
-                                            <td>@if (item.return_num!=0) {@item.return_price } else { <text>-</text>}</td>
-                                            <td>@if (item.return_num!=0) {@item.return_all_price } else { <text>-</text>}</td>
-                                            <td>@item.purchase_person</td>
-                                            <td>@item.unit</td>
-                                        }
+                                                <td>@item.real_num</td>
+                                                <td>@item.real_time.ToString("yyyy-MM-dd")</td>
+                                                <td>@item.return_num</td>
+                                                <td>@if (item.return_num != 0)
+                                                {@item.return_time.ToString("yyyy-MM-dd") }
+                                            else
+                                            { <text>-</text>}</td>
+                                                @if (UserManager.Current.GetLevel >= UserLevelEnum.ProductManager)
+                                                {
+                                                    <td>@if (item.return_num != 0)
+                                                    {@item.return_price }
+                                                else
+                                                { <text>-</text>}</td>
+                                                    <td>@if (item.return_num != 0)
+                                                    {@item.return_all_price }
+                                                else
+                                                { <text>-</text>}</td>
+                                                    <td>@item.purchase_person</td>
+                                                    <td>@item.unit</td>
+                                                }
 
-                                    </tr>
+                                            </tr>
                                             index++;
                                         }
                                     }
@@ -271,6 +281,26 @@
             </table>
         </div>
     </div>
+    <script>
+        var app = new Vue({
+            el: '#vueApp',
+            mounted() {
+                var _self = this;
+                _self.$nextTick(function () {
+                    var flag = $('#menuFlag').val();
+                    if (flag == "History") {
+                        _self.$refs.ReturnHistoryIndex.parentNode.parentNode.classList.add("active");
+                        _self.$refs.ReturnHistoryIndex.parentNode.parentNode.classList.add("open");
+                        _self.$refs.ReturnHistoryIndex.classList.add("active");
+                    } else {
+                        _self.$refs.SaleReturn.parentNode.parentNode.classList.add("active");
+                        _self.$refs.SaleReturn.parentNode.parentNode.classList.add("open");
+                        _self.$refs.SaleReturn.classList.add("active");
+                    }
+                })
+            }
+        })
+    </script>
 </body>
 </html>
 

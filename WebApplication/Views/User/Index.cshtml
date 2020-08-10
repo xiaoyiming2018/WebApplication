@@ -12,8 +12,8 @@
 
     <script type="text/javascript">
         $(function () {
-            $(".sidebar ul li:nth-of-type(7)").addClass("active open")
-            $(".sidebar ul li:nth-of-type(7) ul li:nth-of-type(1)").addClass("active")
+            //$(".sidebar ul li:nth-of-type(7)").addClass("active open")
+            //$(".sidebar ul li:nth-of-type(7) ul li:nth-of-type(1)").addClass("active")
         });
 
         function deleteTiShi(id) {
@@ -109,55 +109,55 @@
                                 </thead>
                                 <tbody>
                                     @{
-                                    int index = 1;
-                                    foreach (var item in Model)
-                                    {
-                                    <tr>
-                                        <td>@index</td>
-                                        <td>@item.user_name</td>
-                                        <td>
-                                            @{
-                                                if (item.level == (int)UserLevelEnum.Operator)
-                                                {
-                                                    <label>普通员工</label>
-                                                }
-                                                else if (item.level == (int)UserLevelEnum.ProductManager)
-                                                {
-                                                    <label>生管</label>
-                                                }
-                                                else if (item.level == (int)UserLevelEnum.Boss)
-                                                {
-                                                    <label>老板</label>
-                                                }
-                                                else if (item.level == (int)UserLevelEnum.Developer)
-                                                {
-                                                    <label>系统后台人员</label>
-                                                }
-
-                                            }
-                                        </td>
-                                        @if (UserManager.Current.GetLevel >= UserLevelEnum.Boss)
+                                        int index = 1;
+                                        foreach (var item in Model)
                                         {
-                                            <td>
-                                                <input type="button" class="btn btn-primary" onclick="window.location.href = '/User/Edit?id=@item.id&&user_name=@item.user_name'" value="编辑" />
-                                            </td>
-                                            <td>
-                                                @if (UserManager.Current.GetLevel >= UserLevelEnum.Developer)
+                                            <tr>
+                                                <td>@index</td>
+                                                <td>@item.user_name</td>
+                                                <td>
+                                                    @{
+                                                        if (item.level == (int)UserLevelEnum.Operator)
+                                                        {
+                                                            <label>普通员工</label>
+                                                        }
+                                                        else if (item.level == (int)UserLevelEnum.ProductManager)
+                                                        {
+                                                            <label>生管</label>
+                                                        }
+                                                        else if (item.level == (int)UserLevelEnum.Boss)
+                                                        {
+                                                            <label>老板</label>
+                                                        }
+                                                        else if (item.level == (int)UserLevelEnum.Developer)
+                                                        {
+                                                            <label>系统后台人员</label>
+                                                        }
+
+                                                    }
+                                                </td>
+                                                @if (UserManager.Current.GetLevel >= UserLevelEnum.Boss)
                                                 {
-                                                    <a href="#" class="btn btn-primary" onclick="window.location.href='/User/EditPassWord?user_name=@item.user_name'">修改密码</a>
-                                                }
-                                                else
-                                                {
-                                                    <button class="btn btn-primary" disabled>修改密码</button>
+                                                    <td>
+                                                        <input type="button" class="btn btn-primary" onclick="window.location.href = '/User/Edit?id=@item.id&&user_name=@item.user_name'" value="编辑" />
+                                                    </td>
+                                                    <td>
+                                                        @if (UserManager.Current.GetLevel >= UserLevelEnum.Developer)
+                                                        {
+                                                            <a href="#" class="btn btn-primary" onclick="window.location.href='/User/EditPassWord?user_name=@item.user_name'">修改密码</a>
+                                                        }
+                                                        else
+                                                        {
+                                                            <button class="btn btn-primary" disabled>修改密码</button>
+                                                        }
+
+                                                    </td>
+                                                    <td>
+                                                        <a href="#" class="btn btn-primary" onclick="deleteTiShi(@item.id)">删除</a>
+                                                    </td>
                                                 }
 
-                                            </td>
-                                            <td>
-                                                <a href="#" class="btn btn-primary" onclick="deleteTiShi(@item.id)">删除</a>
-                                            </td>
-                                        }
-
-                                    </tr>
+                                            </tr>
                                             index++;
                                         }
                                     }
@@ -169,6 +169,19 @@
                 </div><!-- /# column -->
             </div><!-- /# row -->
         </div>
-    </div><!-- /# container-fluid -->    
+    </div><!-- /# container-fluid -->
+    <script>
+        var app = new Vue({
+            el: '#vueApp',
+            mounted() {
+                var _self = this;
+                _self.$nextTick(function () {
+                    _self.$refs.User.parentNode.parentNode.classList.add("active");
+                    _self.$refs.User.parentNode.parentNode.classList.add("open");
+                    _self.$refs.User.classList.add("active");
+                })
+            }
+        })
+    </script>
 </body>
 </html>

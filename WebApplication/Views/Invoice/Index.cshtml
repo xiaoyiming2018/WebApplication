@@ -11,11 +11,180 @@
 
     <script type="text/javascript">
         $(function () {
-            $(".sidebar ul li:nth-of-type(6)").addClass("active open")
-            $(".sidebar ul li:nth-of-type(6) ul li:nth-of-type(1)").addClass("active");
+            //$(".sidebar ul li:nth-of-type(6)").addClass("active open")
+            //$(".sidebar ul li:nth-of-type(6) ul li:nth-of-type(1)").addClass("active");
 
+            var start_time = $('#search_start_time').val();
+            var end_time = $('#search_end_time').val();
+            var invoice_index = $('#search_invoice_index').val();
+            var company_name = $('#search_company_name').val();
+            var invoice_company = $('#search_invoice_company').val();
+            var day = $('#search_day').val();
+            var month = $('#search_month').val();
+            var year = $('#search_year').val();
+
+            var searchUrl = "/Invoice/GetData?company_name=" + company_name + "&invoice_index=" + invoice_index + "&start_time=" + start_time
+                + "&end_time=" + end_time + "&day=" + day + "&month=" + month + "&year=" + year + "&invoice_company=" + invoice_company;
+            $("#myTable").bootstrapTable({
+                url: searchUrl,
+                method: 'GET',
+                theadClasses: "thead-blue",
+                pagination: true,
+                sidePagination: "client",
+                pageNumber: 1,
+                pageSize: 20,
+                pageList: [10, 20, 50],
+                undefinedText: '---',
+                paginationDetailHAlign: 'left',
+                toolbar: '#toolbar',
+                showFooter: true,
+                showExport: true, //是否显示导出
+                exportDataType: "all", //basic', 'all', 'selected'.
+                exportTypes: ['excel'],
+                exportOptions: {//导出设置
+                    fileName: '已开发票记录',//下载文件名称
+                },
+                columns: [{
+                    checkbox: true
+
+                }, {
+                    field: 'no',
+                    title: '编号',
+                    align: 'center',
+                    formatter: function (value, row, index) {
+                        return index + 1;
+                    },
+                    footerFormatter: function (data) {
+                        return "汇总";
+                    }
+                }, {
+                    field: 'id',
+                    title: 'id',
+                    visible: false
+                }, {
+                    field: 'company_name',
+                    title: '客户名称',
+                    align: 'center',
+                    sortable: true
+                }, {
+                    field: 'invoice_company',
+                    title: '开票公司',
+                    align: 'center',
+                    sortable: true
+                }, {
+                    field: 'invoice_index',
+                    title: '发票号',
+                    align: 'center',
+                    sortable: true
+                }, {
+                    field: 'invoice_type',
+                    title: '发票类型',
+                    align: 'center',
+                    sortable: true,
+                    formatter: function (value, row, index) {
+                        if (row.invoice_type == 0) {
+                            return "普通发票";
+                        } else {
+                            return "增值税专用发票";
+                        }
+                    }
+                }, {
+                    field: 'invoice_time',
+                    title: '开票日期',
+                    align: 'center',
+                    sortable: true,
+                    formatter: function (value, row, index) {
+                        return row.invoice_time.split('T')[0];
+                    }
+                }, {
+                    field: 'invoice_price',
+                    title: '应付金额',
+                    align: 'center',
+                    sortable: true,
+                    footerFormatter: function (data) {
+                        var count = 0;
+                        $.each(data, function (index, item) {
+                            count += item.invoice_price;
+                        });
+                        return count.toFixed(2);
+                    }
+                }, {
+                    field: 'invoice_real_price',
+                    title: '已付金额',
+                    align: 'center',
+                    sortable: true,
+                    footerFormatter: function (data) {
+                        var count = 0;
+                        $.each(data, function (index, item) {
+                            count += item.invoice_real_price;
+                        });
+                        return count.toFixed(2);
+                    }
+                }, {
+                    field: 'unnum',
+                    title: '未付金额',
+                    align: 'center',
+                    sortable: true,
+                    formatter: function (value, row, index) {
+                        var res = row.invoice_price - row.invoice_real_price;
+                        return res;
+                    },
+                    footerFormatter: function (data) {
+                        var count = 0;
+                        $.each(data, function (index, item) {
+                            count += item.invoice_price - item.invoice_real_price;
+                        });
+                        return count.toFixed(2);
+                    }
+                }, {
+                    field: 'invoice_prepay',
+                    title: '客户预付款',
+                    align: 'center',
+                    sortable: true,
+                    footerFormatter: function (data) {
+                        var count = 0;
+                        $.each(data, function (index, item) {
+                            count += item.invoice_prepay;
+                        });
+                        return count.toFixed(2);
+                    }
+                }, {
+                    field: 'remark',
+                    title: '备注',
+                    align: 'center',
+                    sortable: true
+                }, {
+                    field: 'edit',
+                    title: '操作',
+                    align: 'center',
+                    formatter: function (value, row, index) {
+                        var result = "";
+                        result += "<input type='button' class='btn btn-primary' onclick='Edit(" + row.id + ")' value='编辑' />";
+                        result += "<span style='margin:5px;'></span>";
+                        result += "<input type='button' class='btn btn-primary' onclick=\"deleteTiShi(" + row.id + ")\" value='删除' />";
+                        return result;
+                    }
+                }
+                ]
+            });
             
         });
+
+        function Edit(id) {
+            var companyNameList = $("#company_name").val();
+            var company_name = companyNameList.join(',');
+            var invoice_index = $("#invoice_index").val();
+            var invoice_company = $("#invoice_company").val();
+
+            var start_time = $("#start_time").val();
+            var end_time = $("#end_time").val();
+
+            var day = $("#day").val();
+            var month = $("#month").val();
+            var year = $("#year").val();
+            window.location.href = "/Invoice/Edit?id=" + id + "&company_name=" + company_name + "&invoice_index=" + invoice_index + "&start_time=" + start_time
+                + "&end_time=" + end_time + "&day=" + day + "&month=" + month + "&year=" + year + "&invoice_company=" + invoice_company;
+        }
 
         function Search() {
             var companyNameList = $("#company_name").val();
@@ -188,7 +357,7 @@
     </script>
 </head>
 <body>
-    <div id="app" class="container-fluid">
+    <div class="container-fluid">
         <div class="row">
             <div class="col-lg-12 p-0">
                 <div class="page-header">
@@ -208,6 +377,15 @@
                     <div class="card alert">
                         <div class="card-header">
                             <div class="form-horizontal">
+                                <input type="hidden" id="search_start_time" value="@ViewBag.start_time" />
+                                <input type="hidden" id="search_end_time" value="@ViewBag.end_time" />
+                                <input type="hidden" id="search_invoice_index" value="@ViewBag.invoice_index" />
+                                <input type="hidden" id="search_company_name" value="@ViewBag.company_name" />
+                                <input type="hidden" id="search_invoice_company" value="@ViewBag.invoice_company" />
+                                <input type="hidden" id="search_day" value="@ViewBag.day" />
+                                <input type="hidden" id="search_month" value="@ViewBag.month" />
+                                <input type="hidden" id="search_year" value="@ViewBag.year" />
+
                                 <div class="form-inline">
                                     <div class="form-group">
                                         <label>客户名称：</label>
@@ -218,10 +396,15 @@
                                                 List<Company> objList = CM.SelectAll(type: 0);
                                                 if (objList.Count > 0)
                                                 {
+                                                    string[] result = { };
+                                                    if (!string.IsNullOrEmpty(ViewBag.company_name))
+                                                    {
+                                                        result = ViewBag.company_name.Split(",");
+                                                    }
                                                     for (int i = 0; i < objList.Count; i++)
                                                     {
 
-                                                        <!option value="@objList[i].company_name" @if (Model != null && ViewBag.company_name.Length > 0) { for (int j = 0; j < ViewBag.company_name.Length; j++) { if (objList[i].company_name == ViewBag.company_name[j]) { <text> selected</text>}} }>@objList[i].company_name</!option>
+                                                        <!option value="@objList[i].company_name" @if (result.Length > 0) { for (int j = 0; j < result.Length; j++) { if (objList[i].company_name == result[j]) { <text> selected</text>}} }>@objList[i].company_name</!option>
                                                     }
                                                 }
                                             }
@@ -238,7 +421,7 @@
                                                 {
                                                     for (int i = 0; i < invoiceList.Count; i++)
                                                     {
-                                                        <!option value="@invoiceList[i].invoice_index" @if (Model != null) { if (invoiceList[i].invoice_index == ViewBag.invoice_index) { <text> selected</text>}}>@invoiceList[i].invoice_index</!option>
+                                                        <!option value="@invoiceList[i].invoice_index" @if (invoiceList[i].invoice_index == ViewBag.invoice_index) { <text> selected</text>}>@invoiceList[i].invoice_index</!option>
                                                     }
                                                 }
                                             }
@@ -255,7 +438,7 @@
                                                 {
                                                     for (int i = 0; i < settings.Count; i++)
                                                     {
-                                                        <!option value="@settings[i].config_list" @if (Model != null) { if (settings[i].config_list == ViewBag.invoice_company) { <text> selected</text>} }>@settings[i].config_list</!option>
+                                                        <!option value="@settings[i].config_list" @if (settings[i].config_list == ViewBag.invoice_company) { <text> selected</text>}>@settings[i].config_list</!option>
                                                     }
                                                 }
                                             }
@@ -290,10 +473,10 @@
                                     </div>
                                     @if (UserManager.Current.GetLevel >= UserLevelEnum.ProductManager)
                                     {
-                                <div class="form-group">
-                                    <input type="button" value="新增" class="btn btn-primary" style="width:80px" onclick="window.location.href = '/Invoice/Edit'" />
-                                    
-                                </div>
+                                        <div class="form-group">
+                                            <input type="button" value="新增" class="btn btn-primary" style="width:80px" onclick="window.location.href = '/Invoice/Edit'" />
+
+                                        </div>
                                     }
 
                                 </div>
@@ -306,7 +489,7 @@
                             <div id="toolbar" class="toolbar">
                                 <button class='btn btn-primary' onclick='duiZhang()'>确认付款</button>
                             </div>
-                            
+
                             <table id="myTable" class="table table-responsive table-hover ">
                             </table>
                         </div>
@@ -346,166 +529,17 @@
             </div>
         </div>
     </div>
-
     <script>
         var app = new Vue({
-            el: '#app',
-            mounted(){
+            el: '#vueApp',
+            mounted() {
                 var _self = this;
                 _self.$nextTick(function () {
-                    setTimeout(function () {
-                        _self.loadL();
-                    }, 500);
+                    _self.$refs.Invoice.parentNode.parentNode.classList.add("active");
+                    _self.$refs.Invoice.parentNode.parentNode.classList.add("open");
+                    _self.$refs.Invoice.classList.add("active");
                 })
-            },
-            methods: {
-                loadL() {
-                    $("#myTable").bootstrapTable({
-                        url: '/Invoice/GetData',
-                        method: 'GET',
-                        theadClasses: "thead-blue",
-                        pagination: true,
-                        sidePagination: "client",
-                        pageNumber: 1,
-                        pageSize: 20,
-                        pageList: [10, 20, 50],
-                        undefinedText: '---',
-                        paginationDetailHAlign: 'left',
-                        toolbar: '#toolbar',
-                        showFooter: true,
-                        showExport: true, //是否显示导出
-                        exportDataType: "all", //basic', 'all', 'selected'.
-                        exportTypes: ['excel'],
-                        exportOptions: {//导出设置
-                            fileName: '已开发票记录',//下载文件名称
-                        },
-                        columns: [{
-                            checkbox: true
-
-                        }, {
-                            field: 'no',
-                            title: '编号',
-                            align: 'center',
-                            formatter: function (value, row, index) {
-                                return index + 1;
-                            },
-                            footerFormatter: function (data) {
-                                return "汇总";
-                            }
-                        }, {
-                            field: 'id',
-                            title: 'id',
-                            visible: false
-                        }, {
-                            field: 'company_name',
-                            title: '客户名称',
-                            align: 'center',
-                            sortable: true
-                        }, {
-                            field: 'invoice_company',
-                            title: '开票公司',
-                            align: 'center',
-                            sortable: true
-                        }, {
-                            field: 'invoice_index',
-                            title: '发票号',
-                            align: 'center',
-                            sortable: true
-                        }, {
-                            field: 'invoice_type',
-                            title: '发票类型',
-                            align: 'center',
-                            sortable: true,
-                            formatter: function (value, row, index) {
-                                if (row.invoice_type == 0) {
-                                    return "普通发票";
-                                } else {
-                                    return "增值税专用发票";
-                                }
-                            }
-                        }, {
-                            field: 'invoice_time',
-                            title: '开票日期',
-                            align: 'center',
-                            sortable: true,
-                            formatter: function (value, row, index) {
-                                return row.invoice_time.split('T')[0];
-                            }
-                        }, {
-                            field: 'invoice_price',
-                            title: '应付金额',
-                            align: 'center',
-                            sortable: true,
-                            footerFormatter: function (data) {
-                                var count = 0;
-                                $.each(data, function (index, item) {
-                                    count += item.invoice_price;
-                                });
-                                return count.toFixed(2);
-                            }
-                        }, {
-                            field: 'invoice_real_price',
-                            title: '已付金额',
-                            align: 'center',
-                            sortable: true,
-                            footerFormatter: function (data) {
-                                var count = 0;
-                                $.each(data, function (index, item) {
-                                    count += item.invoice_real_price;
-                                });
-                                return count.toFixed(2);
-                            }
-                        }, {
-                            field: 'unnum',
-                            title: '未付金额',
-                            align: 'center',
-                            sortable: true,
-                            formatter: function (value, row, index) {
-                                var res = row.invoice_price - row.invoice_real_price;
-                                return res;
-                            },
-                            footerFormatter: function (data) {
-                                var count = 0;
-                                $.each(data, function (index, item) {
-                                    count += item.invoice_price - item.invoice_real_price;
-                                });
-                                return count.toFixed(2);
-                            }
-                        }, {
-                            field: 'invoice_prepay',
-                            title: '客户预付款',
-                            align: 'center',
-                            sortable: true,
-                            footerFormatter: function (data) {
-                                var count = 0;
-                                $.each(data, function (index, item) {
-                                    count += item.invoice_prepay;
-                                });
-                                return count.toFixed(2);
-                            }
-                        }, {
-                            field: 'remark',
-                            title: '备注',
-                            align: 'center',
-                            sortable: true
-                        }, {
-                            field: 'edit',
-                            title: '操作',
-                            align: 'center',
-                            formatter: function (value, row, index) {
-                                var result = "";
-                                result += "<input type='button' class='btn btn-primary' onclick=\"window.location.href = '/Invoice/Edit?id=" + row.id + "'\" value='编辑' />";
-                                result += "<span style='margin:5px;'></span>";
-                                result += "<input type='button' class='btn btn-primary' onclick=\"deleteTiShi(" + row.id + ")\" value='删除' />";
-                                return result;
-                            }
-                        }
-                        ]
-                    });
-                }
             }
-
-
         })
     </script>
 </body>

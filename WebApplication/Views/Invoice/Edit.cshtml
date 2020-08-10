@@ -13,8 +13,8 @@
         var TempArr = [];//存储option
 
         $(function () {
-            $(".sidebar ul li:nth-of-type(6)").addClass("active open")
-            $(".sidebar ul li:nth-of-type(6) ul li:nth-of-type(1)").addClass("active")
+            //$(".sidebar ul li:nth-of-type(6)").addClass("active open")
+            //$(".sidebar ul li:nth-of-type(6) ul li:nth-of-type(1)").addClass("active")
 
 
 
@@ -49,8 +49,19 @@
                         },
                         success: function (msg) {
                             if (msg == "Success") {
+
+                                var start_time = $('#search_start_time').val();
+                                var end_time = $('#search_end_time').val();
+                                var invoice_index = $('#search_invoice_index').val();
+                                var company_name = $('#search_company_name').val();
+                                var invoice_company = $('#search_invoice_company').val();
+                                var day = $('#search_day').val();
+                                var month = $('#search_month').val();
+                                var year = $('#search_year').val();
+                                var searchUrl = "/Invoice/Index?company_name=" + company_name + "&invoice_index=" + invoice_index + "&start_time=" + start_time
+                                    + "&end_time=" + end_time + "&day=" + day + "&month=" + month + "&year=" + year + "&invoice_company=" + invoice_company;
                                 swal({ title: "执行成功!", text: "", type: "success" },
-                                    function () { window.location.href = '/Invoice/Index'; });
+                                    function () { window.location.href = searchUrl; });
 
                             }
                             else if (msg == "Fail") {
@@ -106,6 +117,16 @@
                                 <div class="basic-form">
                                     <div class="form-horizontal">
                                         <input type="hidden" class="form-control" id="id" name="id" value="@if (Model!=null) { @Model.id; } " />
+
+                                        <input type="hidden" id="search_start_time" value="@ViewBag.start_time" />
+                                        <input type="hidden" id="search_end_time" value="@ViewBag.end_time" />
+                                        <input type="hidden" id="search_invoice_index" value="@ViewBag.invoice_index" />
+                                        <input type="hidden" id="search_company_name" value="@ViewBag.search_company_name" />
+                                        <input type="hidden" id="search_invoice_company" value="@ViewBag.invoice_company" />
+                                        <input type="hidden" id="search_day" value="@ViewBag.day" />
+                                        <input type="hidden" id="search_month" value="@ViewBag.month" />
+                                        <input type="hidden" id="search_year" value="@ViewBag.year" />
+
                                         <div class="form-group">
                                             <label for="example-input-normal" class="col-sm-4 control-label">客户名称</label>
                                             <div class="col-sm-3">
@@ -211,13 +232,21 @@
                     </div><!-- /# column -->
                 </div><!-- /# row -->
             }
-
-
-
-
-
         </div>
     </div><!-- /# container-fluid -->
+    <script>
+        var app = new Vue({
+            el: '#vueApp',
+            mounted() {
+                var _self = this;
+                _self.$nextTick(function () {
+                    _self.$refs.Invoice.parentNode.parentNode.classList.add("active");
+                    _self.$refs.Invoice.parentNode.parentNode.classList.add("open");
+                    _self.$refs.Invoice.classList.add("active");
+                })
+            }
+        })
+    </script>
 </body>
 </html>
 

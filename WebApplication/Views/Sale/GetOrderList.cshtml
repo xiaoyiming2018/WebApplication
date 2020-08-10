@@ -52,8 +52,8 @@
                         <td>@item.order_all_price</td>
                     }
 
-                    <td hidden><input type="text" name="remain_num" style="width:100px" value="@item.remain_num" /></td>
-                    <td>@item.remain_num</td>
+                    <td hidden><input type="text" name="remain_num" style="width:100px" value="@(item.order_num-item.open_num+item.tui_num)" /></td>
+                    <td>@(item.order_num-item.open_num+item.tui_num)</td>
                     <td>@item.purchase_person</td>
                     <td>
                         <input type="text" id="real_num@{@item.seq_id}" name="real_num" style="width:100px;border-right-style: none;border-left-style: none;border-top-style: none;" onchange="getProductPrice(@item.seq_id)" />

@@ -12,8 +12,8 @@
 
     <script type="text/javascript">
         $(function () {
-            $(".sidebar ul li:nth-of-type(4)").addClass("active open")
-            $(".sidebar ul li:nth-of-type(4) ul li:nth-of-type(2)").addClass("active");
+            //$(".sidebar ul li:nth-of-type(4)").addClass("active open")
+            //$(".sidebar ul li:nth-of-type(4) ul li:nth-of-type(2)").addClass("active");
             $("#myTable").bootstrapTable({
                 url: '/Order/GetHistoryData',
                 method: 'GET',
@@ -366,6 +366,19 @@
             </div><!-- /# row -->
         </div>
     </div><!-- /# container-fluid -->
+    <script>
+        var app = new Vue({
+            el: '#vueApp',
+            mounted() {
+                var _self = this;
+                _self.$nextTick(function () {
+                    _self.$refs.OrderHistory.parentNode.parentNode.classList.add("active");
+                    _self.$refs.OrderHistory.parentNode.parentNode.classList.add("open");
+                    _self.$refs.OrderHistory.classList.add("active");
+                })
+            }
+        })
+    </script>
 </body>
 </html>
 

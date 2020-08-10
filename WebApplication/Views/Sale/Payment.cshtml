@@ -12,9 +12,9 @@
 
     <script type="text/javascript">
         $(function () {
-            $(".sidebar ul li:nth-of-type(5)").addClass("active open");
-            $(".sidebar ul li:nth-of-type(5) ul li").removeClass();
-            $(".sidebar ul li:nth-of-type(5) ul li:nth-of-type(4)").addClass("active");
+            //$(".sidebar ul li:nth-of-type(5)").addClass("active open");
+            //$(".sidebar ul li:nth-of-type(5) ul li").removeClass();
+            //$(".sidebar ul li:nth-of-type(5) ul li:nth-of-type(4)").addClass("active");
 
             $("#myTable").bootstrapTable({
                 url: '/Sale/GetPaymentData',
@@ -301,7 +301,7 @@
                                 </div>
                                 <br />
                                 <div class="form-inline">
-                                    
+
                                     <div class="form-group">
                                         <input type="button" value="查询" class="btn btn-primary" style="width:80px" onclick="Search()" />
                                     </div>
@@ -356,6 +356,19 @@
             </div>
         </div>
     </div>
+    <script>
+        var app = new Vue({
+            el: '#vueApp',
+            mounted() {
+                var _self = this;
+                _self.$nextTick(function () {
+                    _self.$refs.Payment.parentNode.parentNode.classList.add("active");
+                    _self.$refs.Payment.parentNode.parentNode.classList.add("open");
+                    _self.$refs.Payment.classList.add("active");
+                })
+            }
+        })
+    </script>
 </body>
 </html>
 

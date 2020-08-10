@@ -1,0 +1,731 @@
+﻿@{
+    @model IList<Model.Order>
+    @using Model;
+    @using BLL;
+
+}
+@using AspNetCoreMvcPager;
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+
+    <script type="text/javascript">
+        $(function () {
+
+            $("#myTable").bootstrapTable({
+                url: '/Inventory/GetInventoryInfo',
+                method: 'GET',
+                theadClasses: "thead-blue",
+                pagination: true,
+                sidePagination: "client",
+                pageNumber: 1,
+                pageSize: 10,
+                pageList: [10, 20, 50],
+                undefinedText: '---',
+                paginationDetailHAlign: 'left',
+                toolbar: '#toolbar',
+                showFooter: false,
+                showExport: true, //是否显示导出
+                exportDataType: "all", //basic', 'all', 'selected'.
+                exportTypes: ['excel'],
+                exportOptions: {//导出设置
+                    fileName: '库存总览',//下载文件名称
+                },
+                columns: [{
+                    field: 'no',
+                    title: '编号',
+                    align: 'center',
+                    formatter: function (value, row, index) {
+                        return index + 1;
+                    }
+                }, {
+                    field: 'material_name',
+                    title: '品名',
+                    align: 'center',
+                    sortable: true
+                }, {
+                    field: 'inout_num',
+                    title: '结存数量',
+                    align: 'center',
+                    sortable: true,
+                }, {
+                    field: 'inout_all_price',
+                    title: '结存金额',
+                    align: 'center',
+                    sortable: true,
+                }, {
+                    field: 'picture',
+                    title: '图纸',
+                    align: 'center',
+                    sortable: true,
+                    formatter: function (value, row, index) {
+                        var result = "";
+                        if (row.picture == "" || row.picture == null || row.picture == undefined) {
+                            result += "<a href='#' >暂无图纸</a>";
+
+                        } else {
+                            result += "<a href='/src/Files" + row.picture + "' target='_blank'>查看</a>";
+                        }
+
+                        return result;
+                    }
+                }]
+            });
+        });
+
+        function Search() {
+            
+        }
+
+    </script>
+</head>
+<body>
+    <div class="container-fluid" id="wrap">
+        <div class="row">
+            <div class="col-lg-12 p-0">
+                <div class="page-header">
+                    <div class="page-title">
+                        <ol class="breadcrumb text-left">
+                            <li><a href="/Supplier/Index">主页</a></li>
+                            <li><a href="/Inventory/Index">库存概况</a></li>
+                            <li><a href="/Inventory/Index">库存总览</a></li>
+                            <li class="active">订单列表</li>
+                        </ol>
+                    </div>
+                </div>
+            </div><!-- /# column -->
+        </div><!-- /# row -->
+        <div class="main-content">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="card alert">
+                        <div class="card-header">
+                            <div class="form-horizontal">
+                                <div class="form-inline">
+                                    <div class="form-group">
+                                        <label>&emsp;&emsp;品名：</label>
+                                        <select class="selectpicker" data-live-search="true" data-live-search-placeholder="搜索" id="material_name" name="material_name"
+                                                style="padding:6px 50px" multiple>
+                                            <option value="">-请选择-</option>
+                                            @{
+                                                MaterialManager CM = new MaterialManager();
+                                                List<Material> objList = CM.SelectAll();
+                                                if (objList.Count > 0)
+                                                {
+                                                    for (int i = 0; i < objList.Count; i++)
+                                                    {
+                                                        <!option value="@objList[i].material_name">
+                                                            @objList[i].material_name
+                                                        </!option>
+                                                    }
+                                                }
+                                            }
+                                        </select>
+                                    </div>
+                                    @*<div class="form-group">
+                                            <label>开始时间：</label>
+                                            <input id="start_time" name="start_time" type="text" class="form-control" autocomplete="off" style="width:160px" onclick="WdatePicker({ skin: 'whyGreen',dateFmt:'yyyy-MM-dd' })" />
+                                        </div>
+                                        <div class="form-group">
+                                            <label>结束时间：</label>
+                                            <input id="end_time" name="end_time" type="text" class="form-control" autocomplete="off" style="width:160px" onclick="WdatePicker({ skin: 'whyGreen',dateFmt:'yyyy-MM-dd' })" />
+                                        </div>*@
+                                    <div class="form-group">
+                                        <input type="button" value="查询" class="btn btn-primary" style="width:80px" v-on:click="Search" />
+                                    </div>
+                                </div>
+                                <br />
+
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div id="toolbar" class="toolbar">
+                                <b>现有库存总览</b>
+                            </div>
+                            <table id="myTable" class="table table-responsive table-hover ">
+                            </table>
+                            @*<div id="dayNum" style="width:100%;height:380px">
+                                </div>
+                                <div id="dayPrice" style="width:100%;height:380px">
+                                </div>
+                                <div id="monthNum" style="width:100%;height:380px">
+                                </div>
+                                <div id="monthPrice" style="width:100%;height:380px">
+                                </div>
+                                <div class="row">
+                                    <div id="yearNum" style="width:45%;height:380px">
+                                    </div>
+                                    <div id="yearPrice" style="width:45%;height:380px">
+                                    </div>
+                                </div>*@
+                            <div class="box-content">
+                                <ul class="nav nav-tabs">
+                                    <li class="active">
+                                        <a data-toggle="tab" href="#tab1" v-on:click="refreshTab1"><span>过去一个月品名进出库数量与金额</span></a>
+                                    </li>
+                                    <li>
+                                        <a data-toggle="tab" href="#tab2" v-on:click="refreshTab2"><span>过去一年品名进出库数量与金额</span></a>
+                                    </li>
+                                    <li>
+                                        <a data-toggle="tab" href="#tab3" v-on:click="refreshTab3"><span>各年品名进出库数量与金额</span></a>
+                                    </li>
+                                </ul>
+                                <div class="tab-content">
+                                    <div class="tab-pane active" id="tab1">
+                                        <div class="col-md-12" style="margin-top: 20px;">
+                                            <div class="box-body">
+                                                <div id="dayNum" style="width:1600px;height:380px">
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-12" style="margin-top: 20px;">
+                                            <div class="box-body">
+                                                <div id="dayPrice" style="width:1600px;height:380px">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="tab-pane" id="tab2">
+
+                                        <div class="col-md-12" style="margin-top: 20px;">
+                                            <div class="box-body">
+                                                <div id="monthNum" style="width:1600px;height:380px">
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-12" style="margin-top: 20px;">
+                                            <div class="box-body">
+                                                <div id="monthPrice" style="width:1600px;height:380px">
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                    <div class="tab-pane" id="tab3">
+                                        <div class="col-md-12" style="margin-top: 20px;">
+                                            <div class="box-body">
+                                                <div id="yearNum" style="width:1600px;height:380px">
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-12" style="margin-top: 20px;">
+                                            <div class="box-body">
+                                                <div id="yearPrice" style="width:1600px;height:380px">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div><!-- /# card -->
+                </div><!-- /# column -->
+            </div><!-- /# row -->
+        </div>
+    </div><!-- /# container-fluid -->
+    <script>
+        var app = new Vue({
+            el: '#vueApp',
+            data: {
+                material_name: ""
+            },
+            mounted() {
+                var _self = this;
+                _self.$nextTick(function () {
+                    _self.$refs.Inventory.parentNode.parentNode.classList.add("active");
+                    _self.$refs.Inventory.parentNode.parentNode.classList.add("open");
+                    _self.$refs.Inventory.classList.add("active");
+                    _self.LoadEchartDayNum("");
+                    _self.LoadEchartDayPrice("");
+
+                    _self.LoadEchartMonthNum("");
+                    _self.LoadEchartMonthPrice("");
+
+                    _self.LoadEchartYearNum("");
+                    _self.LoadEchartYearPrice("");
+                })
+            },
+            methods: {
+                LoadEchartDayNum(material_name) {
+                    var _self = this;
+
+                    var url = '/Inventory/GetnventoryTrendDay?material_name=' + material_name;
+                    axios.get(url).then(function (response) {
+                        var res = response.data;
+                        var legendData = [];
+                        var xAxisData = [];
+                        var result = [];
+                        if (res.length > 0) {
+
+                            for (var item in res) {
+
+                                if (legendData.indexOf(res[item].material_name) == -1) {
+                                    legendData.push(res[item].material_name);
+
+                                    var data = []
+
+                                    for (var i in res) {
+                                        if (res[item].material_name == res[i].material_name) {
+                                            data.push(res[i].inout_num);
+                                        } else {
+                                            data.push(0);
+                                        }
+                                    }
+
+                                    var items = {};
+                                    items.name = res[item].material_name;
+                                    items.type = "bar";
+                                    items.stack = "bar";
+                                    items.barWidth = 50;
+                                    items.data = data;
+                                    result.push(items);
+                                }
+                                if (xAxisData.indexOf(res[item].create_time.split('T')[0]) == -1) {
+                                    xAxisData.push(res[item].create_time.split('T')[0]);
+                                }
+                            }
+
+                        }
+
+                        var echartNum = echarts.init(document.getElementById('dayNum'));
+                        var optionNum = {
+                            legend: {
+                                data: legendData.sort()
+                            },
+                            tooltip: {
+                                trigger: 'axis',
+                                axisPointer: {            // 坐标轴指示器，坐标轴触发有效
+                                    type: 'shadow'        // 默认为直线，可选为：'line' | 'shadow'
+                                }
+                            },
+                            xAxis: {
+                                type: 'category',
+                                data: xAxisData
+                            },
+                            yAxis: {
+                                type: 'value',
+                                name: '过去一个月各品名进出库数量趋势'
+                            },
+                            series: result,
+                            dataZoom: {
+                                type: 'slider',
+                                show: true,
+                                realtime: true,
+                                bottom: -5,
+                                height: 20,
+                                start: 0,
+                                end: 100
+                            }
+                        };
+                        // 使用刚指定的配置项和数据显示图表。
+                        echartNum.setOption(optionNum);
+                    }).catch(function (error) {
+                        console.info(error);
+                    })
+                },
+                LoadEchartDayPrice(material_name) {
+                    var _self = this;
+
+                    var url = '/Inventory/GetnventoryTrendDay?material_name=' + material_name;
+                    axios.get(url).then(function (response) {
+                        var res = response.data;
+                        var legendData = [];
+                        var xAxisData = [];
+                        var result = [];
+                        if (res.length > 0) {
+
+                            for (var item in res) {
+                                if (legendData.indexOf(res[item].material_name) == -1) {
+                                    legendData.push(res[item].material_name);
+                                    var data = []
+                                    for (var i in res) {
+                                        if (res[item].material_name == res[i].material_name) {
+                                            data.push(res[i].inout_all_price);
+                                        } else {
+                                            data.push(0);
+                                        }
+                                    }
+                                    var items = {};
+                                    items.name = res[item].material_name;
+                                    items.type = "bar";
+                                    items.stack = "bar";
+                                    items.barWidth = 50;
+                                    items.data = data;
+                                    result.push(items);
+                                }
+                                if (xAxisData.indexOf(res[item].create_time.split('T')[0]) == -1) {
+                                    xAxisData.push(res[item].create_time.split('T')[0]);
+                                }
+                            }
+
+                        }
+
+                        var echartNum = echarts.init(document.getElementById('dayPrice'));
+                        var optionNum = {
+                            legend: {
+                                data: legendData.sort()
+                            },
+                            tooltip: {
+                                trigger: 'axis',
+                                axisPointer: {            // 坐标轴指示器，坐标轴触发有效
+                                    type: 'shadow'        // 默认为直线，可选为：'line' | 'shadow'
+                                }
+                            },
+                            xAxis: {
+                                type: 'category',
+                                data: xAxisData
+                            },
+                            yAxis: {
+                                type: 'value',
+                                name: '过去一个月各品名进出库金额趋势'
+                            },
+                            series: result,
+                            dataZoom: {
+                                type: 'slider',
+                                show: true,
+                                realtime: true,
+                                bottom: -5,
+                                height: 20,
+                                start: 0,
+                                end: 100
+                            }
+                        };
+                        // 使用刚指定的配置项和数据显示图表。
+                        echartNum.setOption(optionNum);
+                    }).catch(function (error) {
+                        console.info(error);
+                    })
+                },
+                LoadEchartMonthNum(material_name) {
+                    var _self = this;
+
+                    var url = '/Inventory/GetnventoryTrendMonth?material_name=' + material_name;
+                    axios.get(url).then(function (response) {
+                        var res = response.data;
+                        var legendData = [];
+                        var xAxisData = [];
+                        var result = [];
+                        if (res.length > 0) {
+
+                            for (var item in res) {
+
+
+                                if (legendData.indexOf(res[item].material_name) == -1) {
+                                    legendData.push(res[item].material_name);
+
+
+                                    var data = []
+
+                                    for (var i in res) {
+                                        if (res[item].material_name == res[i].material_name) {
+                                            data.push(res[i].inout_num);
+                                        } else {
+                                            data.push(0);
+                                        }
+                                    }
+
+                                    var items = {};
+                                    items.name = res[item].material_name;
+                                    items.type = "bar";
+                                    items.stack = "bar";
+                                    items.barWidth = 50;
+                                    items.data = data;
+                                    result.push(items);
+                                }
+                                if (xAxisData.indexOf(res[item].create_time.substring(0, 7)) == -1) {
+                                    xAxisData.push(res[item].create_time.substring(0, 7));
+                                }
+                            }
+
+                        }
+
+                        var echartNum = echarts.init(document.getElementById('monthNum'));
+                        var optionNum = {
+                            legend: {
+                                data: legendData.sort()
+                            },
+                            tooltip: {
+                                trigger: 'axis',
+                                axisPointer: {            // 坐标轴指示器，坐标轴触发有效
+                                    type: 'shadow'        // 默认为直线，可选为：'line' | 'shadow'
+                                }
+                            },
+                            xAxis: {
+                                type: 'category',
+                                data: xAxisData
+                            },
+                            yAxis: {
+                                type: 'value',
+                                name: '过去一年各品名进出库数量趋势'
+                            },
+                            series: result,
+                            dataZoom: {
+                                type: 'slider',
+                                show: true,
+                                realtime: true,
+                                bottom: -5,
+                                height: 20,
+                                start: 0,
+                                end: 100
+                            }
+                        };
+                        // 使用刚指定的配置项和数据显示图表。
+                        echartNum.setOption(optionNum);
+                    }).catch(function (error) {
+                        console.info(error);
+                    })
+                },
+                LoadEchartMonthPrice(material_name) {
+                    var _self = this;
+
+                    var url = '/Inventory/GetnventoryTrendMonth?material_name=' + material_name;
+                    axios.get(url).then(function (response) {
+                        var res = response.data;
+                        var legendData = [];
+                        var xAxisData = [];
+                        var result = [];
+                        if (res.length > 0) {
+
+                            for (var item in res) {
+                                if (legendData.indexOf(res[item].material_name) == -1) {
+                                    legendData.push(res[item].material_name);
+                                    var data = []
+                                    for (var i in res) {
+                                        if (res[item].material_name == res[i].material_name) {
+                                            data.push(res[i].inout_all_price);
+                                        } else {
+                                            data.push(0);
+                                        }
+                                    }
+                                    var items = {};
+                                    items.name = res[item].material_name;
+                                    items.type = "bar";
+                                    items.stack = "bar";
+                                    items.barWidth = 50;
+                                    items.data = data;
+                                    result.push(items);
+                                }
+                                if (xAxisData.indexOf(res[item].create_time.substring(0, 7)) == -1) {
+                                    xAxisData.push(res[item].create_time.substring(0, 7));
+                                }
+                            }
+
+                        }
+
+                        var echartNum = echarts.init(document.getElementById('monthPrice'));
+                        var optionNum = {
+                            legend: {
+                                data: legendData.sort()
+                            },
+                            tooltip: {
+                                trigger: 'axis',
+                                axisPointer: {            // 坐标轴指示器，坐标轴触发有效
+                                    type: 'shadow'        // 默认为直线，可选为：'line' | 'shadow'
+                                }
+                            },
+                            xAxis: {
+                                type: 'category',
+                                data: xAxisData
+                            },
+                            yAxis: {
+                                type: 'value',
+                                name: '过去一年各品名进出库金额趋势'
+                            },
+                            series: result,
+                            dataZoom: {
+                                type: 'slider',
+                                show: true,
+                                realtime: true,
+                                bottom: -5,
+                                height: 20,
+                                start: 0,
+                                end: 100
+                            }
+                        };
+                        // 使用刚指定的配置项和数据显示图表。
+                        echartNum.setOption(optionNum);
+                    }).catch(function (error) {
+                        console.info(error);
+                    })
+                },
+                LoadEchartYearNum(material_name) {
+                    var _self = this;
+
+                    var url = '/Inventory/GetnventoryTrendYear?material_name=' + material_name;
+                    axios.get(url).then(function (response) {
+                        var res = response.data;
+                        var legendData = [];
+                        var xAxisData = [];
+                        var result = [];
+                        if (res.length > 0) {
+
+                            for (var item in res) {
+
+
+                                if (legendData.indexOf(res[item].material_name) == -1) {
+                                    legendData.push(res[item].material_name);
+
+
+                                    var data = []
+
+                                    for (var i in res) {
+                                        if (res[item].material_name == res[i].material_name) {
+                                            data.push(res[i].inout_num);
+                                        } else {
+                                            data.push(0);
+                                        }
+                                    }
+
+                                    var items = {};
+                                    items.name = res[item].material_name;
+                                    items.type = "bar";
+                                    items.stack = "bar";
+                                    items.barWidth = 50;
+                                    items.data = data;
+                                    result.push(items);
+                                }
+                                if (xAxisData.indexOf(res[item].create_time.substring(0, 4)) == -1) {
+                                    xAxisData.push(res[item].create_time.substring(0, 4));
+                                }
+                            }
+
+                        }
+
+                        var echartNum = echarts.init(document.getElementById('yearNum'));
+                        var optionNum = {
+                            legend: {
+                                data: legendData.sort()
+                            },
+                            tooltip: {
+                                trigger: 'axis',
+                                axisPointer: {            // 坐标轴指示器，坐标轴触发有效
+                                    type: 'shadow'        // 默认为直线，可选为：'line' | 'shadow'
+                                }
+                            },
+                            xAxis: {
+                                type: 'category',
+                                data: xAxisData
+                            },
+                            yAxis: {
+                                type: 'value',
+                                name: '过去一年各品名进出库数量趋势'
+                            },
+                            series: result,
+                            dataZoom: {
+                                type: 'slider',
+                                show: true,
+                                realtime: true,
+                                bottom: -5,
+                                height: 20,
+                                start: 0,
+                                end: 100
+                            }
+                        };
+                        // 使用刚指定的配置项和数据显示图表。
+                        echartNum.setOption(optionNum);
+                    }).catch(function (error) {
+                        console.info(error);
+                    })
+                },
+                LoadEchartYearPrice(material_name) {
+                    var _self = this;
+
+                    var url = '/Inventory/GetnventoryTrendYear?material_name=' + material_name;
+                    axios.get(url).then(function (response) {
+                        var res = response.data;
+                        var legendData = [];
+                        var xAxisData = [];
+                        var result = [];
+                        if (res.length > 0) {
+
+                            for (var item in res) {
+                                if (legendData.indexOf(res[item].material_name) == -1) {
+                                    legendData.push(res[item].material_name);
+                                    var data = []
+                                    for (var i in res) {
+                                        if (res[item].material_name == res[i].material_name) {
+                                            data.push(res[i].inout_all_price);
+                                        } else {
+                                            data.push(0);
+                                        }
+                                    }
+                                    var items = {};
+                                    items.name = res[item].material_name;
+                                    items.type = "bar";
+                                    items.stack = "bar";
+                                    items.barWidth = 50;
+                                    items.data = data;
+                                    result.push(items);
+                                }
+                                if (xAxisData.indexOf(res[item].create_time.substring(0, 4)) == -1) {
+                                    xAxisData.push(res[item].create_time.substring(0, 4));
+                                }
+                            }
+
+                        }
+
+                        var echartNum = echarts.init(document.getElementById('yearPrice'));
+                        var optionNum = {
+                            legend: {
+                                data: legendData.sort()
+                            },
+                            tooltip: {
+                                trigger: 'axis',
+                                axisPointer: {            // 坐标轴指示器，坐标轴触发有效
+                                    type: 'shadow'        // 默认为直线，可选为：'line' | 'shadow'
+                                }
+                            },
+                            xAxis: {
+                                type: 'category',
+                                data: xAxisData
+                            },
+                            yAxis: {
+                                type: 'value',
+                                name: '过去一年各品名进出库金额趋势'
+                            },
+                            series: result,
+                            dataZoom: {
+                                type: 'slider',
+                                show: true,
+                                realtime: true,
+                                bottom: -5,
+                                height: 20,
+                                start: 0,
+                                end: 100
+                            }
+                        };
+                        // 使用刚指定的配置项和数据显示图表。
+                        echartNum.setOption(optionNum);
+                    }).catch(function (error) {
+                        console.info(error);
+                    })
+                },
+                Search() {
+                    var material_name = $("#material_name").val();
+                    var searchUrl = "/Inventory/GetInventoryInfo?material_name=" + material_name;
+                    $("#myTable").bootstrapTable('refresh', { url: searchUrl });
+
+                },
+                refreshTab1() {
+                    //var material_name = $("#material_name").val();
+                    this.LoadEchartDayNum("");
+                    this.LoadEchartDayPrice("");
+                },
+                refreshTab2() {
+                    //var material_name = $("#material_name").val();
+                    this.LoadEchartMonthNum("");
+                    this.LoadEchartMonthPrice("");
+                },
+                refreshTab3() {
+                    //var material_name = $("#material_name").val();
+                    this.LoadEchartYearNum("");
+                    this.LoadEchartYearPrice("");
+                }
+            }
+        })
+    </script>
+</body>
+</html>
+
+

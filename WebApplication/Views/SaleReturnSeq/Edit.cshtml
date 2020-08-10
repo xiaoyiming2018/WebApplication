@@ -12,9 +12,9 @@
     <script type="text/javascript">
         var TempArr = [];//存储option
         $(function () {
-            $(".sidebar ul li:nth-of-type(5)").addClass("active open")
-            $(".sidebar ul li:nth-of-type(5) ul li").removeClass()
-            $(".sidebar ul li:nth-of-type(5) ul li:nth-of-type(2)").addClass("active")
+            //$(".sidebar ul li:nth-of-type(5)").addClass("active open")
+            //$(".sidebar ul li:nth-of-type(5) ul li").removeClass()
+            //$(".sidebar ul li:nth-of-type(5) ul li:nth-of-type(2)").addClass("active")
             $('#submit').click(function () {
                 var seq_id = $('#seq_id').val();
                 var return_index = $('#return_index').val();
@@ -177,7 +177,19 @@
             </div><!-- /# row -->
         </div>
     </div><!-- /# container-fluid -->
-
+    <script>
+        var app = new Vue({
+            el: '#vueApp',
+            mounted() {
+                var _self = this;
+                _self.$nextTick(function () {
+                    _self.$refs.SaleReturn.parentNode.parentNode.classList.add("active");
+                    _self.$refs.SaleReturn.parentNode.parentNode.classList.add("open");
+                    _self.$refs.SaleReturn.classList.add("active");
+                })
+            }
+        })
+    </script>
 </body>
 </html>
 

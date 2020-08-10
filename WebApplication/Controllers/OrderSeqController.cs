@@ -76,6 +76,18 @@ namespace WebApplication.Controllers
                 ViewBag.company_order_index = order.company_order_index;
                 ViewBag.order_time = DateTime.Now.ToLocalTime().AddHours(8).ToString("yyyy-MM-dd");
 
+
+                ViewBag.search_company_name = Convert.ToString(Request.Query["company_name"]);
+                ViewBag.search_order_index = Convert.ToString(Request.Query["order_index"]);
+                ViewBag.search_company_order_index = Convert.ToString(Request.Query["company_order_index"]);
+                ViewBag.search_purchase_person = Convert.ToString(Request.Query["purchase_person"]);
+                ViewBag.search_order_name = Convert.ToString(Request.Query["order_name"]);
+
+                ViewBag.search_start_time = Convert.ToString(Request.Query["start_time"]);
+                ViewBag.search_end_time = Convert.ToString(Request.Query["end_time"]);
+                ViewBag.search_deliver_start_time = Convert.ToString(Request.Query["deliver_start_time"]);
+                ViewBag.search_deliver_end_time = Convert.ToString(Request.Query["deliver_end_time"]);
+
                 int seq_id = Convert.ToInt32(Request.Query["seq_id"]);
                 if (seq_id > 0)
                 {

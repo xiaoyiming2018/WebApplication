@@ -21,12 +21,7 @@ namespace WebApplication.Controllers
         /// <param name="page">分页页码</param>
         /// <param name="size">每页显示数量</param>
         /// <returns></returns>
-        public IActionResult Index()
-        {
-            return View();
-
-        }
-        public IActionResult GetData(string start_time, string end_time, string company_name, string purchase_index,
+        public IActionResult Index(string start_time, string end_time, string company_name, string purchase_index,
             string material_name, string deliver_index, string category)
         {
             ViewBag.start_time = start_time;
@@ -37,7 +32,12 @@ namespace WebApplication.Controllers
             ViewBag.material_name = material_name;
             ViewBag.deliver_index = deliver_index;
             ViewBag.category = category;
+            return View();
 
+        }
+        public IActionResult GetData(string start_time, string end_time, string company_name, string purchase_index,
+            string material_name, string deliver_index, string category)
+        {
             if (start_time == null)
             {
                 start_time = "0001-01-01";
@@ -178,6 +178,16 @@ namespace WebApplication.Controllers
             try
             {
                 int id = Convert.ToInt32(Request.Query["id"]);
+
+                ViewBag.start_time = Convert.ToString(Request.Query["start_time"]);
+                ViewBag.end_time = Convert.ToString(Request.Query["end_time"]);
+
+                ViewBag.company_name = Convert.ToString(Request.Query["company_name"]);
+                ViewBag.purchase_index = Convert.ToString(Request.Query["purchase_index"]);
+                ViewBag.material_name = Convert.ToString(Request.Query["material_name"]);
+                ViewBag.deliver_index = Convert.ToString(Request.Query["deliver_index"]);
+                ViewBag.category = Convert.ToString(Request.Query["category"]);
+
                 Purchase purchase = PM.SelectById(id);
                 return View(purchase);
             }
