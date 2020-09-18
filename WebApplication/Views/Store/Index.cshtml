@@ -1,0 +1,345 @@
+﻿@{
+    @model IList<Model.Order>
+    @using Model;
+    @using BLL;
+
+}
+@using AspNetCoreMvcPager;
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+
+    <script type="text/javascript">
+        $(function () {
+
+            $("#myTable").bootstrapTable({
+                url: '/Store/GetData',
+                method: 'GET',
+                theadClasses: "thead-blue",
+                pagination: true,
+                sidePagination: "client",
+                pageNumber: 1,
+                pageSize: 20,
+                pageList: [10, 20, 50],
+                undefinedText: '---',
+                paginationDetailHAlign: 'left',
+                toolbar: '#toolbar',
+                showFooter: false,
+                showExport: true, //是否显示导出
+                exportDataType: "all", //basic', 'all', 'selected'.
+                exportTypes: ['excel'],
+                exportOptions: {//导出设置
+                    fileName: '仓位详情',//下载文件名称
+                },
+                columns: [{
+                    checkbox: true
+                }, {
+                    field: 'no',
+                    title: '编号',
+                    align: 'center',
+                    formatter: function (value, row, index) {
+                        return index + 1;
+                    }
+                }, {
+                    field: 'id',
+                    title: 'id',
+                    visible: false
+                }, {
+                    field: 'store_name',
+                    title: '品名',
+                    align: 'center',
+                    sortable: true
+                }, {
+                    field: 'edit',
+                    title: '操作',
+                    align: 'center',
+                    formatter: function (value, row, index) {
+                        var result = "";
+                        result += "<input type='button'  class='btn btn-primary' data-toggle='modal' data-target='#insertData' " +
+                            "onclick =\"Edit(" + row.id + ",'" + row.store_name + "')\" value='编辑' />";
+                        return result;
+                    },
+                    searchable: false,
+                }]
+            });
+        });
+
+        function Search() {
+            var store_name = $("#store_name_search").val();
+
+            var searchUrl = "/Store/GetData?store_name=" + store_name;
+            $("#myTable").bootstrapTable('refresh', { url: searchUrl });
+        }
+
+        function ConfirmInsert() {
+            var id = $('#id').val();
+            if (id == "") {
+                id = 0;
+            }
+            var store_name = $('#store_name').val();
+
+            if (store_name == "") {
+                swal("信息不能为空！", "", "error");
+            }
+            else {
+                $.ajax({
+                    type: "POST",
+                    url: "/Store/InsertData",
+                    beforeSend: function (xhr) {
+                        xhr.setRequestHeader("XSRF-TOKEN",
+                            $('input:hidden[name="__RequestVerificationToken"]').val());
+                    },
+                    data: {
+                        id: id, store_name: store_name
+                    },
+                    success: function (msg) {
+                        if (msg == "Success") {
+                            if (parseInt(id) > 0) {
+                                swal("编辑成功 !", "", "success");
+                            } else {
+                                swal("添加成功 !", "", "success");
+                            }
+                            $("#myTable").bootstrapTable('refresh', { url: "/Store/GetData" });
+                        } else {
+                            swal("添加失败 !", "", "error");
+                        }
+                    },
+                    error: function (msg) {
+                        swal("数据获取失败 !", "该记录已保留 !", "error");
+                    }
+                });
+
+            }
+
+        }
+
+        function deleteTiShi() {
+            var mySelect = $("#myTable").bootstrapTable("getSelections");
+            if (mySelect.length < 1) {
+                swal("执行失败 !", "请先选择要删除的数据 !", "error");
+            } else {
+                swal({
+                    title: "确定删除 ?",
+                    text: "删除后将无法恢复 !",
+                    type: "warning",
+                    showCancelButton: true,
+                    confirmButtonColor: "#DD6B55",
+                    confirmButtonText: "删除",
+                    cancelButtonText: "取消",
+                    closeOnConfirm: false,//true表示不需要点击确认,fasle需要点击确认后再关闭对话框
+                    closeOnCancel: false //true表示不需要点击确认,fasle需要点击确认后再关闭对话框
+                },
+                    function (isConfirm) {
+                        if (isConfirm) {
+                            var delList = new Array();
+                            for (let i = 0; i < mySelect.length; i++) {
+                                delList.push(mySelect[i].id);
+                            }
+                            $.ajax({
+                                type: "POST",
+                                url: "/Store/Del",
+                                beforeSend: function (xhr) {
+                                    xhr.setRequestHeader("XSRF-TOKEN",
+                                        $('input:hidden[name="__RequestVerificationToken"]').val());
+                                },
+                                data: {
+                                    delList: delList
+                                },
+                                success: function (msg) {
+                                    if (msg == "Success") {
+                                        swal("已删除 !", "该条记录已删除 !", "success"),
+                                            $("#myTable").bootstrapTable('refresh', { url: "/Store/GetData" });
+                                    }
+                                    else {
+                                        swal("执行失败 !", "该记录已保留 !", "error");
+                                    }
+                                },
+                                error: function (msg) {
+                                    swal("数据获取失败 !", "该记录已保留 !", "error");
+                                }
+                            });
+                        }
+                        else {
+                            swal("已取消 !", "该记录已保留 !", "error");
+                        }
+                    });
+            }
+
+        }
+
+        function insertAction() {
+            $("#myModalLabel").innerHTML = "新增仓位";
+            $("#flag").val("");
+            $("#material_id").selectpicker('val', "");
+            $("#inout_id").val("");
+            $("#inout_num").val("");
+            $("#inout_price").val("");
+            $("#inout_all_price").val("");
+            $("#remarks").val("");
+            $("#remain_num").val("");
+        }
+        function Edit(id, store_name) {
+            $("#myModalLabel").innerHTML = "修改仓位";
+            $("#id").val(id);
+            $("#store_name").val(store_name);
+
+        }
+
+        function SelectChange() {
+            var material_id = $("#material_id").val();
+            $.ajax({
+                type: "POST",
+                url: "/Store/SelectChange",
+                beforeSend: function (xhr) {
+                    xhr.setRequestHeader("XSRF-TOKEN",
+                        $('input:hidden[name="__RequestVerificationToken"]').val());
+                },
+                data: {
+                    material_id: material_id
+                },
+                success: function (msg) {
+                    $("#inout_price").val(msg.price);
+
+                    GetAllPrice();
+                },
+                error: function (msg) {
+                    swal("数据获取失败 !", "该记录已保留 !", "error");
+                }
+            });
+            GetRemainNum(material_id);
+        }
+        //获取某品名的剩余库存
+        function GetRemainNum(material_id) {
+            $.ajax({
+                type: "POST",
+                url: "/Store/GetRemainNum",
+                beforeSend: function (xhr) {
+                    xhr.setRequestHeader("XSRF-TOKEN",
+                        $('input:hidden[name="__RequestVerificationToken"]').val());
+                },
+                data: {
+                    material_id: material_id
+                },
+                success: function (msg) {
+                    $("#remain_num").val(msg);
+                },
+                error: function (msg) {
+                    swal("数据获取失败 !", "该记录已保留 !", "error");
+                }
+            });
+        }
+
+        function GetAllPrice() {
+            var inout_num = $("#inout_num").val();
+            var inout_price = $("#inout_price").val();
+            var inout_all_price = inout_num * inout_price;
+            $("#inout_all_price").val(inout_all_price.toFixed(2));
+        }
+    </script>
+</head>
+<body>
+    <div class="container-fluid" id="wrap">
+        <div class="row">
+            <div class="col-lg-12 p-0">
+                <div class="page-header">
+                    <div class="page-title">
+                        <ol class="breadcrumb text-left">
+                            <li><a href="/Supplier/Index">主页</a></li>
+                            <li><a href="/Inventory/Index">库存概况</a></li>
+                            <li class="active">出入库管理</li>
+                        </ol>
+                    </div>
+                </div>
+            </div><!-- /# column -->
+        </div><!-- /# row -->
+        <div class="main-content">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="card alert">
+                        <div class="card-header">
+                            <div class="form-horizontal">
+                                <div class="form-inline">
+                                    <div class="form-group">
+                                        <label>&emsp;&emsp;仓位：</label>
+                                        <select class="selectpicker" data-live-search="true" data-live-search-placeholder="搜索" id="store_name_search" name="store_name_search"
+                                                style="padding:6px 50px">
+                                            <option value="">-请选择-</option>
+                                            @{
+                                                StoreManager SM = new StoreManager();
+                                                List<Store> objList = SM.SelectAll();
+                                                if (objList.Count > 0)
+                                                {
+                                                    for (int i = 0; i < objList.Count; i++)
+                                                    {
+                                                        <!option value="@objList[i].store_name">
+                                                            @objList[i].store_name
+                                                        </!option>
+                                                    }
+                                                }
+                                            }
+                                        </select>
+                                    </div>
+                                    
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div id="toolbar">
+                                <div class="form-inline">
+                                    <div class="form-group">
+                                        <input type="button" value="查询" class="btn btn-primary" style="width:80px" onclick="Search()" />
+                                    </div>
+                                    <button class="btn btn-primary" data-toggle="modal" data-target="#insertData" style="width:80px" onclick="insertAction()">新增</button>
+                                    <button class="btn btn-primary" style="width:80px" onclick="deleteTiShi()">删除</button>
+                                </div>
+
+                            </div>
+                            <table id="myTable" class="table table-responsive table-hover ">
+                            </table>
+
+                            <div class="modal fade" id="insertData" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+                                <div class="modal-dialog" role="document" style="width:30%">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                            <h4 class="modal-title" id="myModalLabel">新增仓位</h4>
+                                        </div>
+                                        <div class="modal-body">
+                                            <input type="hidden" id="id" />
+                                            
+                                            <div class="form-group">
+                                                <label for="">仓位</label>
+                                                <input type="text" id="store_name" name="store_name" class="form-control"/>
+                                            </div>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                                            <button type="button" id="btn_submit" class="btn btn-primary" data-dismiss="modal" onclick="ConfirmInsert()">确认</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div><!-- /# card -->
+                </div><!-- /# column -->
+            </div><!-- /# row -->
+        </div>
+    </div><!-- /# container-fluid -->
+    <script>
+        var app = new Vue({
+            el: '#vueApp',
+            mounted() {
+                var _self = this;
+                _self.$nextTick(function () {
+                    _self.$refs.Store.parentNode.parentNode.classList.add("active");
+                    _self.$refs.Store.parentNode.parentNode.classList.add("open");
+                    _self.$refs.Store.classList.add("active");
+                })
+            }
+        })
+    </script>
+</body>
+</html>
+
+

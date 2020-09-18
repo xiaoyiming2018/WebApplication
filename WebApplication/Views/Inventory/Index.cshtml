@@ -25,7 +25,7 @@
                 undefinedText: '---',
                 paginationDetailHAlign: 'left',
                 toolbar: '#toolbar',
-                showFooter: false,
+                showFooter: true,
                 showExport: true, //是否显示导出
                 exportDataType: "all", //basic', 'all', 'selected'.
                 exportTypes: ['excel'],
@@ -38,6 +38,9 @@
                     align: 'center',
                     formatter: function (value, row, index) {
                         return index + 1;
+                    },
+                    footerFormatter: function (data) {
+                        return "汇总";
                     }
                 }, {
                     field: 'material_name',
@@ -54,6 +57,13 @@
                     title: '结存金额',
                     align: 'center',
                     sortable: true,
+                    footerFormatter: function (data) {
+                        var count = 0;
+                        $.each(data, function (index, item) {
+                            count += item.inout_all_price;
+                        });
+                        return "结存金额:" + count.toFixed(2);
+                    }
                 }, {
                     field: 'picture',
                     title: '图纸',
@@ -75,7 +85,7 @@
         });
 
         function Search() {
-            
+
         }
 
     </script>
@@ -175,12 +185,15 @@
                                     <div class="tab-pane active" id="tab1">
                                         <div class="col-md-12" style="margin-top: 20px;">
                                             <div class="box-body">
+                                                <b>过去一个月各品名进出库数量趋势</b>
+                                                
                                                 <div id="dayNum" style="width:1600px;height:380px">
                                                 </div>
                                             </div>
                                         </div>
                                         <div class="col-md-12" style="margin-top: 20px;">
                                             <div class="box-body">
+                                                <b>过去一个月各品名进出库金额趋势</b>
                                                 <div id="dayPrice" style="width:1600px;height:380px">
                                                 </div>
                                             </div>
@@ -190,12 +203,14 @@
 
                                         <div class="col-md-12" style="margin-top: 20px;">
                                             <div class="box-body">
+                                                <b>过去一年各品名进出库数量趋势</b>
                                                 <div id="monthNum" style="width:1600px;height:380px">
                                                 </div>
                                             </div>
                                         </div>
                                         <div class="col-md-12" style="margin-top: 20px;">
                                             <div class="box-body">
+                                                <b>过去一年各品名进出库金额趋势</b>
                                                 <div id="monthPrice" style="width:1600px;height:380px">
                                                 </div>
                                             </div>
@@ -205,12 +220,14 @@
                                     <div class="tab-pane" id="tab3">
                                         <div class="col-md-12" style="margin-top: 20px;">
                                             <div class="box-body">
+                                                <b>各品名进出库数量年趋势</b>
                                                 <div id="yearNum" style="width:1600px;height:380px">
                                                 </div>
                                             </div>
                                         </div>
                                         <div class="col-md-12" style="margin-top: 20px;">
                                             <div class="box-body">
+                                                <b>各品名进出库金额年趋势</b>
                                                 <div id="yearPrice" style="width:1600px;height:380px">
                                                 </div>
                                             </div>
@@ -257,35 +274,49 @@
                         var xAxisData = [];
                         var result = [];
                         if (res.length > 0) {
-
+                            //存储xAxisData和legendData
                             for (var item in res) {
 
-                                if (legendData.indexOf(res[item].material_name) == -1) {
-                                    legendData.push(res[item].material_name);
-
-                                    var data = []
-
-                                    for (var i in res) {
-                                        if (res[item].material_name == res[i].material_name) {
-                                            data.push(res[i].inout_num);
-                                        } else {
-                                            data.push(0);
-                                        }
-                                    }
-
-                                    var items = {};
-                                    items.name = res[item].material_name;
-                                    items.type = "bar";
-                                    items.stack = "bar";
-                                    items.barWidth = 50;
-                                    items.data = data;
-                                    result.push(items);
-                                }
                                 if (xAxisData.indexOf(res[item].create_time.split('T')[0]) == -1) {
                                     xAxisData.push(res[item].create_time.split('T')[0]);
                                 }
-                            }
 
+                                if (legendData.indexOf(res[item].material_name) == -1) {
+                                    legendData.push(res[item].material_name);
+                                }
+                            }
+                            //series
+                            for (var i in legendData) {
+                                var data = []
+                                for (var j in xAxisData) {
+                                    var flag = 0;
+                                    for (var item in res) {
+                                        
+                                        if (res[item].material_name == legendData[i]) {
+                                            if (xAxisData[j] == res[item].create_time.split('T')[0]) {
+                                                //符合条件的有且只有一笔数据（legendData和xAxisData全部匹配）
+                                                data.push(res[item].inout_num);
+                                            } else {
+                                                flag++;
+                                            }
+                                        } else {
+                                            flag++;
+                                        }
+                                    }
+                                    if (flag == res.length) {
+                                        data.push(0);
+                                    }
+                                }
+
+                                var items = {};
+                                items.name = legendData[i];
+                                items.type = "bar";
+                                items.stack = "广告";
+                                items.barWidth = 50;
+                                items.data = data;
+                                result.push(items);
+
+                            }
                         }
 
                         var echartNum = echarts.init(document.getElementById('dayNum'));
@@ -305,7 +336,6 @@
                             },
                             yAxis: {
                                 type: 'value',
-                                name: '过去一个月各品名进出库数量趋势'
                             },
                             series: result,
                             dataZoom: {
@@ -334,31 +364,49 @@
                         var xAxisData = [];
                         var result = [];
                         if (res.length > 0) {
-
+                            //存储xAxisData和legendData
                             for (var item in res) {
-                                if (legendData.indexOf(res[item].material_name) == -1) {
-                                    legendData.push(res[item].material_name);
-                                    var data = []
-                                    for (var i in res) {
-                                        if (res[item].material_name == res[i].material_name) {
-                                            data.push(res[i].inout_all_price);
-                                        } else {
-                                            data.push(0);
-                                        }
-                                    }
-                                    var items = {};
-                                    items.name = res[item].material_name;
-                                    items.type = "bar";
-                                    items.stack = "bar";
-                                    items.barWidth = 50;
-                                    items.data = data;
-                                    result.push(items);
-                                }
+
                                 if (xAxisData.indexOf(res[item].create_time.split('T')[0]) == -1) {
                                     xAxisData.push(res[item].create_time.split('T')[0]);
                                 }
-                            }
 
+                                if (legendData.indexOf(res[item].material_name) == -1) {
+                                    legendData.push(res[item].material_name);
+                                }
+                            }
+                            //series
+                            for (var i in legendData) {
+                                var data = []
+                                for (var j in xAxisData) {
+                                    var flag = 0;
+                                    for (var item in res) {
+
+                                        if (res[item].material_name == legendData[i]) {
+                                            if (xAxisData[j] == res[item].create_time.split('T')[0]) {
+                                                //符合条件的有且只有一笔数据（legendData和xAxisData全部匹配）
+                                                data.push(res[item].inout_all_price);
+                                            } else {
+                                                flag++;
+                                            }
+                                        } else {
+                                            flag++;
+                                        }
+                                    }
+                                    if (flag == res.length) {
+                                        data.push(0);
+                                    }
+                                }
+
+                                var items = {};
+                                items.name = legendData[i];
+                                items.type = "bar";
+                                items.stack = "广告";
+                                items.barWidth = 50;
+                                items.data = data;
+                                result.push(items);
+
+                            }
                         }
 
                         var echartNum = echarts.init(document.getElementById('dayPrice'));
@@ -378,7 +426,7 @@
                             },
                             yAxis: {
                                 type: 'value',
-                                name: '过去一个月各品名进出库金额趋势'
+                                
                             },
                             series: result,
                             dataZoom: {
@@ -407,37 +455,49 @@
                         var xAxisData = [];
                         var result = [];
                         if (res.length > 0) {
-
+                            //存储xAxisData和legendData
                             for (var item in res) {
 
-
-                                if (legendData.indexOf(res[item].material_name) == -1) {
-                                    legendData.push(res[item].material_name);
-
-
-                                    var data = []
-
-                                    for (var i in res) {
-                                        if (res[item].material_name == res[i].material_name) {
-                                            data.push(res[i].inout_num);
-                                        } else {
-                                            data.push(0);
-                                        }
-                                    }
-
-                                    var items = {};
-                                    items.name = res[item].material_name;
-                                    items.type = "bar";
-                                    items.stack = "bar";
-                                    items.barWidth = 50;
-                                    items.data = data;
-                                    result.push(items);
-                                }
                                 if (xAxisData.indexOf(res[item].create_time.substring(0, 7)) == -1) {
                                     xAxisData.push(res[item].create_time.substring(0, 7));
                                 }
-                            }
 
+                                if (legendData.indexOf(res[item].material_name) == -1) {
+                                    legendData.push(res[item].material_name);
+                                }
+                            }
+                            //series
+                            for (var i in legendData) {
+                                var data = []
+                                for (var j in xAxisData) {
+                                    var flag = 0;
+                                    for (var item in res) {
+
+                                        if (res[item].material_name == legendData[i]) {
+                                            if (xAxisData[j] == res[item].create_time.substring(0, 7)) {
+                                                //符合条件的有且只有一笔数据（legendData和xAxisData全部匹配）
+                                                data.push(res[item].inout_num);
+                                            } else {
+                                                flag++;
+                                            }
+                                        } else {
+                                            flag++;
+                                        }
+                                    }
+                                    if (flag == res.length) {
+                                        data.push(0);
+                                    }
+                                }
+
+                                var items = {};
+                                items.name = legendData[i];
+                                items.type = "bar";
+                                items.stack = "广告";
+                                items.barWidth = 50;
+                                items.data = data;
+                                result.push(items);
+
+                            }
                         }
 
                         var echartNum = echarts.init(document.getElementById('monthNum'));
@@ -457,7 +517,6 @@
                             },
                             yAxis: {
                                 type: 'value',
-                                name: '过去一年各品名进出库数量趋势'
                             },
                             series: result,
                             dataZoom: {
@@ -486,31 +545,49 @@
                         var xAxisData = [];
                         var result = [];
                         if (res.length > 0) {
-
+                            //存储xAxisData和legendData
                             for (var item in res) {
-                                if (legendData.indexOf(res[item].material_name) == -1) {
-                                    legendData.push(res[item].material_name);
-                                    var data = []
-                                    for (var i in res) {
-                                        if (res[item].material_name == res[i].material_name) {
-                                            data.push(res[i].inout_all_price);
-                                        } else {
-                                            data.push(0);
-                                        }
-                                    }
-                                    var items = {};
-                                    items.name = res[item].material_name;
-                                    items.type = "bar";
-                                    items.stack = "bar";
-                                    items.barWidth = 50;
-                                    items.data = data;
-                                    result.push(items);
-                                }
+
                                 if (xAxisData.indexOf(res[item].create_time.substring(0, 7)) == -1) {
                                     xAxisData.push(res[item].create_time.substring(0, 7));
                                 }
-                            }
 
+                                if (legendData.indexOf(res[item].material_name) == -1) {
+                                    legendData.push(res[item].material_name);
+                                }
+                            }
+                            //series
+                            for (var i in legendData) {
+                                var data = []
+                                for (var j in xAxisData) {
+                                    var flag = 0;
+                                    for (var item in res) {
+
+                                        if (res[item].material_name == legendData[i]) {
+                                            if (xAxisData[j] == res[item].create_time.substring(0, 7)) {
+                                                //符合条件的有且只有一笔数据（legendData和xAxisData全部匹配）
+                                                data.push(res[item].inout_all_price);
+                                            } else {
+                                                flag++;
+                                            }
+                                        } else {
+                                            flag++;
+                                        }
+                                    }
+                                    if (flag == res.length) {
+                                        data.push(0);
+                                    }
+                                }
+
+                                var items = {};
+                                items.name = legendData[i];
+                                items.type = "bar";
+                                items.stack = "广告";
+                                items.barWidth = 50;
+                                items.data = data;
+                                result.push(items);
+
+                            }
                         }
 
                         var echartNum = echarts.init(document.getElementById('monthPrice'));
@@ -530,7 +607,6 @@
                             },
                             yAxis: {
                                 type: 'value',
-                                name: '过去一年各品名进出库金额趋势'
                             },
                             series: result,
                             dataZoom: {
@@ -559,37 +635,49 @@
                         var xAxisData = [];
                         var result = [];
                         if (res.length > 0) {
-
+                            //存储xAxisData和legendData
                             for (var item in res) {
 
-
-                                if (legendData.indexOf(res[item].material_name) == -1) {
-                                    legendData.push(res[item].material_name);
-
-
-                                    var data = []
-
-                                    for (var i in res) {
-                                        if (res[item].material_name == res[i].material_name) {
-                                            data.push(res[i].inout_num);
-                                        } else {
-                                            data.push(0);
-                                        }
-                                    }
-
-                                    var items = {};
-                                    items.name = res[item].material_name;
-                                    items.type = "bar";
-                                    items.stack = "bar";
-                                    items.barWidth = 50;
-                                    items.data = data;
-                                    result.push(items);
-                                }
                                 if (xAxisData.indexOf(res[item].create_time.substring(0, 4)) == -1) {
                                     xAxisData.push(res[item].create_time.substring(0, 4));
                                 }
-                            }
 
+                                if (legendData.indexOf(res[item].material_name) == -1) {
+                                    legendData.push(res[item].material_name);
+                                }
+                            }
+                            //series
+                            for (var i in legendData) {
+                                var data = []
+                                for (var j in xAxisData) {
+                                    var flag = 0;
+                                    for (var item in res) {
+
+                                        if (res[item].material_name == legendData[i]) {
+                                            if (xAxisData[j] == res[item].create_time.substring(0, 4)) {
+                                                //符合条件的有且只有一笔数据（legendData和xAxisData全部匹配）
+                                                data.push(res[item].inout_num);
+                                            } else {
+                                                flag++;
+                                            }
+                                        } else {
+                                            flag++;
+                                        }
+                                    }
+                                    if (flag == res.length) {
+                                        data.push(0);
+                                    }
+                                }
+
+                                var items = {};
+                                items.name = legendData[i];
+                                items.type = "bar";
+                                items.stack = "广告";
+                                items.barWidth = 50;
+                                items.data = data;
+                                result.push(items);
+
+                            }
                         }
 
                         var echartNum = echarts.init(document.getElementById('yearNum'));
@@ -609,7 +697,6 @@
                             },
                             yAxis: {
                                 type: 'value',
-                                name: '过去一年各品名进出库数量趋势'
                             },
                             series: result,
                             dataZoom: {
@@ -638,31 +725,49 @@
                         var xAxisData = [];
                         var result = [];
                         if (res.length > 0) {
-
+                            //存储xAxisData和legendData
                             for (var item in res) {
-                                if (legendData.indexOf(res[item].material_name) == -1) {
-                                    legendData.push(res[item].material_name);
-                                    var data = []
-                                    for (var i in res) {
-                                        if (res[item].material_name == res[i].material_name) {
-                                            data.push(res[i].inout_all_price);
-                                        } else {
-                                            data.push(0);
-                                        }
-                                    }
-                                    var items = {};
-                                    items.name = res[item].material_name;
-                                    items.type = "bar";
-                                    items.stack = "bar";
-                                    items.barWidth = 50;
-                                    items.data = data;
-                                    result.push(items);
-                                }
+
                                 if (xAxisData.indexOf(res[item].create_time.substring(0, 4)) == -1) {
                                     xAxisData.push(res[item].create_time.substring(0, 4));
                                 }
-                            }
 
+                                if (legendData.indexOf(res[item].material_name) == -1) {
+                                    legendData.push(res[item].material_name);
+                                }
+                            }
+                            //series
+                            for (var i in legendData) {
+                                var data = []
+                                for (var j in xAxisData) {
+                                    var flag = 0;
+                                    for (var item in res) {
+
+                                        if (res[item].material_name == legendData[i]) {
+                                            if (xAxisData[j] == res[item].create_time.substring(0, 4)) {
+                                                //符合条件的有且只有一笔数据（legendData和xAxisData全部匹配）
+                                                data.push(res[item].inout_all_price);
+                                            } else {
+                                                flag++;
+                                            }
+                                        } else {
+                                            flag++;
+                                        }
+                                    }
+                                    if (flag == res.length) {
+                                        data.push(0);
+                                    }
+                                }
+
+                                var items = {};
+                                items.name = legendData[i];
+                                items.type = "bar";
+                                items.stack = "广告";
+                                items.barWidth = 50;
+                                items.data = data;
+                                result.push(items);
+
+                            }
                         }
 
                         var echartNum = echarts.init(document.getElementById('yearPrice'));
@@ -682,7 +787,6 @@
                             },
                             yAxis: {
                                 type: 'value',
-                                name: '过去一年各品名进出库金额趋势'
                             },
                             series: result,
                             dataZoom: {

@@ -27,7 +27,8 @@
                 pageList: [10, 20, 50],
                 undefinedText: '---',
                 paginationDetailHAlign: 'left',
-                toolbarAlign: 'right',
+                toolbar: "#toolbar",
+                toolbarAlign: 'left',
                 showFooter: true,
                 showExport: true, //是否显示导出
                 exportDataType: "all", //basic', 'all', 'selected'.
@@ -59,38 +60,38 @@
                     title: '客户订单号',
                     align: 'center',
                     sortable: true
-                    }, {
-                        field: 'deliver_index',
-                        title: '送货单号',
-                        align: 'center',
-                        sortable: true
-                    }, {
-                        field: 'deliver_time',
-                        title: '送货开单时间',
-                        align: 'center',
-                        sortable: true,
-                        formatter: function (value, row, index) {
-                            return row.deliver_time.split('T')[0];
-                        }
-                    }, {
-                        field: 'dz_index',
-                        title: '对账单号',
-                        align: 'center',
-                        sortable: true
-                    }, {
-                        field: 'dui_time',
+                }, {
+                    field: 'deliver_index',
+                    title: '送货单号',
+                    align: 'center',
+                    sortable: true
+                }, {
+                    field: 'deliver_time',
+                    title: '送货开单时间',
+                    align: 'center',
+                    sortable: true,
+                    formatter: function (value, row, index) {
+                        return row.deliver_time.split('T')[0];
+                    }
+                }, {
+                    field: 'dz_index',
+                    title: '对账单号',
+                    align: 'center',
+                    sortable: true
+                }, {
+                    field: 'dui_time',
                     title: '对账时间',
                     align: 'center',
                     sortable: true,
                     formatter: function (value, row, index) {
                         return row.dui_time.split('T')[0];
                     }
-                    }, {
-                        field: 'invoice_index',
-                        title: '发票号',
-                        align: 'center',
-                        sortable: true
-                    }, {
+                }, {
+                    field: 'invoice_index',
+                    title: '发票号',
+                    align: 'center',
+                    sortable: true
+                }, {
                     field: 'order_name',
                     title: '名称规格',
                     align: 'center',
@@ -99,14 +100,14 @@
                     field: 'dui_num',
                     title: '数量',
                     align: 'center',
-                        sortable: true,
-                        footerFormatter: function (data) {
-                            var count = 0;
-                            $.each(data, function (index, item) {
-                                count += item.dui_num;
-                            });
-                            return count.toFixed(2);
-                        }
+                    sortable: true,
+                    footerFormatter: function (data) {
+                        var count = 0;
+                        $.each(data, function (index, item) {
+                            count += item.dui_num;
+                        });
+                        return count.toFixed(2);
+                    }
                 }, {
                     field: 'unit',
                     title: '单位',
@@ -121,14 +122,14 @@
                     field: 'dui_all_price',
                     title: '总价',
                     align: 'center',
-                        sortable: true,
-                        footerFormatter: function (data) {
-                            var count = 0;
-                            $.each(data, function (index, item) {
-                                count += item.dui_all_price;
-                            });
-                            return count.toFixed(2);
-                        }
+                    sortable: true,
+                    footerFormatter: function (data) {
+                        var count = 0;
+                        $.each(data, function (index, item) {
+                            count += item.dui_all_price;
+                        });
+                        return count.toFixed(2);
+                    }
                 }]
             });
 
@@ -497,32 +498,34 @@
                                 </div>
                                 <br />
                             </div>
-                            <div class="form-inline">
-                                <div class="form-group">
-                                    <label>本日</label>
-                                    <input id="day" name="day" type="checkbox" class="form-control" onclick="CheckOrCancleAll($(this))" style="width:16px" value="0" @if (ViewBag.day == "1") { <text> checked</text> } />
-                                </div>
-                                <div class="form-group">
-                                    <label>本月</label>
-                                    <input id="month" name="month" type="checkbox" class="form-control" onclick="CheckOrCancleAll($(this))" style="width:16px" value="0" @if (ViewBag.month == "1") { <text> checked</text> } />
-                                </div>
-                                <div class="form-group">
-                                    <label>本年</label>
-                                    <input id="year" name="year" type="checkbox" class="form-control" onclick="CheckOrCancleAll($(this))" style="width:16px" value="0" @if (ViewBag.year == "1") { <text> checked</text> } />
-                                    <label>（对账时间）</label>
-                                </div>
-                                <div class="form-group">
-                                    <input type="button" value="查询" class="btn btn-primary" style="width:80px" onclick="Search()" />
-
-                                </div>
-
-                                <input type="file" id="file" style="display:none;" accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet">
-                                <button class="btn btn-primary" onclick="selectFile()"><i class="ti-download"></i>历史数据导入</button>
-                                <button class="btn btn-primary" onclick="exportSpecialExcel()"><i class="ti-upload"></i>模板导出</button>
-                            </div>
 
                         </div>
                         <div class="card-body">
+                            <div id="toolbar">
+                                <div class="form-inline">
+                                    <div class="form-group">
+                                        <label>本日</label>
+                                        <input id="day" name="day" type="checkbox" class="form-control" onclick="CheckOrCancleAll($(this))" style="width:16px" value="0" @if (ViewBag.day == "1") { <text> checked</text> } />
+                                    </div>
+                                    <div class="form-group">
+                                        <label>本月</label>
+                                        <input id="month" name="month" type="checkbox" class="form-control" onclick="CheckOrCancleAll($(this))" style="width:16px" value="0" @if (ViewBag.month == "1") { <text> checked</text> } />
+                                    </div>
+                                    <div class="form-group">
+                                        <label>本年</label>
+                                        <input id="year" name="year" type="checkbox" class="form-control" onclick="CheckOrCancleAll($(this))" style="width:16px" value="0" @if (ViewBag.year == "1") { <text> checked</text> } />
+                                        <label>（对账时间）</label>
+                                    </div>
+                                    <div class="form-group">
+                                        <input type="button" value="查询" class="btn btn-primary" style="width:80px" onclick="Search()" />
+
+                                    </div>
+
+                                    <input type="file" id="file" style="display:none;" accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet">
+                                    <button class="btn btn-primary" onclick="selectFile()"><i class="ti-download"></i>历史数据导入</button>
+                                    <button class="btn btn-primary" onclick="exportSpecialExcel()"><i class="ti-upload"></i>模板导出</button>
+                                </div>
+                            </div>
                             <table id="myTable" class="table table-responsive table-hover ">
                             </table>
                         </div>

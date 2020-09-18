@@ -12,6 +12,10 @@
         $("#material_name_edit").val(material_name);
         $("#price_edit").val(price);
         $("#picture_edit").val(picture);
+
+        if (picture != null && picture != undefined && picture !="") {
+            $("#prview_picture").attr("href", "/scr/Files/" + picture);
+        }
     }
 
     function confirmEdit() {
@@ -251,9 +255,8 @@
                 <div class="form-group">
                     <label for="">图纸</label>
                     <div class="">
-                        <input type="file" id="files1" name="files1" placeholder="file" style="padding-top:12px" />
+                        <input type="file" id="files1" name="files1" placeholder="file" style="padding-top:12px" onchange="upload(1)" />
                         <input type="hidden" id="picture" name="picture" value="" />
-                        <input type="button" id="btn_fileUpload" name="btn_fileUpload" class="btn btn-primary" value="上传" onclick="upload(1)" />
                     </div>
 
                 </div>
@@ -286,9 +289,9 @@
                 <div class="form-group">
                     <label for="">图纸</label>
                     <div class="">
-                        <input type="file" id="files2" name="files2" placeholder="file" style="padding-top:12px" />
+                        <a id="prview_picture" href="/src/Files/" target="_blank">查看</a>
+                        <input type="file" id="files2" name="files2" placeholder="file" style="padding-top:12px" onchange="upload(2)" />
                         <input type="hidden" id="picture_edit" name="picture_edit" value="" />
-                        <input type="button" class="btn btn-primary" value="上传" onclick="upload(2)" />
                     </div>
                 </div>
             </div>

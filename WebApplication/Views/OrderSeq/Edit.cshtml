@@ -8,7 +8,11 @@
 <html>
 <head>
     <meta name="viewport" content="width=device-width" />
-
+    <style>
+        input[type=file]:focus {
+        outline:none;
+        }
+    </style>
     <script type="text/javascript">
         $(function () {
             //$(".sidebar ul li:nth-of-type(4)").addClass("active open")
@@ -79,44 +83,42 @@
                 }
 
             });
-
-            $("#btn_fileUpload").click(function () {
-                var fileUpload = $("#files").get(0);
-                var files = fileUpload.files;
-                var data = new FormData();
-                for (var i = 0; i < files.length; i++) {
-                    data.append(files[i].name, files[i]);
-                }
-                if (files.length <= 0) {
-                    swal("请先上传再提交！", "", "error");
-                }
-                else {
-                    $.ajax({
-                        type: "POST",
-                        url: "/api/File",
-                        contentType: false,
-                        processData: false,
-                        data: data,
-                        success: function (data) {
-                            if (data == "Fail") {
-                                swal("上传文件有误！", "仅支持pdf文档！", "error");
-                            }
-                            else {
-                                var filecode = document.getElementById("order_picture");
-                                filecode.value = data;
-                                swal("上传成功！", "", "success");
-                            }
-
-                        },
-                        error: function (data) {
-                            swal("上传失败！", "" + data + "", "error");
-
+        });
+        function fileIpload() {
+            var fileUpload = $("#files").get(0);
+            var files = fileUpload.files;
+            var data = new FormData();
+            for (var i = 0; i < files.length; i++) {
+                data.append(files[i].name, files[i]);
+            }
+            if (files.length <= 0) {
+                swal("请先上传再提交！", "", "error");
+            }
+            else {
+                $.ajax({
+                    type: "POST",
+                    url: "/api/File",
+                    contentType: false,
+                    processData: false,
+                    data: data,
+                    success: function (data) {
+                        if (data == "Fail") {
+                            swal("上传文件有误！", "仅支持pdf文档！", "error");
                         }
-                    });
-                }
+                        else {
+                            var filecode = document.getElementById("order_picture");
+                            filecode.value = data;
+                            swal("上传成功！", "", "success");
+                        }
 
-            });
-        })
+                    },
+                    error: function (data) {
+                        swal("上传失败！", "" + data + "", "error");
+
+                    }
+                });
+            }
+        }
 
         function getProductPrice() {
             var order_num = $('#order_num').val()
@@ -290,12 +292,16 @@
 
                                     <div class="form-group">
                                         <label for="example-input-normal" class="col-sm-4 control-label">图纸上传</label>
+                                        @{
+                                            if (!string.IsNullOrEmpty(Model.order_picture) )
+                                            {
+                                                <a class="control-label" href="/src/Files/@Model.order_picture" target="_blank" style="float:left;margin-left:15px">查看</a>
+                                            }
+                                        }
                                         <div class="col-sm-4">
-                                            <input type="file" id="files" name="files" placeholder="file" class="form-control" style="border:none;outline:none" />
+
+                                            <input type="file" id="files" name="files" placeholder="file" class="form-control" style="border:none;outline:none" onchange="fileIpload()" />
                                             <input type="hidden" id="order_picture" name="order_picture" value="@if (Model != null) {@Model.order_picture}" />
-                                        </div>
-                                        <div class="col-sm-4">
-                                            <input type="button" id="btn_fileUpload" name="btn_fileUpload" class="btn btn-primary" value="上传" />
                                         </div>
                                     </div>
 

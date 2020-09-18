@@ -13,8 +13,7 @@ namespace DAL
         /// </summary>
         /// <param name="name"></param>
         /// <returns></returns>
-        public List<DuiZhang> SelectForInvoice( string dz_start_time, string dz_end_time, string deliver_start_time, string deliver_end_time,
-            string deliver_index, string deliver_company_head, string order_name, string dz_index)
+        public List<DuiZhang> SelectForInvoice( string dz_start_time, string dz_end_time,string deliver_company_head, string dz_index)
         {
             try
             {
@@ -24,12 +23,44 @@ namespace DAL
                 {
                     deliver_company_head = deliver_company_head.Replace("(", "\\(").Replace(")", "\\)");
                 }
-                sql = "select a.id, a.dz_index,a.dui_time,a.deliver_time, a.company_order_index,b.deliver_index,a.company_name,a.dui_num,a.dui_price,a.dui_all_price," +
+                sql = "select a.dz_index,max(a.dui_time) as dui_time,max(a.company_name) as company_name,"+
+                    " sum(a.dui_num) as dui_num,sum(a.dui_all_price) as dui_all_price" +
+                    " from jinchen.duizhang_info a, jinchen.sale_info b" +
+                    " where a.sale_id = b.id and company_name ~*'{0}'" +
+                    " and to_char(a.dui_time,'yyyy-MM-dd')>= '{1}' and to_char(a.dui_time,'yyyy-MM-dd')<= '{2}'" +
+                    " and dz_index ~*'{3}'" +
+                    " and a.invoice_time is null" +
+                    " group by a.dz_index" +
+                    " order by a.dz_index desc";
+                sql = string.Format(sql, deliver_company_head, dz_start_time, dz_end_time, dz_index);
+
+                objList = PostgreHelper.GetEntityList<DuiZhang>(sql);
+
+                return objList;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        /// <summary>
+        /// 用于销售管理：模糊查询，查询结果为一笔或多笔数据
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
+        public List<DuiZhang> SelectByDzIndex(string dz_index)
+        {
+            try
+            {
+                List<DuiZhang> objList = new List<DuiZhang>();
+                string sql = null;
+                sql = "select a.id,a.dz_index, a.deliver_time, a.company_order_index,b.deliver_index,a.company_name,a.dui_num,a.dui_price,a.dui_all_price," +
                     "a.order_name,a.unit  from jinchen.duizhang_info a, jinchen.sale_info b " +
-                      "where a.sale_id= b.id and deliver_index ~*'{0}' and deliver_company_head ~*'{1}' " +
-                      "and to_char(a.dui_time,'yyyy-MM-dd')>='{2}' and to_char(a.dui_time,'yyyy-MM-dd')<='{3}' and " +
-                      "order_name ~* '{4}' and dz_index ~* '{5}' and to_char(a.deliver_time,'yyyy-MM-dd')>='{6}' and to_char(a.deliver_time,'yyyy-MM-dd')<='{7}' and a.invoice_time is null order by a.dui_time desc, deliver_index desc,deliver_company_head ";
-                sql = string.Format(sql, deliver_index, deliver_company_head,dz_start_time, dz_end_time, order_name, dz_index, deliver_start_time, deliver_end_time);
+                      "where a.sale_id= b.id " +
+                      "and dz_index ~* '{0}' and a.invoice_time is null " +
+                      "order by a.dui_time desc, deliver_index desc,deliver_company_head ";
+                sql = string.Format(sql, dz_index);
 
                 objList = PostgreHelper.GetEntityList<DuiZhang>(sql);
 

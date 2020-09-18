@@ -15,6 +15,7 @@ namespace WebApplication.Controllers
         OrderManager OM = new OrderManager();
         SettingManager SM = new SettingManager();
         ContactManager CM = new ContactManager();
+        MaterialManager MM = new MaterialManager();
         /// <summary>
         /// 用户列表首页
         /// </summary>
@@ -129,6 +130,7 @@ namespace WebApplication.Controllers
             int id = 0;
 
             int count = 0;
+            bool flag = true;
             int customer_id = Convert.ToInt32(HttpContext.Request.Form["customer_id"]);
             string order_index = Convert.ToString(HttpContext.Request.Form["order_index"]);
             string company_order_index = Convert.ToString(HttpContext.Request.Form["company_order_index"]);
@@ -162,6 +164,9 @@ namespace WebApplication.Controllers
             {
                 orderList.id = id;
                 count = OM.UpdateOrder(orderList);
+                if (count==0) {
+                    flag = false;
+                }
             }
             else
             {
@@ -208,13 +213,34 @@ namespace WebApplication.Controllers
 
                         Order or = OM.SelectByOrderIndex(order_index);
                         orderList.order_id = or.id;
-                        OM.InsertOrderSeq(orderList);
+                        int insert1 =OM.InsertOrderSeq(orderList);
+                        if (insert1==0) {
+                            flag = false;
+                        }
+
+
+                        List<Material> materials = MM.SelectAll();
+                        Material material = materials.Find(s => s.material_name == order_name[i]);
+                        if (material == null)
+                        {
+                            Material res = new Material();
+                            res.material_name = orderList.order_name;
+                            res.price = orderList.order_price;
+                            res.picture = orderList.order_picture;
+                            int insert2 = MM.Insert(res);
+                            if (insert2==0) {
+                                flag = false;
+                            }
+                        }
 
                     }
                 }
+                else {
+                    flag = false;
+                }
                                
             }                            
-            if (count > 0)
+            if (flag)
             {
                 return Json("Success");
             }

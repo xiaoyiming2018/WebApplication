@@ -167,7 +167,7 @@
                 }
                 ]
             });
-            
+
         });
 
         function Edit(id) {
@@ -351,7 +351,7 @@
                 var id = submitId.join(',');
                 document.getElementById("duizhang_id").value = id;
             }
-            
+
         }
 
     </script>
@@ -404,7 +404,8 @@
                                                     for (int i = 0; i < objList.Count; i++)
                                                     {
 
-                                                        <!option value="@objList[i].company_name" @if (result.Length > 0) { for (int j = 0; j < result.Length; j++) { if (objList[i].company_name == result[j]) { <text> selected</text>}} }>@objList[i].company_name</!option>
+                                                        <!option value="@objList[i].company_name" @if (result.Length > 0) { for (int j = 0; j < result.Length; j++) { if (objList[i].company_name == result[j]) { <text> selected</text>}} }>
+                                                        @objList[i].company_name</!option>
                                                     }
                                                 }
                                             }
@@ -421,7 +422,8 @@
                                                 {
                                                     for (int i = 0; i < invoiceList.Count; i++)
                                                     {
-                                                        <!option value="@invoiceList[i].invoice_index" @if (invoiceList[i].invoice_index == ViewBag.invoice_index) { <text> selected</text>}>@invoiceList[i].invoice_index</!option>
+                                                        <!option value="@invoiceList[i].invoice_index" @if (invoiceList[i].invoice_index == ViewBag.invoice_index) { <text> selected</text>}>
+                                                        @invoiceList[i].invoice_index</!option>
                                                     }
                                                 }
                                             }
@@ -438,7 +440,8 @@
                                                 {
                                                     for (int i = 0; i < settings.Count; i++)
                                                     {
-                                                        <!option value="@settings[i].config_list" @if (settings[i].config_list == ViewBag.invoice_company) { <text> selected</text>}>@settings[i].config_list</!option>
+                                                        <!option value="@settings[i].config_list" @if (settings[i].config_list == ViewBag.invoice_company) { <text> selected</text>}>
+                                                        @settings[i].config_list</!option>
                                                     }
                                                 }
                                             }
@@ -453,7 +456,11 @@
                                         <input id="end_time" name="end_time" type="text" autocomplete="off" class="form-control" onclick="WdatePicker({ skin: 'whyGreen',dateFmt:'yyyy-MM-dd' })" value="@ViewBag.end_time" />
                                     </div>
                                 </div>
-                                <br />
+                            </div>
+
+                        </div>
+                        <div class="card-body">
+                            <div id="toolbar">
                                 <div class="form-inline">
                                     <div class="form-group">
                                         <label>本日</label>
@@ -478,16 +485,9 @@
 
                                         </div>
                                     }
-
+                                    <button class='btn btn-primary' onclick='duiZhang()'>确认付款</button>
                                 </div>
 
-                            </div>
-
-                        </div>
-                        <br />
-                        <div class="card-body">
-                            <div id="toolbar" class="toolbar">
-                                <button class='btn btn-primary' onclick='duiZhang()'>确认付款</button>
                             </div>
 
                             <table id="myTable" class="table table-responsive table-hover ">

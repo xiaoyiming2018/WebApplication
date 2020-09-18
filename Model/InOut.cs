@@ -19,6 +19,16 @@ namespace Model
         /// 品名
         /// </summary>
         public string material_name { get; set; }
+
+        /// <summary>
+        /// 仓位id
+        /// </summary>
+        public int store_id { get; set; }
+
+        /// <summary>
+        /// 仓位名称
+        /// </summary>
+        public string store_name { get; set; }
         /// <summary>
         /// 品名价格
         /// </summary>

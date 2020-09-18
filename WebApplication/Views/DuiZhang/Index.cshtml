@@ -11,7 +11,7 @@
     <meta name="viewport" content="width=device-width" />
     <style>
         .bootstrap-select {
-            width:100%;
+            width: 100%;
         }
     </style>
 
@@ -32,9 +32,101 @@
                 pageList: [10, 20, 50],
                 undefinedText: '---',
                 paginationDetailHAlign: 'left',
-                toolbarAlign: 'right',
+                toolbar: "#toolbar",
+                toolbarAlign: 'left',
                 showFooter: true,
                 showExport: true, //是否显示导出
+                exportDataType: "all", //basic', 'all', 'selected'.
+                exportTypes: ['excel'],
+                exportOptions: {//导出设置
+                    fileName: '销售发票对账',//下载文件名称
+                },
+                columns: [
+                    {
+                        checkbox: true
+                    }, {
+                        field: 'no',
+                        title: '编号',
+                        align: 'center',
+                        formatter: function (value, row, index) {
+                            return index + 1;
+                        },
+                        footerFormatter: function () {
+                            return "汇总";
+                        }
+                    }, {
+                        field: 'dz_index',
+                        title: '对账单号',
+                        align: 'center',
+                        sortable: true
+                    }, {
+                        field: 'company_name',
+                        title: '客户名称',
+                        align: 'center',
+                        sortable: true
+                    }, {
+                        field: 'dui_time',
+                        title: '对账时间',
+                        align: 'center',
+                        sortable: true,
+                        formatter: function (value, row, index) {
+                            return row.dui_time.split('T')[0];
+                        }
+                    }, {
+                        field: 'dui_num',
+                        title: '订单总数',
+                        align: 'center',
+                        sortable: true,
+                        formatter: function (value, row, index) {
+                            return row.dui_num.toFixed(2);
+                        },
+                        footerFormatter: function (data) {
+                            var count = 0;
+                            $.each(data, function (index, item) {
+                                count += item.dui_num;
+                            });
+                            return count.toFixed(2);
+                        }
+                    }, {
+                        field: 'dui_all_price',
+                        title: '订单总价',
+                        align: 'center',
+                        sortable: true,
+                        formatter: function (value, row, index) {
+                            return row.dui_all_price.toFixed(2);
+                        },
+                        footerFormatter: function (data) {
+                            var count = 0;
+                            $.each(data, function (index, item) {
+                                count += item.dui_all_price;
+                            });
+                            return count.toFixed(2);
+                        }
+                    }, {
+                        field: 'edit',
+                        title: '对账单号详情',
+                        align: 'center',
+                        formatter: function (value, row, index) {
+                            var result = "";
+                            result += "<button class='btn btn-info' onclick=\"getPickerList('" + row.dz_index + "')\">查看详情</button>";
+                            return result;
+                        }
+                    }]
+            });
+
+            $("#dz_list").bootstrapTable({
+                url: '/DuiZhang/GetPickerList?DZ_Index=""',
+                method: 'GET',
+                theadClasses: "thead-blue",
+                pagination: true,
+                sidePagination: "client",
+                pageNumber: 1,
+                pageSize: 10,
+                pageList: [10, 20, 50],
+                undefinedText: '---',
+                paginationDetailHAlign: 'left',
+                showFooter: true,
+                showExport: false, //是否显示导出
                 exportDataType: "all", //basic', 'all', 'selected'.
                 exportTypes: ['excel'],
                 exportOptions: {//导出设置
@@ -51,12 +143,8 @@
                         return "汇总";
                     }
                 }, {
-                    field: 'id',
-                    title: 'id',
-                    visible: false
-                }, {
-                        field: 'dz_index',
-                        title: '对账单号',
+                    field: 'dz_index',
+                    title: '对账单号',
                     align: 'center',
                     sortable: true
                 }, {
@@ -65,7 +153,7 @@
                     align: 'center',
                     sortable: true
                 }, {
-                        field: 'company_name',
+                    field: 'company_name',
                     title: '客户名称',
                     align: 'center',
                     sortable: true
@@ -75,68 +163,141 @@
                     align: 'center',
                     sortable: true
                 }, {
-                        field: 'deliver_time',
-                        title: '送货开单时间',
-                    align: 'center',
-                        sortable: true,
-                        formatter: function (value, row, index) {
-                            return row.deliver_time.split('T')[0];
-                        }
-                }, {
-                        field: 'dui_time',
-                        title: '对账时间',
-                    align: 'center',
-                        sortable: true,
-                        formatter: function (value, row, index) {
-                            return row.dui_time.split('T')[0];
-                        }
-                }, {
-                        field: 'order_name',
-                        title: '名称规格',
+                    field: 'order_name',
+                    title: '名称规格',
                     align: 'center',
                     sortable: true
                 }, {
-                        field: 'dui_num',
-                        title: '数量',
-                    align: 'center',
-                        sortable: true,
-                        footerFormatter: function (data) {
-                            var count = 0;
-                            $.each(data, function (index, item) {
-                                count += item.dui_num;
-                            });
-                            return count.toFixed(2);
-                        }
-                }, {
-                        field: 'unit',
-                        title: '单位',
+                    field: 'unit',
+                    title: '单位',
                     align: 'center',
                     sortable: true
                 }, {
-                        field: 'dui_price',
-                        title: '单价',
+                    field: 'dui_num',
+                    title: '数量',
+                    align: 'center',
+                    sortable: true,
+                    footerFormatter: function (data) {
+                        var count = 0;
+                        $.each(data, function (index, item) {
+                            count += item.dui_num;
+                        });
+                        return count.toFixed(2);
+                    }
+                }, {
+                    field: 'dui_price',
+                    title: '单价',
                     align: 'center',
                     sortable: true
-                    }, {
-                        field: 'dui_all_price',
-                        title: '总价',
-                        align: 'center',
-                        sortable: true,
-                        footerFormatter: function (data) {
-                            var count = 0;
-                            $.each(data, function (index, item) {
-                                count += item.dui_all_price;
-                            });
-                            return count.toFixed(2);
-                        }
-                    }, {
-                    field: 'edit',
-                        title: '关联发票',
+                }, {
+                    field: 'dui_all_price',
+                    title: '金额',
+                    align: 'center',
+                    sortable: true,
+                    footerFormatter: function (data) {
+                        var count = 0;
+                        $.each(data, function (index, item) {
+                            count += item.dui_all_price;
+                        });
+                        return count.toFixed(2);
+                    }
+                }]
+            });
+
+            $("#picker_list").bootstrapTable({
+                url: '/DuiZhang/GetPickerList?DZ_Index=""',
+                method: 'GET',
+                theadClasses: "thead-blue",
+                pagination: true,
+                sidePagination: "client",
+                pageNumber: 1,
+                pageSize: 10,
+                pageList: [10, 20, 50],
+                undefinedText: '---',
+                paginationDetailHAlign: 'left',
+                showFooter: true,
+                showExport: false, //是否显示导出
+                exportDataType: "all", //basic', 'all', 'selected'.
+                exportTypes: ['excel'],
+                exportOptions: {//导出设置
+                    fileName: '销售发票对账',//下载文件名称
+                },
+                columns: [{
+                    checkbox: true
+                },
+                    {
+                    field: 'no',
+                    title: '编号',
                     align: 'center',
                     formatter: function (value, row, index) {
-                        var result = "";
-                        result += "<input name='duizhangId' type='checkbox' style='width:18px;height:18px;' value=" + row.id + " />";
-                        return result;
+                        return index + 1;
+                    },
+                    footerFormatter: function () {
+                        return "汇总";
+                    }
+                }, {
+                        field: 'id',
+                        title: 'id',
+                        align: 'center',
+                        hidden: true
+                    }, {
+                    field: 'dz_index',
+                    title: '对账单号',
+                    align: 'center',
+                    sortable: true
+                }, {
+                    field: 'deliver_index',
+                    title: '送货单号',
+                    align: 'center',
+                    sortable: true
+                }, {
+                    field: 'company_name',
+                    title: '客户名称',
+                    align: 'center',
+                    sortable: true
+                }, {
+                    field: 'company_order_index',
+                    title: '客户订单号',
+                    align: 'center',
+                    sortable: true
+                }, {
+                    field: 'order_name',
+                    title: '名称规格',
+                    align: 'center',
+                    sortable: true
+                }, {
+                    field: 'unit',
+                    title: '单位',
+                    align: 'center',
+                    sortable: true
+                }, {
+                    field: 'dui_num',
+                    title: '数量',
+                    align: 'center',
+                    sortable: true,
+                    footerFormatter: function (data) {
+                        var count = 0;
+                        $.each(data, function (index, item) {
+                            count += item.dui_num;
+                        });
+                        return count.toFixed(2);
+                    }
+                }, {
+                    field: 'dui_price',
+                    title: '单价',
+                    align: 'center',
+                    sortable: true
+                }, {
+                    field: 'dui_all_price',
+                    title: '金额',
+                    align: 'center',
+                    sortable: true,
+                    footerFormatter: function (data) {
+                        var count = 0;
+                        $.each(data, function (index, item) {
+                            count += item.dui_all_price;
+                        });
+                        return count.toFixed(2);
                     }
                 }]
             });
@@ -169,43 +330,52 @@
             }
         }
 
-        function getPickerList()
-        {
-            var duizhangIdList = document.getElementsByName("duizhangId");
-            var duizhangId = new Array();
-            for (var i = 0; i < duizhangIdList.length; i++) {
-                var flag = duizhangIdList[i].checked;
-                if (flag) {
-                    duizhangId.push(duizhangIdList[i].value);
+        function getPickerList(dz_index_flag) {
+            var DZ_Index = "";
+            if (dz_index_flag != "0") {
+                DZ_Index = dz_index_flag
+            } else {
+                var duizhangIdList = $("#myTable").bootstrapTable("getSelections");
+                var duizhangIndex = new Array();
+                for (var i = 0; i < duizhangIdList.length; i++) {
+                    duizhangIndex.push(duizhangIdList[i].dz_index);
                 }
+                DZ_Index = duizhangIndex.join(',');
             }
-            var DZ_Id = duizhangId.join(',');
-            $.ajax({
-                type: "POST",
-                url: "/DuiZhang/GetPickerList",
-                data: { DZ_Id: DZ_Id },
-                success: function (msg) {
-                    $('#picker_list').html(msg);
+            if (DZ_Index == "") {
+                swal("请先勾选对账单号！", "请重新操作！", "error");
+            } else {
+                if (dz_index_flag != "0") {
+                    $("#dz_list").bootstrapTable('refresh', { url: '/DuiZhang/GetPickerList?DZ_Index=' + DZ_Index });
+                    $('#detailDZ').modal();
+                } else {
+                    $("#picker_list").bootstrapTable('refresh', { url: '/DuiZhang/GetPickerList?DZ_Index=' + DZ_Index });
                     $('#myModalList').modal();
-                },
-                error: function (msg) {
-                    swal("您暂无勾选！", "请重新操作！", "error");
                 }
-            });
-        }
 
-        function getInvoice() {
-            $('#myModal').modal();
+            }
+
         }
 
         function putInvoice() {
-            var duizhangIdList = document.getElementsByName("id");
+            var duizhangIdList = $('#picker_list').bootstrapTable('getSelections');
             var invoice_index = document.getElementById("invoice_index").value;
+
+            if (duizhangIdList.length == 0) {
+                swal("请先勾选需要关联的数据！", "", "error");
+                return;
+            }
+            if (invoice_index == "" || invoice_index == null || invoice_index == undefined) {
+                swal("请先选择关联的发票号", "", "error");
+                return;
+            }
+
             var duizhangId = new Array();
             for (var i = 0; i < duizhangIdList.length; i++) {
-                duizhangId.push(duizhangIdList[i].value);
+                duizhangId.push(duizhangIdList[i].id);
             }
             var DZ_Id = duizhangId.join(',');
+            //console.log(duizhangId)
             swal({
                 title: "是否关联此发票?",
                 text: "",
@@ -252,11 +422,7 @@
         function Search() {
             var dz_start_time = $("#dz_start_time").val();
             var dz_end_time = $("#dz_end_time").val();
-            var deliver_start_time = $("#deliver_start_time").val();
-            var deliver_end_time = $("#deliver_end_time").val();
 
-            var deliver_index = $("#deliver_index").val();
-            var order_name = $("#order_name").val();
             var dz_index = $("#dz_index").val();
             var deliver_company_head = $("#deliver_company_head").val();
 
@@ -264,8 +430,8 @@
             var month = $("#month").val();
             var year = $("#year").val();
 
-            var searchUrl = "/DuiZhang/GetData?dz_start_time=" + dz_start_time + "&dz_end_time=" + dz_end_time + "&deliver_start_time=" + deliver_start_time
-                + "&deliver_end_time=" + deliver_end_time + "&deliver_index=" + deliver_index + "&order_name=" + order_name + "&dz_index=" + dz_index + "&deliver_company_head=" + deliver_company_head
+            var searchUrl = "/DuiZhang/GetData?dz_start_time=" + dz_start_time + "&dz_end_time=" + dz_end_time
+                + "&dz_index=" + dz_index + "&deliver_company_head=" + deliver_company_head
                 + "&day=" + day + "&month=" + month + "&year=" + year;
             $("#myTable").bootstrapTable('refresh', { url: searchUrl });
         }
@@ -294,21 +460,8 @@
                             <div class="form-horizontal">
                                 <div class="form-inline">
                                     <div class="form-group">
-                                        <label>送货单号：</label>
-                                        <select class="selectpicker" data-live-search="true" data-live-search-placeholder="搜索" id="deliver_index" name="deliver_index" style="padding:6px 50px">
-                                            <option value=""></option>
-                                            @{
-                                                SaleManager SM = new SaleManager();
-                                                List<Sale> saleList = SM.SelectDeliverList();
-                                                if (saleList.Count > 0)
-                                                {
-                                                    for (int i = 0; i < saleList.Count; i++)
-                                                    {
-                                                        <!option value="@saleList[i].deliver_index" @if (Model != null) { if (saleList[i].deliver_index == ViewBag.deliver_index) { <text> selected</text>}}>@saleList[i].deliver_index</!option>
-                                                    }
-                                                }
-                                            }
-                                        </select>
+                                        <label>对账单号：</label>
+                                        <input id="dz_index" name="dz_index" type="text" class="form-control" style="width:220px" value="@ViewBag.dz_index" />
                                     </div>
                                     <div class="form-group">
                                         <label>客户名称：</label>
@@ -321,30 +474,13 @@
                                                 {
                                                     for (int i = 0; i < objList.Count; i++)
                                                     {
-                                                        <!option value="@objList[i].company_name" @if (Model != null) { if (objList[i].company_name == ViewBag.deliver_company_head) { <text> selected</text>}}>@objList[i].company_name</!option>
+                                                <!option value="@objList[i].company_name" @if (Model != null) { if (objList[i].company_name == ViewBag.deliver_company_head) { <text> selected</text>}}>
+                                                    @objList[i].company_name
+                                                </!option>
                                                     }
                                                 }
                                             }
                                         </select>
-                                    </div>
-                                    <div class="form-group">
-                                        <label>送货开始时间：</label>
-                                        <input id="deliver_start_time" name="deliver_start_time" type="text" autocomplete="off" class="form-control" style="width:180px" onclick="WdatePicker({ skin: 'whyGreen',dateFmt:'yyyy-MM-dd' })" value="@ViewBag.deliver_start_time" />
-                                    </div>
-                                    <div class="form-group">
-                                        <label>送货结束时间：</label>
-                                        <input id="deliver_end_time" name="deliver_end_time" type="text" autocomplete="off" class="form-control" style="width:180px" onclick="WdatePicker({ skin: 'whyGreen',dateFmt:'yyyy-MM-dd' })" value="@ViewBag.deliver_end_time" />
-                                    </div>
-                                </div>
-                                <br />
-                                <div class="form-inline">
-                                    <div class="form-group">
-                                        <label>对账单号：</label>
-                                        <input id="dz_index" name="dz_index" type="text" class="form-control" style="width:220px" value="@ViewBag.dz_index" />
-                                    </div>
-                                    <div class="form-group">
-                                        <label>名称规格：</label>
-                                        <input id="order_name" name="order_name" type="text" class="form-control" style="width:220px" value="@ViewBag.order_name" />
                                     </div>
                                     <div class="form-group">
                                         <label>对账开始时间：</label>
@@ -355,7 +491,11 @@
                                         <input id="dz_end_time" name="dz_end_time" type="text" autocomplete="off" class="form-control" style="width:180px" onclick="WdatePicker({ skin: 'whyGreen',dateFmt:'yyyy-MM-dd' })" value="@ViewBag.dz_end_time" />
                                     </div>
                                 </div>
-                                <br />
+
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div id="toolbar">
                                 <div class="form-inline">
                                     <div class="form-group">
                                         <label>本日</label>
@@ -374,13 +514,10 @@
                                         <input type="button" value="查询" class="btn btn-primary" style="width:80px" onclick="Search()" />
                                     </div>
                                     <div class="form-group">
-                                        <input type="button" value="关联发票" class="btn btn-primary" style="width:80px" onclick="getPickerList()" />
+                                        <input type="button" value="关联发票" class="btn btn-primary" style="width:80px" onclick="getPickerList('0')" />
                                     </div>
                                 </div>
-                                <br />
                             </div>
-                        </div>
-                        <div class="card-body">
                             <table id="myTable" class="table table-responsive table-hover ">
                             </table>
                         </div>
@@ -390,37 +527,35 @@
         </div>
     </div><!-- /# container-fluid -->
 
+    <div class="modal fade" id="detailDZ" tabindex="-1" role="dialog">
+        <div class="modal-dialog modal-lg" role="document" style="width:50%">
+            <div class="modal-content">
+                <div class="modal-header">
+
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="myModalDZ">对账单详情</h4>
+                </div>
+                <table class="table table-responsive table-hover " id="dz_list">
+                </table>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="modal fade" id="myModalList" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
         <div class="modal-dialog modal-lg" role="document" style="width:50%">
             <div class="modal-content">
                 <div class="modal-header">
 
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                    <h4 class="modal-title" id="myModalLabel">已勾选列表</h4>
+                    <h4 class="modal-title" id="myModalList">已勾选列表</h4>
                 </div>
-                <div class="modal-body" id="picker_list">
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
-                    <button type="button" class="btn btn-primary" data-dismiss="modal" onclick="getInvoice()">关联发票</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
-        <div class="modal-dialog" role="document" style="width:20%">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                    <h4 class="modal-title" id="myModalLabel">关联发票</h4>
-                </div>
-                <div class="modal-body" id="picker_list">
+                <div class="modal-body" style="padding:10px;">
                     <div class="form-group">
-                        <label for="txt_departmentname">发票号</label>
-                    </div>
-                    <div class="form-group">
-                        <select class="selectpicker" data-live-search="true" data-live-search-placeholder="搜索" id="invoice_index" name="invoice_index" style="padding:6px 50px;width:100%">
+                        <label>发票号</label>
+                        <select class="selectpicker" data-live-search="true" data-live-search-placeholder="搜索" id="invoice_index" name="invoice_index">
                             <option value=""></option>
                             @{
                                 InvoiceManager IM = new InvoiceManager();
@@ -435,8 +570,10 @@
                             }
                         </select>
                     </div>
-
+                    <table class="table table-responsive table-hover" id="picker_list">
+                    </table>
                 </div>
+                
                 <div class="modal-footer">
                     <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
                     <button type="button" class="btn btn-primary" data-dismiss="modal" onclick="putInvoice()">保存</button>
@@ -444,6 +581,7 @@
             </div>
         </div>
     </div>
+
     <script>
         var app = new Vue({
             el: '#vueApp',

@@ -26,7 +26,8 @@
                 pageList: [10, 20, 50],
                 undefinedText: '---',
                 paginationDetailHAlign: 'left',
-                toolbarAlign: 'right',
+                toolbar: "#toolbar",
+                toolbarAlign: 'left',
                 showFooter: true,
                 showExport: true, //是否显示导出
                 exportDataType: "all", //basic', 'all', 'selected'.
@@ -82,14 +83,14 @@
                     field: 'return_num',
                     title: '退货数量',
                     align: 'center',
-                        sortable: true,
-                        footerFormatter: function (data) {
-                            var count = 0;
-                            $.each(data, function (index, item) {
-                                count += item.return_num;
-                            });
-                            return count.toFixed(2);
-                        }
+                    sortable: true,
+                    footerFormatter: function (data) {
+                        var count = 0;
+                        $.each(data, function (index, item) {
+                            count += item.return_num;
+                        });
+                        return count.toFixed(2);
+                    }
                 }, {
                     field: 'return_price',
                     title: '退货单价',
@@ -99,14 +100,14 @@
                     field: 'return_all_price',
                     title: '退货总价',
                     align: 'center',
-                        sortable: true,
-                        footerFormatter: function (data) {
-                            var count = 0;
-                            $.each(data, function (index, item) {
-                                count += item.return_all_price;
-                            });
-                            return count.toFixed(2);
-                        }
+                    sortable: true,
+                    footerFormatter: function (data) {
+                        var count = 0;
+                        $.each(data, function (index, item) {
+                            count += item.return_all_price;
+                        });
+                        return count.toFixed(2);
+                    }
                 }, {
                     field: 'insert_time',
                     title: '退货开单日期',
@@ -116,12 +117,12 @@
                         return row.insert_time.split('T')[0];
                     }
                 }, {
-                        field: 'confirm_time',
-                        title: '退货确认时间',
+                    field: 'confirm_time',
+                    title: '退货确认时间',
                     align: 'center',
-                        formatter: function (value, row, index) {
-                            return row.confirm_time.replace('T',' ');
-                        }
+                    formatter: function (value, row, index) {
+                        return row.confirm_time.replace('T', ' ');
+                    }
                 }]
             });
         });
@@ -201,7 +202,8 @@
                                                 {
                                                     for (int i = 0; i < saleList.Count; i++)
                                                     {
-                                                        <!option value="@saleList[i]" @if (Model != null) { if (saleList[i] == ViewBag.return_index) { <text> selected</text>}}>@saleList[i]</!option>
+                                                        <!option value="@saleList[i]" @if (Model != null) { if (saleList[i] == ViewBag.return_index) { <text> selected</text>}}>
+                                                        @saleList[i]</!option>
                                                     }
                                                 }
                                             }
@@ -220,7 +222,12 @@
                                         <input id="end_time" name="end_time" type="text" autocomplete="off" class="form-control" style="width:180px" onclick="WdatePicker({ skin: 'whyGreen',dateFmt:'yyyy-MM-dd' })" value="@ViewBag.end_time" />
                                     </div>
                                 </div>
-                                <br />
+
+
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div id="toolbar">
                                 <div class="form-inline">
                                     <div class="form-group">
                                         <label>本日</label>
@@ -239,13 +246,7 @@
                                         <input type="button" value="查询" class="btn btn-primary" style="width:80px" onclick="Search()" />
                                     </div>
                                 </div>
-
-                                <br />
-
-
                             </div>
-                        </div>
-                        <div class="card-body">
                             <table id="myTable" class="table table-responsive table-hover ">
                             </table>
                         </div>

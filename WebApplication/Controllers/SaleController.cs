@@ -29,7 +29,7 @@ namespace WebApplication.Controllers
             return View();
         }
 
-        public IActionResult GetData(string start_time, string end_time, string deliver_index, string deliver_company_head) {
+        public IActionResult GetData(string start_time, string end_time, string deliver_index, string deliver_company_head, string day, string month, string year) {
             ViewBag.start_time = start_time;
             ViewBag.end_time = end_time;
 
@@ -43,6 +43,28 @@ namespace WebApplication.Controllers
             if (end_time == null)
             {
                 end_time = "2222-01-01";
+            }
+
+            DateTime dt = DateTime.Now.AddHours(8);
+            DateTime dt2 = dt.AddMonths(1);
+
+            if (day == "1")
+            {
+                start_time = DateTime.Now.ToLocalTime().AddHours(8).ToString("yyyy-MM-dd");
+                end_time = DateTime.Now.ToLocalTime().AddHours(8).ToString("yyyy-MM-dd");
+                ViewBag.day = "1";
+            }
+            if (month == "1")
+            {
+                start_time = dt.AddDays(-(dt.Day) + 1).ToString("yyyy-MM-dd");
+                end_time = dt2.AddDays(-dt.Day).ToString("yyyy-MM-dd");
+                ViewBag.month = "1";
+            }
+            if (year == "1")
+            {
+                start_time = dt.AddMonths(-dt.Month + 1).AddDays(-dt.Day + 1).ToString("yyyy-MM-dd");
+                end_time = new DateTime(DateTime.Now.AddHours(8).Year, 12, 31).ToString("yyyy-MM-dd");
+                ViewBag.year = "1";
             }
 
             var objList = SM.SelectAll(start_time, end_time, deliver_index, deliver_company_head);

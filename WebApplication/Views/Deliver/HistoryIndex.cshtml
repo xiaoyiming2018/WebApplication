@@ -24,7 +24,8 @@
                 pageList: [10, 20, 50],
                 undefinedText: '---',
                 paginationDetailHAlign: 'left',
-                toolbarAlign: 'right',
+                toolbar: "#toolbar",
+                toolbarAlign: 'left',
                 showFooter: true,
                 showExport: true, //是否显示导出
                 exportDataType: "all", //basic', 'all', 'selected'.
@@ -319,7 +320,8 @@
                                                 {
                                                     for (int i = 0; i < deliverList.Count; i++)
                                                     {
-                                                        <!option value="@deliverList[i]" @if (Model != null) { if (deliverList[i] == ViewBag.purchase_index) { <text> selected</text>}}>@deliverList[i]</!option>
+                                                        <!option value="@deliverList[i]" @if (Model != null) { if (deliverList[i] == ViewBag.purchase_index) { <text> selected</text>}}>
+                                                        @deliverList[i]</!option>
                                                     }
                                                 }
                                             }
@@ -336,7 +338,8 @@
                                                 {
                                                     for (int i = 0; i < objList.Count; i++)
                                                     {
-                                                        <!option value="@objList[i].company_name" @if (Model != null) { if (objList[i].company_name == ViewBag.company_name) { <text> selected</text>}}>@objList[i].company_name</!option>
+                                                        <!option value="@objList[i].company_name" @if (Model != null) { if (objList[i].company_name == ViewBag.company_name) { <text> selected</text>}}>
+                                                        @objList[i].company_name</!option>
                                                     }
                                                 }
                                             }
@@ -358,7 +361,8 @@
                                                 {
                                                     for (int i = 0; i < sList.Count; i++)
                                                     {
-                                                        <!option value="@sList[i].config_list" @if (Model != null) { if (sList[i].config_list == ViewBag.category) { <text> selected</text>}}>@sList[i].config_list</!option>
+                                                        <!option value="@sList[i].config_list" @if (Model != null) { if (sList[i].config_list == ViewBag.category) { <text> selected</text>}}>
+                                                        @sList[i].config_list</!option>
                                                     }
                                                 }
                                             }
@@ -390,9 +394,13 @@
                                         <input id="confirm_end_time" name="confirm_end_time" type="text" class="form-control" autocomplete="off" style="width:180px" onclick="WdatePicker({ skin: 'whyGreen',dateFmt:'yyyy-MM-dd' })" value="@ViewBag.confirm_end_time" />
                                     </div>
                                 </div>
-                                <br />
-                                <div class="form-inline">
 
+
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div id="toolbar">
+                                <div class="form-inline">
                                     <div class="form-group">
                                         <label>本日</label>
                                         <input id="day" name="day" type="checkbox" class="form-control" onclick="CheckOrCancleAll($(this))" style="width:16px" value="0" @if (ViewBag.day == "1") { <text> checked</text> } />
@@ -411,12 +419,7 @@
                                     </div>
 
                                 </div>
-                                <br />
-
-
                             </div>
-                        </div>
-                        <div class="card-body">
                             <table id="myTable" class="table table-responsive table-hover ">
                             </table>
                         </div>

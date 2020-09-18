@@ -25,7 +25,8 @@
                 pageList: [10, 20, 50],
                 undefinedText: '---',
                 paginationDetailHAlign: 'left',
-                toolbarAlign: 'right',
+                toolbar: "#toolbar",
+                toolbarAlign: 'left',
                 showFooter: true,
                 showExport: true, //是否显示导出
                 exportDataType: "all", //basic', 'all', 'selected'.
@@ -75,15 +76,15 @@
                 }, {
                     field: 'order_name',
                     title: '名称规格',
-                        align: 'center',
-                        width: 200,
+                    align: 'center',
+                    width: 200,
                     sortable: true
                 }, {
                     field: 'order_num',
                     title: '数量',
                     align: 'center',
-                        sortable: true,
-                        width: 50,
+                    sortable: true,
+                    width: 50,
                     footerFormatter: function (data) {
                         var count = 0;
                         $.each(data, function (index, item) {
@@ -127,7 +128,7 @@
                     field: 'tui_num',
                     title: '退单数',
                     align: 'center',
-                        sortable: true,
+                    sortable: true,
                     width: 50,
                     formatter: function (value, row, index) {
                         return "<span style='color:red'>" + row.tui_num + "</span>"
@@ -335,7 +336,12 @@
                                         <input id="deliver_end_time" name="deliver_end_time" type="text" class="form-control" autocomplete="off" style="width:160px" onclick="WdatePicker({ skin: 'whyGreen',dateFmt:'yyyy-MM-dd' })" value="@ViewBag.deliver_end_time" />
                                     </div>
                                 </div>
-                                <br />
+
+
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div id="toolbar">
                                 <div class="form-inline">
                                     <div class="form-group">
                                         <label>本日</label>
@@ -354,10 +360,7 @@
                                         <input type="button" value="查询" class="btn btn-primary" style="width:80px" onclick="Search()" />
                                     </div>
                                 </div>
-
                             </div>
-                        </div>
-                        <div class="card-body">
                             <table id="myTable" class="table table-responsive table-hover ">
                             </table>
                         </div>

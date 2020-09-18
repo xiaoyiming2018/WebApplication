@@ -15,6 +15,7 @@ namespace WebApplication.Controllers
         OrderManager OMM = new OrderManager();
         SaleManager SM = new SaleManager();
         SaleReturnManager SRM = new SaleReturnManager();
+        MaterialManager MM = new MaterialManager();
         /// <summary>
         /// 用户列表首页
         /// </summary>
@@ -161,6 +162,12 @@ namespace WebApplication.Controllers
                 objOrder.seq_id = seq_id;
                 count = OMM.UpdateOrderSeq(objOrder);
                 OMM.UpdateOrder(objOrder);
+
+
+                Material material = MM.SelectAll().Find(s=>s.material_name==order_name);
+                material.price = order_price;
+                material.picture = order_picture;
+                MM.Update(material);
             }
             else
             {

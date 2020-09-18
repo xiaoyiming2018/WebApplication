@@ -18,10 +18,14 @@ namespace WebApplication.Controllers
             return View();
         }
         
-        public IActionResult GetData(string material_name,int flag,string start_time,string end_time,string day,string month,string year) {
+        public IActionResult GetData(string material_name,int flag,string start_time,string end_time,string day,string month,string year,string store_name) {
 
             if (material_name==null) {
                 material_name = "";
+            }
+            if (store_name == null)
+            {
+                store_name = "";
             }
 
             if (start_time == null)
@@ -56,15 +60,16 @@ namespace WebApplication.Controllers
             {
                 inOuts = inOutManager.SelectAll().Where(s => Convert.ToDateTime(s.create_time.ToString("yyyy-MM-dd")) >= Convert.ToDateTime(start_time) &&
                 Convert.ToDateTime(s.create_time.ToString("yyyy-MM-dd")) <= Convert.ToDateTime(end_time) &&
-                s.material_name.Contains(material_name)
+                s.material_name.Contains(material_name) && s.store_name.Contains(store_name)
                 ).ToList();
             }
             else {
                 inOuts = inOutManager.SelectAll().Where(s => Convert.ToDateTime(s.create_time.ToString("yyyy-MM-dd")) >= Convert.ToDateTime(start_time) &&
                 Convert.ToDateTime(s.create_time.ToString("yyyy-MM-dd")) <= Convert.ToDateTime(end_time) &&
-                s.material_name.Contains(material_name) && s.flag == flag
+                s.material_name.Contains(material_name) && s.store_name.Contains(store_name) && s.flag == flag
                 ).ToList();
             }
+
             return Json(inOuts);
         
         }

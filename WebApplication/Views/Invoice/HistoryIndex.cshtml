@@ -11,8 +11,6 @@
 
     <script type="text/javascript">
         $(function () {
-            $(".sidebar ul li:nth-of-type(6)").addClass("active open")
-            $(".sidebar ul li:nth-of-type(6) ul li:nth-of-type(2)").addClass("active")
 
             $("#myTable").bootstrapTable({
                 url: '/Invoice/GetHistoryData',
@@ -25,7 +23,8 @@
                 pageList: [10, 20, 50],
                 undefinedText: '---',
                 paginationDetailHAlign: 'left',
-                toolbarAlign: 'right',
+                toolbar:"#toolbar",
+                toolbarAlign: 'left',
                 showFooter: true,
                 showExport: true, //是否显示导出
                 exportDataType: "all", //basic', 'all', 'selected'.
@@ -314,6 +313,15 @@
                                         <label>付款结束时间：</label>
                                         <input id="confirm_end_time" name="confirm_end_time" autocomplete="off" type="text" class="form-control" style="width:180px" onclick="WdatePicker({ skin: 'whyGreen',dateFmt:'yyyy-MM-dd' })" value="@ViewBag.confirm_end_time" />
                                     </div>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+                        <div class="card-body">
+                            <div id="toolbar">
+                                <div class="form-inline">
                                     <div class="form-group">
                                         <label>本日</label>
                                         <input id="day" name="day" type="checkbox" class="form-control" onclick="CheckOrCancleAll($(this))" style="width:16px" value="0" @if (ViewBag.day == "1") { <text> checked</text> } />
@@ -330,14 +338,8 @@
                                     <div class="form-group">
                                         <input type="button" value="查询" class="btn btn-primary" style="width:80px" onclick="Search()" />
                                     </div>
-
                                 </div>
-
                             </div>
-
-                        </div>
-                        <br />
-                        <div class="card-body">
                             <table id="myTable" class="table table-responsive table-hover ">
                             </table>
                         </div>

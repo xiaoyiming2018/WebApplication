@@ -94,9 +94,9 @@
                     footerFormatter: function (data) {
                         var count = 0;
                         $.each(data, function (index, item) {
-                            count += item.inout_all_price *item.flag;
+                            count += item.inout_all_price * item.flag;
                         });
-                        return "结存金额:" +count.toFixed(2);
+                        return "结存金额:" + count.toFixed(2);
                     }
                 }, {
                     field: 'picture',
@@ -120,6 +120,11 @@
                     align: 'center',
                     sortable: true,
                 }, {
+                    field: 'store_name',
+                    title: '仓位',
+                    align: 'center',
+                    sortable: true,
+                }, {
                     field: 'create_time',
                     title: '创建时间',
                     align: 'center',
@@ -134,7 +139,7 @@
                     formatter: function (value, row, index) {
                         var result = "";
                         result += "<input type='button'  class='btn btn-primary' data-toggle='modal' data-target='#insertData' " +
-                            "onclick =\"Edit(" + row.id + "," + row.material_id + "," + row.flag + "," + row.inout_price + "," + row.inout_all_price + "," + row.inout_num + ",'" + row.remarks + "')\" value='编辑' />";
+                            "onclick =\"Edit(" + row.id + "," + row.material_id + "," + row.flag + "," + row.inout_price + "," + row.inout_all_price + "," + row.inout_num + ",'" + row.remarks + "'," + row.store_id + ")\" value='编辑' />";
                         return result;
                     },
                     searchable: false,
@@ -176,18 +181,21 @@
             var day = $("#day").val();
             var month = $("#month").val();
             var year = $("#year").val();
+            var store_name = $("#store_name").val();
 
-            var searchUrl = "/InOut/GetData?start_time=" + start_time + "&end_time=" + end_time + "&material_name=" + material_name + "&day=" + day + "&month=" + month + "&year=" + year + "&flag=" + flag;
+            var searchUrl = "/InOut/GetData?start_time=" + start_time + "&end_time=" + end_time + "&material_name="
+                + material_name + "&day=" + day + "&month=" + month + "&year=" + year + "&flag=" + flag + "&store_name=" + store_name;
             $("#myTable").bootstrapTable('refresh', { url: searchUrl });
         }
 
         function ConfirmInsert() {
             var inout_id = $('#inout_id').val();
-            if (inout_id=="") {
+            if (inout_id == "") {
                 inout_id = 0;
             }
             var flag = $('#flag').val();
             var material_id = $('#material_id').val();
+            var store_id = $('#store_id').val();
             var inout_price = $('#inout_price').val();
             var inout_num = $('#inout_num').val();
             var remain_num = $('#remain_num').val();
@@ -196,7 +204,7 @@
             var remarks = $('#remarks').val();
             if (flag == "" || inout_price == "" || inout_num == "" || material_id == "") {
                 swal("信息不能为空！", "", "error");
-            } else if (flag == "-1" && inout_num > remain_num && inout_id==0) {
+            } else if (flag == "-1" && parseFloat(inout_num) > parseFloat(remain_num) && inout_id == 0) {
                 swal("库存不足！", "该品名的剩余库存小于出货数量", "error");
             }
             else {
@@ -209,7 +217,7 @@
                     },
                     data: {
                         id: inout_id, material_id: material_id, inout_price: inout_price, inout_all_price: inout_all_price,
-                        inout_num: inout_num, remarks: remarks, flag: flag
+                        inout_num: inout_num, remarks: remarks, flag: flag, store_id: store_id
                     },
                     success: function (msg) {
                         if (msg == "Success") {
@@ -217,7 +225,7 @@
                                 swal("编辑成功 !", "", "success");
                             } else {
                                 swal("添加成功 !", "", "success");
-                            } 
+                            }
                             $("#myTable").bootstrapTable('refresh', { url: "/InOut/GetData" });
                         } else {
                             swal("添加失败 !", "", "error");
@@ -296,12 +304,14 @@
             $("#inout_all_price").val("");
             $("#remarks").val("");
             $("#remain_num").val("");
+            $("#store_id").val("");
         }
-        function Edit(id, material_id, flag, inout_price, inout_all_price, inout_num, remarks) {
+        function Edit(id, material_id, flag, inout_price, inout_all_price, inout_num, remarks,store_id) {
             $("#flag").val(flag);
             $("#flag").attr("disabled", "disabled");
 
             $("#material_id").selectpicker('val', material_id);
+            $("#store_id").selectpicker('val', store_id);
             $("#inout_id").val(id);
             $("#inout_num").val(inout_num);
             $("#inout_price").val(inout_price);
@@ -370,9 +380,8 @@
                     <div class="page-title">
                         <ol class="breadcrumb text-left">
                             <li><a href="/Supplier/Index">主页</a></li>
-                            <li><a href="/Order/Index">订单管理</a></li>
-                            <li><a href="/Order/HistoryIndex">历史客户订单</a></li>
-                            <li class="active">订单列表</li>
+                            <li><a href="/Inventory/Index">库存概况</a></li>
+                            <li class="active">出入库管理</li>
                         </ol>
                     </div>
                 </div>
@@ -387,7 +396,7 @@
                                 <div class="form-inline">
                                     <div class="form-group">
                                         <label>&emsp;&emsp;品名：</label>
-                                        <select class="selectpicker" data-live-search="true" data-live-search-placeholder="搜索" id="material_name" name="material_name" 
+                                        <select class="selectpicker" data-live-search="true" data-live-search-placeholder="搜索" id="material_name" name="material_name"
                                                 style="padding:6px 50px">
                                             <option value="">-请选择-</option>
                                             @{
@@ -398,7 +407,8 @@
                                                     for (int i = 0; i < objList.Count; i++)
                                                     {
                                                         <!option value="@objList[i].material_name">
-                                                        @objList[i].material_name</!option>
+                                                            @objList[i].material_name
+                                                        </!option>
                                                     }
                                                 }
                                             }
@@ -413,6 +423,26 @@
                                         </select>
                                     </div>
                                     <div class="form-group">
+                                        <label>&emsp;&emsp;仓位：</label>
+                                        <select class="selectpicker" data-live-search="true" data-live-search-placeholder="搜索" id="store_name" name="store_name"
+                                                style="padding:6px 50px">
+                                            <option value="">-请选择-</option>
+                                            @{
+                                                StoreManager SSM = new StoreManager();
+                                                List<Store> ssList = SSM.SelectAll();
+                                                if (ssList.Count > 0)
+                                                {
+                                                    for (int i = 0; i < ssList.Count; i++)
+                                                    {
+                                                        <!option value="@ssList[i].store_name">
+                                                            @ssList[i].store_name
+                                                        </!option>
+                                                    }
+                                                }
+                                            }
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
                                         <label>开始时间：</label>
                                         <input id="start_time" name="start_time" type="text" class="form-control" autocomplete="off" style="width:160px" onclick="WdatePicker({ skin: 'whyGreen',dateFmt:'yyyy-MM-dd' })" />
                                     </div>
@@ -421,7 +451,10 @@
                                         <input id="end_time" name="end_time" type="text" class="form-control" autocomplete="off" style="width:160px" onclick="WdatePicker({ skin: 'whyGreen',dateFmt:'yyyy-MM-dd' })" />
                                     </div>
                                 </div>
-                                <br />
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div id="toolbar">
                                 <div class="form-inline">
                                     <div class="form-group">
                                         <label>本日</label>
@@ -438,14 +471,10 @@
                                     <div class="form-group">
                                         <input type="button" value="查询" class="btn btn-primary" style="width:80px" onclick="Search()" />
                                     </div>
+                                    <button class="btn btn-primary" data-toggle="modal" data-target="#insertData" style="width:80px" onclick="insertAction()">新增</button>
+                                    <button class="btn btn-primary" style="width:80px" onclick="deleteTiShi()">删除</button>
                                 </div>
 
-                            </div>
-                        </div>
-                        <div class="card-body">
-                            <div id="toolbar" class="toolbar">
-                                <button class="btn btn-primary" data-toggle="modal" data-target="#insertData" onclick="insertAction()">新增</button>
-                                <button class="btn btn-primary" onclick="deleteTiShi()">删除</button>
                             </div>
                             <table id="myTable" class="table table-responsive table-hover ">
                             </table>
@@ -480,6 +509,26 @@
                                                             for (int i = 0; i < objListM.Count; i++)
                                                             {
                                                                 <!option value="@objListM[i].id">@objListM[i].material_name</!option>
+                                                            }
+                                                        }
+                                                    }
+                                                </select>
+                                            </div>
+                                            <div class="form-group">
+                                                <label>仓位</label>
+                                                <select class="selectpicker form-control" data-live-search="true" data-live-search-placeholder="搜索" id="store_id" name="store_id"
+                                                        style="padding:6px 50px">
+                                                    <option value="">-请选择-</option>
+                                                    @{
+                                                        StoreManager SM = new StoreManager();
+                                                        List<Store> sList = SM.SelectAll();
+                                                        if (sList.Count > 0)
+                                                        {
+                                                            for (int i = 0; i < sList.Count; i++)
+                                                            {
+                                                                <!option value="@sList[i].id">
+                                                                    @sList[i].store_name
+                                                                </!option>
                                                             }
                                                         }
                                                     }

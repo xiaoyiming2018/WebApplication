@@ -27,7 +27,8 @@
                 pageList: [10, 20, 50],
                 undefinedText: '---',
                 paginationDetailHAlign: 'left',
-                toolbarAlign: 'right',
+                toolbar: "#toolbar",
+                toolbarAlign: 'left',
                 showFooter: true,
                 showExport: true, //是否显示导出
                 exportDataType: "all", //basic', 'all', 'selected'.
@@ -88,14 +89,14 @@
                     field: 'real_num',
                     title: '送货数量',
                     align: 'center',
-                        sortable: true,
-                        footerFormatter: function (data) {
-                            var count = 0;
-                            $.each(data, function (index, item) {
-                                count += item.real_num;
-                            });
-                            return count.toFixed(2);
-                        }
+                    sortable: true,
+                    footerFormatter: function (data) {
+                        var count = 0;
+                        $.each(data, function (index, item) {
+                            count += item.real_num;
+                        });
+                        return count.toFixed(2);
+                    }
                 }, {
                     field: 'unit',
                     title: '单位',
@@ -110,14 +111,14 @@
                     field: 'deliver_all_price',
                     title: '送货总价',
                     align: 'center',
-                        sortable: true,
-                        footerFormatter: function (data) {
-                            var count = 0;
-                            $.each(data, function (index, item) {
-                                count += item.deliver_all_price;
-                            });
-                            return count.toFixed(2);
-                        }
+                    sortable: true,
+                    footerFormatter: function (data) {
+                        var count = 0;
+                        $.each(data, function (index, item) {
+                            count += item.deliver_all_price;
+                        });
+                        return count.toFixed(2);
+                    }
                 }, {
                     field: 'money_onoff',
                     title: '结款与否',
@@ -152,7 +153,7 @@
                     align: 'center',
                     formatter: function (value, row, index) {
                         var result = "";
-                        result += "<input class='btn btn-primary' style='width:60px' value='修改' onclick=\"changeMoney('" + row.deliver_index + "'," + row.seq_id + "," + row.money_onoff + "," + row.money_way +")\" />";
+                        result += "<input class='btn btn-primary' style='width:60px' value='修改' onclick=\"changeMoney('" + row.deliver_index + "'," + row.seq_id + "," + row.money_onoff + "," + row.money_way + ")\" />";
                         return result;
                     }
                 }]
@@ -160,14 +161,12 @@
         });
 
         //修改结款方式（弹出对话框）
-        function changeMoney(deliver_index1,seq_id1,money_onoff,money_way)
-        {
+        function changeMoney(deliver_index1, seq_id1, money_onoff, money_way) {
             $('#moneyModal').modal();
             document.getElementById("deliver_index1").value = deliver_index1;
             document.getElementById("seq_id1").value = seq_id1;
             var selectMoneyOnOff = document.getElementById("money_onoff");
-            for (var i = 0; i < selectMoneyOnOff.options.length; i++)
-            {
+            for (var i = 0; i < selectMoneyOnOff.options.length; i++) {
                 if (selectMoneyOnOff.options[i].value == money_onoff) {
                     selectMoneyOnOff.options[i].selected = true;
                 }
@@ -263,7 +262,8 @@
                                                 {
                                                     for (int i = 0; i < saleList.Count; i++)
                                                     {
-                                                        <!option value="@saleList[i].deliver_index" @if (Model != null) { if (saleList[i].deliver_index == ViewBag.deliver_index) { <text> selected</text>}}>@saleList[i].deliver_index</!option>
+                                                        <!option value="@saleList[i].deliver_index" @if (Model != null) { if (saleList[i].deliver_index == ViewBag.deliver_index) { <text> selected</text>}}>
+                                                        @saleList[i].deliver_index</!option>
                                                     }
                                                 }
                                             }
@@ -280,7 +280,8 @@
                                                 {
                                                     for (int i = 0; i < objList.Count; i++)
                                                     {
-                                                        <!option value="@objList[i].company_name" @if (Model != null) { if (objList[i].company_name == ViewBag.deliver_company_head) { <text> selected</text>}}>@objList[i].company_name</!option>
+                                                        <!option value="@objList[i].company_name" @if (Model != null) { if (objList[i].company_name == ViewBag.deliver_company_head) { <text> selected</text>}}>
+                                                        @objList[i].company_name</!option>
                                                     }
                                                 }
                                             }
@@ -299,17 +300,17 @@
                                         <input id="order_name" name="order_name" type="text" class="form-control" style="width:220px" value="@ViewBag.order_name" />
                                     </div>
                                 </div>
-                                <br />
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div id="toolbar">
                                 <div class="form-inline">
 
                                     <div class="form-group">
                                         <input type="button" value="查询" class="btn btn-primary" style="width:80px" onclick="Search()" />
                                     </div>
                                 </div>
-                                <br />
                             </div>
-                        </div>
-                        <div class="card-body">
                             <table id="myTable" class="table table-responsive table-hover ">
                             </table>
                         </div>

@@ -19,8 +19,8 @@ namespace DAL
                 List<InOut> objList = new List<InOut>();
                 string sql = null;
 
-                sql = "select a.id,a.material_id,a.inout_price,a.inout_all_price,a.inout_num,a.create_time,a.remarks,a.flag,b.material_name,b.price,b.picture " +
-                    "from jinchen.inout_info a,jinchen.material_info b where a.material_id=b.id order by create_time desc";
+                sql = "select a.id,a.material_id,a.inout_price,a.inout_all_price,a.inout_num,a.create_time,a.remarks,a.flag,b.material_name,b.price,b.picture,a.store_id,c.store_name " +
+                    "from jinchen.inout_info a,jinchen.material_info b,jinchen.store_info c where a.material_id=b.id and a.store_id=c.id order by create_time desc";
                 sql = string.Format(sql);
 
                 objList = PostgreHelper.GetEntityList<InOut>(sql);
@@ -159,8 +159,8 @@ namespace DAL
             try
             {
                 InOut obj = new InOut();
-                string sql = "select a.id,a.material_id,a.inout_price,a.inout_all_price,a.inout_num,a.create_time,a.remarks,a.flag,b.material_num,b.price,b.picture " +
-                    "from jinchen.inout_info a,jinchen.material_info b where a.material_id=b.id and a.id={0}";
+                string sql = "select a.id,a.material_id,a.inout_price,a.inout_all_price,a.inout_num,a.create_time,a.remarks,a.flag,b.material_num,b.price,b.picture,a.store_id,c.store_name " +
+                    "from jinchen.inout_info a,jinchen.material_info b,jinchen.store_info c where a.material_id=b.id and a.store_id=c.id and a.id={0}";
                 sql = string.Format(sql, id);
                 obj = PostgreHelper.GetSingleEntity<InOut>(sql);
                 return obj;
@@ -181,9 +181,9 @@ namespace DAL
             try
             {
                 int count = 0;
-                string sql = "insert into jinchen.inout_info (material_id, inout_num, inout_price, create_time, remarks, flag, inout_all_price) " +
-                    "VALUES({0}, {1}, {2}, '{3}', '{4}', {5}, {6}); ";
-                sql = string.Format(sql, obj.material_id, obj.inout_num, obj.inout_price, obj.create_time, obj.remarks, obj.flag, obj.inout_all_price);
+                string sql = "insert into jinchen.inout_info (material_id, inout_num, inout_price, create_time, remarks, flag, inout_all_price,store_id) " +
+                    "VALUES({0}, {1}, {2}, '{3}', '{4}', {5}, {6},{7}); ";
+                sql = string.Format(sql, obj.material_id, obj.inout_num, obj.inout_price, obj.create_time, obj.remarks, obj.flag, obj.inout_all_price,obj.store_id);
                 count = PostgreHelper.ExecuteNonQuery(sql);
                 return count;
             }
@@ -205,8 +205,8 @@ namespace DAL
             {
                 int count = 0;
                 string sql = "update jinchen.inout_info set material_id={0},inout_num={1},inout_price={2},inout_all_price={3},flag={4} " +
-                    ",remarks='{5}' where id={6}";
-                sql = string.Format(sql, obj.material_id, obj.inout_num, obj.inout_price, obj.inout_all_price, obj.flag, obj.remarks, obj.id);
+                    ",remarks='{5}',store_id={6} where id={7}";
+                sql = string.Format(sql, obj.material_id, obj.inout_num, obj.inout_price, obj.inout_all_price, obj.flag, obj.remarks,obj.store_id, obj.id);
                 count = PostgreHelper.ExecuteNonQuery(sql);
                 return count;
 

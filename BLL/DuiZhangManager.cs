@@ -14,13 +14,22 @@ namespace BLL
         /// 用于绑定发票视图
         /// </summary>
         /// <returns></returns>
-        public List<DuiZhang> SelectForInvoice(string dz_start_time, string dz_end_time, string deliver_start_time="0000-01-01", string deliver_end_time="2222-01-01",
-            string deliver_index="", string deliver_company_head="", string order_name="", string dz_index="")
+        public List<DuiZhang> SelectForInvoice(string dz_start_time, string dz_end_time, string deliver_company_head="", string dz_index="")
         {
-            List<DuiZhang> objList = DZS.SelectForInvoice(dz_start_time, dz_end_time, deliver_start_time, deliver_end_time, deliver_index, 
-                deliver_company_head, order_name, dz_index);
+            List<DuiZhang> objList = DZS.SelectForInvoice(dz_start_time, dz_end_time, deliver_company_head, dz_index);
             return objList;
         }
+
+        /// <summary>
+        /// 查看某一对账单号中的所有订单信息
+        /// </summary>
+        /// <returns></returns>
+        public List<DuiZhang> SelectByDzIndex(string dz_index)
+        {
+            List<DuiZhang> objList = DZS.SelectByDzIndex(dz_index);
+            return objList;
+        }
+
         /// <summary>
         /// 历史数据
         /// </summary>
