@@ -261,6 +261,10 @@
 
                     _self.LoadEchartYearNum("");
                     _self.LoadEchartYearPrice("");
+
+                    setTimeout(function () {
+                        setDataCardView("#myTable");
+                    }, 500);
                 })
             },
             methods: {

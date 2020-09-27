@@ -335,6 +335,10 @@
                     _self.$refs.Store.parentNode.parentNode.classList.add("active");
                     _self.$refs.Store.parentNode.parentNode.classList.add("open");
                     _self.$refs.Store.classList.add("active");
+
+                    setTimeout(function () {
+                        setDataCardView("#myTable");
+                    }, 500);
                 })
             }
         })

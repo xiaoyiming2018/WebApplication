@@ -378,7 +378,9 @@
                         _self.$refs.ReturnHistoryIndex.parentNode.parentNode.classList.add("open");
                         _self.$refs.ReturnHistoryIndex.classList.add("active");
                     }
-
+                    setTimeout(function () {
+                        setDataCardView("#myTable");
+                    }, 500);
                     
                 })
             }

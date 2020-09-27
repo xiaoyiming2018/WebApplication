@@ -316,6 +316,10 @@
                 _self.$refs.Material.parentNode.parentNode.classList.add("open");
                 _self.$refs.Material.classList.add("active");
                 _self.LoadL();
+
+                setTimeout(function () {
+                    setDataCardView("#myTable");
+                }, 500);
             })
         },
         methods: {

@@ -45,10 +45,16 @@ namespace WebApplication.Controllers
 
             ViewBag.type = type;
             ViewBag.name = name;
-            var objList = CM.SelectAll(customer_id,name: name);
-            return View(objList);
+            //var objList = CM.SelectAll(customer_id,name: name);
+            return View();
            
-        }              
+        }
+
+        public IActionResult GetData(int customer_id, string name)
+        {
+            var objList = CM.SelectAll(customer_id,name);
+            return Json(objList);
+        }
 
         /// <summary>
         /// 插入更新页面

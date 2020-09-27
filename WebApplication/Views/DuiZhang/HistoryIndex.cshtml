@@ -575,6 +575,10 @@
                     _self.$refs.DuiZhangHistory.parentNode.parentNode.classList.add("active");
                     _self.$refs.DuiZhangHistory.parentNode.parentNode.classList.add("open");
                     _self.$refs.DuiZhangHistory.classList.add("active");
+
+                    setTimeout(function () {
+                        setDataCardView("#myTable");
+                    }, 500);
                 })
             }
         })

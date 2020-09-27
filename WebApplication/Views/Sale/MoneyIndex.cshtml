@@ -446,6 +446,10 @@
                     _self.$refs.MoneyIndex.parentNode.parentNode.classList.add("active");
                     _self.$refs.MoneyIndex.parentNode.parentNode.classList.add("open");
                     _self.$refs.MoneyIndex.classList.add("active");
+
+                    setTimeout(function () {
+                        setDataCardView("#myTable");
+                    }, 500);
                 })
             }
         })

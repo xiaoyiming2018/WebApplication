@@ -577,6 +577,10 @@
                     _self.$refs.InOut.parentNode.parentNode.classList.add("active");
                     _self.$refs.InOut.parentNode.parentNode.classList.add("open");
                     _self.$refs.InOut.classList.add("active");
+
+                    setTimeout(function () {
+                        setDataCardView("#myTable");
+                    }, 500);
                 })
             }
         })

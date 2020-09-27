@@ -266,6 +266,10 @@
                     _self.$refs.Sale.parentNode.parentNode.classList.add("active");
                     _self.$refs.Sale.parentNode.parentNode.classList.add("open");
                     _self.$refs.Sale.classList.add("active");
+
+                    setTimeout(function () {
+                        setDataCardView("#myTable");
+                    }, 500);
                 })
             }
         })

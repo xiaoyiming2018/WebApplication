@@ -233,6 +233,10 @@
                     _self.$refs.Customer.parentNode.parentNode.classList.add("active");
                     _self.$refs.Customer.parentNode.parentNode.classList.add("open");
                     _self.$refs.Customer.classList.add("active");
+
+                    setTimeout(function () {
+                        setDataCardView("#myTable");
+                    }, 500);
                 })
             }
         })

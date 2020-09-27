@@ -186,6 +186,10 @@
                     _self.$refs.SaleReturn.parentNode.parentNode.classList.add("active");
                     _self.$refs.SaleReturn.parentNode.parentNode.classList.add("open");
                     _self.$refs.SaleReturn.classList.add("active");
+
+                    setTimeout(function () {
+                        setDataCardView("#myTable");
+                    }, 500);
                 })
             }
         })

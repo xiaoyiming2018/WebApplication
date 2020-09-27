@@ -393,6 +393,10 @@
                     _self.$refs.SupplierIndex.parentNode.parentNode.classList.add("active");
                     _self.$refs.SupplierIndex.parentNode.parentNode.classList.add("open");
                     _self.$refs.SupplierIndex.classList.add("active");
+
+                    setTimeout(function () {
+                        setDataCardView("#myTable");
+                    }, 500);
                 })
             }
         })

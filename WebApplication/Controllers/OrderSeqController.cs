@@ -22,10 +22,10 @@ namespace WebApplication.Controllers
         /// <param name="page">分页页码</param>
         /// <param name="size">每页显示数量</param>
         /// <returns></returns>
-        public IActionResult Index(string start_time, string end_time, string order_name, string unit,string activation, 
+        public IActionResult Index(string start_time, string end_time, string order_name, string unit, string activation,
             int pageindex = 1, int pagesize = 20)
         {
-            
+
             int order_id = Convert.ToInt32(Request.Query["order_id"]);
             Order order = OMM.SelectById(order_id);
             ViewBag.order_index = order.order_index;
@@ -56,9 +56,9 @@ namespace WebApplication.Controllers
                 end_time = "2222-01-01";
             }
 
-            var objList = OMM.SelectSeqByOrderId(order_id, start_time,end_time, order_name, unit);
+            var objList = OMM.SelectSeqByOrderId(order_id, start_time, end_time, order_name, unit);
             return View(objList);
-            
+
         }
 
         /// <summary>
@@ -134,7 +134,7 @@ namespace WebApplication.Controllers
             string order_picture = order.order_picture;
             string remark = order.remark;
 
-            if (order.seq_id >0)
+            if (order.seq_id > 0)
             {
                 seq_id = order.seq_id;
             }
@@ -160,14 +160,37 @@ namespace WebApplication.Controllers
             if (seq_id > 0)
             {
                 objOrder.seq_id = seq_id;
+                Order order1 = OMM.SelectByOrderSeqId(seq_id);//查询提交修改的订单
+                objOrder.order_status = order1.order_status;
+                //用于用户修改订单数量时状态判断，相等则订单结束，修改的订单小于已开订单数则报错
+                if (objOrder.order_num == order1.open_num)
+                {
+                    objOrder.order_status = 1;
+                }
+                if (objOrder.order_num < order1.open_num)
+                {
+                    return Json("Fail");
+                }
+
                 count = OMM.UpdateOrderSeq(objOrder);
                 OMM.UpdateOrder(objOrder);
 
-
-                Material material = MM.SelectAll().Find(s=>s.material_name==order_name);
-                material.price = order_price;
-                material.picture = order_picture;
-                MM.Update(material);
+                //修改图纸
+                Material material = MM.SelectAll().Find(s => s.material_name.Trim() == order_name.Trim());
+                if (material == null)
+                {
+                    Material res = new Material();
+                    res.material_name = order_name.Trim();
+                    res.price = order_price;
+                    res.picture = order_picture;
+                    MM.Insert(res);
+                }
+                else {
+                    material.price = order_price;
+                    material.picture = order_picture;
+                    MM.Update(material);
+                }
+                
             }
             else
             {
@@ -200,7 +223,7 @@ namespace WebApplication.Controllers
                 int seq_id = Convert.ToInt32(Request.Query["seq_id"]);
                 List<Order> orderList = OMM.SelectOrderSeqList(order_id);
 
-                List<Sale> sales = SM.SelectByOrderId(order_id).Where(s=>s.seq_id==seq_id).ToList();
+                List<Sale> sales = SM.SelectByOrderId(order_id).Where(s => s.seq_id == seq_id).ToList();
                 //在删除order之前需判断一下该order是否已开送货单，若开了则提示无法删除送货单
                 if (sales.Count >= 1)
                 {
@@ -230,7 +253,7 @@ namespace WebApplication.Controllers
                         return Json("Fail");
                     }
                 }
-                
+
             }
             catch (Exception ex)
             {
@@ -250,7 +273,7 @@ namespace WebApplication.Controllers
 
         public IActionResult HistoryIndex(string start_time, string end_time, string order_name, string unit, string activation)
         {
-            
+
             int order_id = Convert.ToInt32(Request.Query["order_id"]);
             //从order_info中获取相关信息
             Order order = OMM.SelectById(order_id);
@@ -264,7 +287,7 @@ namespace WebApplication.Controllers
 
             double order_num = 0;
             double order_all_price = 0;
-            for (int i=0;i< orderseqList.Count;i++)
+            for (int i = 0; i < orderseqList.Count; i++)
             {
                 order_num += orderseqList[i].order_num;
                 order_all_price += orderseqList[i].order_all_price;
@@ -272,7 +295,7 @@ namespace WebApplication.Controllers
             ViewBag.order_num = order_num;
             ViewBag.order_all_price = order_all_price;
 
-            
+
             ViewBag.start_time = start_time;
             ViewBag.end_time = end_time;
             ViewBag.order_id = order_id;
@@ -288,9 +311,9 @@ namespace WebApplication.Controllers
                 end_time = "2222-01-01";
             }
 
-            var objList = OMM.SelectSeqByOrderId(order_id, start_time, end_time,  order_name, unit);
+            var objList = OMM.SelectSeqByOrderId(order_id, start_time, end_time, order_name, unit);
             return View(objList);
         }
-        
+
     }
 }

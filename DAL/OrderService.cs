@@ -363,9 +363,9 @@ namespace DAL
             {
                 int count = 0;
                 string sql = "update jinchen.orderseq_info set order_name='{0}',deliver_time='{1}',unit='{2}',order_price={3}," +
-                    "order_all_price={4},order_picture='{5}',purchase_person='{6}',order_num={7},order_time='{8}',remark='{9}' where seq_id={10}";
+                    "order_all_price={4},order_picture='{5}',purchase_person='{6}',order_num={7},order_time='{8}',remark='{9}',order_status={10} where seq_id={11}";
                 sql = string.Format(sql, obj.order_name, obj.deliver_time, obj.unit,obj.order_price, obj.order_all_price,
-                    obj.order_picture,obj.purchase_person,obj.order_num,obj.order_time,obj.remark, obj.seq_id);
+                    obj.order_picture,obj.purchase_person,obj.order_num,obj.order_time,obj.remark,obj.order_status, obj.seq_id);
                 count = PostgreHelper.ExecuteNonQuery(sql);
                 return count;
 

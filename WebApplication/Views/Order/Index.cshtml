@@ -473,6 +473,10 @@
                     _self.$refs.Order.parentNode.parentNode.classList.add("active");
                     _self.$refs.Order.parentNode.parentNode.classList.add("open");
                     _self.$refs.Order.classList.add("active");
+
+                    setTimeout(function () {
+                        setDataCardView("#myTable");
+                    }, 500);
                 })
             }
         })

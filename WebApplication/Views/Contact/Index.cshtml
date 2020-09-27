@@ -15,6 +15,7 @@
 
             @*$(".sidebar ul li:nth-of-type(@if(ViewBag.type==0){<text>3</text>}else{<text>1</text>})").addClass("active open")
             $(".sidebar ul li:nth-of-type(@if(ViewBag.type==0){<text>3</text>}else{<text>1</text>}) ul li:nth-of-type(1)").addClass("active")*@
+            
         });
 
         function deleteTiShi(id, customer_id, type) {
@@ -44,7 +45,7 @@
                             success: function (msg) {
                                 if (msg == "Success") {
                                     swal({ title: "已删除 !", text: "该条记录已删除 !", type: "success" },
-                                        function () { window.location.href = '/Contact/Index?customer_id=' + customer_id+'&type=' + type+''; });
+                                        function () { $("#myTable").bootstrapTable("refresh"); });
                                 }
                                 else {
                                     swal("执行失败 !", "该记录已保留 !", "error");
@@ -156,47 +157,7 @@
                             </form>
                         </div>
                         <div class="card-body">
-                            <table class="table table-responsive table-hover ">
-                                <thead>
-                                    <tr>
-                                        <th>编号</th>
-                                        <th>联系人</th>
-                                        <th>职务</th>
-                                        <th>手机号</th>
-                                        <th>邮箱</th>
-                                        @if (UserManager.Current.GetLevel >= UserLevelEnum.Boss)
-                                        {
-                                            <th>编辑</th>
-                                            <th>删除</th>
-                                        }
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @{
-                                        int index = 1;
-                                        foreach (var item in Model)
-                                        {
-                                            <tr>
-                                                <td>@index</td>
-                                                <td>@item.name</td>
-                                                <td>@item.position</td>
-                                                <td>@item.telephone</td>
-                                                <td>@item.email</td>
-                                                @if (UserManager.Current.GetLevel >= UserLevelEnum.Boss)
-                                                {
-                                                    <td>
-                                                        <input type="button" class="btn btn-primary" onclick="window.location.href = '/Contact/Edit?id=@item.id&customer_id=@ViewBag.customer_id&type=@ViewBag.type'" value="编辑" />
-                                                    </td>
-                                                    <td>
-                                                        <input type="button" class="btn btn-primary" onclick="deleteTiShi(@item.id,@ViewBag.customer_id,@ViewBag.type)" value="删除" />
-                                                    </td>
-
-                                                }
-                                            </tr>
-                                            index++;
-                                        }
-                                    }
-                                </tbody>
+                            <table id="myTable" class="table table-responsive table-hover ">
                             </table>
                         </div>
                     </div><!-- /# card -->
@@ -207,6 +168,11 @@
     <script>
         var app = new Vue({
             el: '#vueApp',
+            data: {
+                customer_id: "@ViewBag.customer_id",
+                name: "@ViewBag.name",
+                type: "@ViewBag.type"
+            },
             mounted() {
                 var _self = this;
                 _self.$nextTick(function () {
@@ -220,7 +186,78 @@
                         _self.$refs.Supplier.parentNode.parentNode.classList.add("open");
                         _self.$refs.Supplier.classList.add("active");
                     }
+
+                    setTimeout(function () {
+                        _self.loadL();
+                        setDataCardView("#myTable");
+                    }, 500);
                 })
+            },
+            methods: {
+                loadL: function () {
+                    var _self = this;
+                    $("#myTable").bootstrapTable({
+                        url: '/Contact/GetData?customer_id=' + _self.customer_id + "&name=" + _self.name,
+                        method: 'GET',
+                        theadClasses: "thead-blue",
+                        pagination: true,
+                        sidePagination: "client",
+                        pageNumber: 1,
+                        pageSize: 20,
+                        pageList: [10, 20, 50],
+                        undefinedText: '---',
+                        paginationDetailHAlign: 'left',
+                        toolbar: "#toolbar",
+                        toolbarAlign: 'left',
+                        showFooter: false,
+                        showExport: true, //是否显示导出
+                        exportDataType: "all", //basic', 'all', 'selected'.
+                        exportTypes: ['excel'],
+                        exportOptions: {//导出设置
+                            fileName: '销售送货开单',//下载文件名称
+                        },
+                        columns: [{
+                            field: 'no',
+                            title: '编号',
+                            align: 'center',
+                            formatter: function (value, row, index) {
+                                return index + 1;
+                            }
+                        }, {
+                            field: 'id',
+                            title: 'id',
+                            visible: false
+                        }, {
+                            field: 'name',
+                            title: '联系人',
+                            align: 'center'
+                        }, {
+                            field: 'position',
+                            title: '职务',
+                            align: 'center'
+                        }, {
+                            field: 'telephone',
+                                title: '手机号',
+                            align: 'center'
+                        }, {
+                            field: 'email',
+                            title: '邮箱',
+                            align: 'center'
+                        }, {
+                            field: 'edit',
+                            title: '操作',
+                            align: 'center',
+                            formatter: function (value, row, index) {
+                                var result = "";
+                                result += "<input type='button' class='btn btn-primary' onclick=\"window.location.href = '/Contact/Edit?id=" + row.id + "&customer_id=" + _self.customer_id + "&type=" + _self.type + "'\" value = '编辑' />";
+                                result += "<span style='margin-left:20px'><span>";
+                                result += "<input type='button' class='btn btn-primary' onclick='deleteTiShi(" + row.id + "," + _self.customer_id + "," + _self.type + ")' value='删除' />";
+
+                                return result;
+                            }
+                        }]
+                    });
+                }
             }
         })
     </script>
