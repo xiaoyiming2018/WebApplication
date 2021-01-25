@@ -67,7 +67,7 @@ namespace WebApplication.Controllers
                 }
                 else
                 {
-                    List<Purchase> listPurchase = PM.SelectTodayForPurchaseIndex(DateTime.Now.ToLocalTime().AddHours(8).ToString("yyyy-MM"));
+                    List<Purchase> listPurchase = PM.SelectTodayForPurchaseIndex(DateTime.Now.ToLocalTime().ToString("yyyy-MM"));
                     string count_num = "";
                     int num = listPurchase.Count + 1;
                     if (num < 10)
@@ -89,7 +89,7 @@ namespace WebApplication.Controllers
 
                     ViewBag.supplier_id = 0;
 
-                    ViewBag.purchase_index = SM.SelectConfigList(4)[0].config_list + DateTime.Now.ToLocalTime().AddHours(8).ToString("yyyy-MM").Replace("-", "") + count_num;
+                    ViewBag.purchase_index = SM.SelectConfigList(4)[0].config_list + DateTime.Now.ToLocalTime().ToString("yyyy-MM").Replace("-", "") + count_num;
 
                     return View();
                 }
@@ -157,7 +157,7 @@ namespace WebApplication.Controllers
                     objPurchase.material_num = Convert.ToDouble(material_num[i]);
                     objPurchase.material_price = Convert.ToDouble(material_price[i]);
                     objPurchase.material_all_price = Convert.ToDouble(material_all_price[i]);
-                    objPurchase.purchase_time = DateTime.Now.ToLocalTime().AddHours(8);
+                    objPurchase.purchase_time = DateTime.Now.ToLocalTime();
                     count = PM.Insert(objPurchase);
                     if (count < 1)
                     {
@@ -379,13 +379,13 @@ namespace WebApplication.Controllers
                 confirm_end_time = "2222-01-01";
             }
 
-            DateTime dt = DateTime.Now.AddHours(8);
+            DateTime dt = DateTime.Now;
             DateTime dt2 = dt.AddMonths(1);
 
             if (day == "1")
             {
-                confirm_start_time = DateTime.Now.ToLocalTime().AddHours(8).ToString("yyyy-MM-dd");
-                confirm_end_time = DateTime.Now.ToLocalTime().AddHours(8).ToString("yyyy-MM-dd");
+                confirm_start_time = DateTime.Now.ToLocalTime().ToString("yyyy-MM-dd");
+                confirm_end_time = DateTime.Now.ToLocalTime().ToString("yyyy-MM-dd");
                 ViewBag.day = "1";
             }
             if (month == "1")
@@ -397,7 +397,7 @@ namespace WebApplication.Controllers
             if (year == "1")
             {
                 confirm_start_time = dt.AddMonths(-dt.Month + 1).AddDays(-dt.Day + 1).ToString("yyyy-MM-dd");
-                confirm_end_time = new DateTime(DateTime.Now.AddHours(8).Year, 12, 31).ToString("yyyy-MM-dd");
+                confirm_end_time = new DateTime(DateTime.Now.Year, 12, 31).ToString("yyyy-MM-dd");
                 ViewBag.year = "1";
             }
 

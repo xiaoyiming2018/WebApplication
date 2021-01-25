@@ -46,13 +46,13 @@ namespace WebApplication.Controllers
                 dz_end_time = "2222-01-01";
             }
 
-            DateTime dt = DateTime.Now.AddHours(8);
+            DateTime dt = DateTime.Now;
             DateTime dt2 = dt.AddMonths(1);
 
             if (day == "1")
             {
-                dz_start_time = DateTime.Now.ToLocalTime().AddHours(8).ToString("yyyy-MM-dd");
-                dz_end_time = DateTime.Now.ToLocalTime().AddHours(8).ToString("yyyy-MM-dd");
+                dz_start_time = DateTime.Now.ToLocalTime().ToString("yyyy-MM-dd");
+                dz_end_time = DateTime.Now.ToLocalTime().ToString("yyyy-MM-dd");
                 ViewBag.day = "1";
             }
             if (month == "1")
@@ -64,7 +64,7 @@ namespace WebApplication.Controllers
             if (year == "1")
             {
                 dz_start_time = dt.AddMonths(-dt.Month + 1).AddDays(-dt.Day + 1).ToString("yyyy-MM-dd");
-                dz_end_time = new DateTime(DateTime.Now.AddHours(8).Year, 12, 31).ToString("yyyy-MM-dd");
+                dz_end_time = new DateTime(DateTime.Now.Year, 12, 31).ToString("yyyy-MM-dd");
                 ViewBag.year = "1";
             }
 
@@ -114,7 +114,7 @@ namespace WebApplication.Controllers
                 {
                     dz.id = Convert.ToInt32(dzId[i]);
                     dz.invoice_index = invoice_index;
-                    dz.invoice_time = DateTime.Now.ToLocalTime().AddHours(8);
+                    dz.invoice_time = DateTime.Now.ToLocalTime();
                     count = DZM.Update(dz);
                     if (count < 1)
                     {
@@ -186,13 +186,13 @@ namespace WebApplication.Controllers
                 dz_end_time = "2222-01-01";
             }
 
-            DateTime dt = DateTime.Now.AddHours(8);
+            DateTime dt = DateTime.Now;
             DateTime dt2 = dt.AddMonths(1);
 
             if (day == "1")
             {
-                dz_start_time = DateTime.Now.ToLocalTime().AddHours(8).ToString("yyyy-MM-dd");
-                dz_end_time = DateTime.Now.ToLocalTime().AddHours(8).ToString("yyyy-MM-dd");
+                dz_start_time = DateTime.Now.ToLocalTime().ToString("yyyy-MM-dd");
+                dz_end_time = DateTime.Now.ToLocalTime().ToString("yyyy-MM-dd");
                 ViewBag.day = "1";
             }
             if (month == "1")
@@ -204,7 +204,7 @@ namespace WebApplication.Controllers
             if (year == "1")
             {
                 dz_start_time = dt.AddMonths(-dt.Month + 1).AddDays(-dt.Day + 1).ToString("yyyy-MM-dd");
-                dz_end_time = new DateTime(DateTime.Now.AddHours(8).Year, 12, 31).ToString("yyyy-MM-dd");
+                dz_end_time = new DateTime(DateTime.Now.Year, 12, 31).ToString("yyyy-MM-dd");
                 ViewBag.year = "1";
             }
 
@@ -256,6 +256,20 @@ namespace WebApplication.Controllers
             }
             string result = "共" + all + "笔数据，导入成功" + check + "笔数据";
             return Json(result);
+        }
+
+        public IActionResult ChangeInvoice(string[] idList,string invoice_index) {
+            for (int i=0;i<idList.Length;i++) {
+                DuiZhang duiZhang = new DuiZhang();
+                duiZhang.id =Convert.ToInt32(idList[i]);
+                duiZhang.invoice_index = invoice_index;
+                duiZhang.invoice_time = DateTime.Now;
+                int flag=DZM.Update(duiZhang);
+                if (flag==0) {
+                    return Json("fail");
+                }
+            }
+            return Json("success");
         }
 
     }

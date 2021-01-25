@@ -88,7 +88,7 @@ namespace DAL
                 {
                     company_name = company_name.Replace("(", "\\(").Replace(")", "\\)");
                 }
-                sql = "select a.company_order_index,a.company_name,a.dui_num,a.dui_price,a.dui_all_price," +
+                sql = "select a.id, a.company_order_index,a.company_name,a.dui_num,a.dui_price,a.dui_all_price," +
                     "a.order_name,a.unit,a.dz_index,a.invoice_index,a.deliver_time,dui_time,b.deliver_index " +
                     "from (select * " +
                     " from jinchen.duizhang_info a " +

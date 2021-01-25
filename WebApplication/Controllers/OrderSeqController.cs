@@ -75,7 +75,7 @@ namespace WebApplication.Controllers
                 ViewBag.order_index = order.order_index;
                 ViewBag.company_name = order.company_name;
                 ViewBag.company_order_index = order.company_order_index;
-                ViewBag.order_time = DateTime.Now.ToLocalTime().AddHours(8).ToString("yyyy-MM-dd");
+                ViewBag.order_time = DateTime.Now.ToLocalTime().ToString("yyyy-MM-dd");
 
 
                 ViewBag.search_company_name = Convert.ToString(Request.Query["company_name"]);

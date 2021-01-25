@@ -81,7 +81,7 @@ namespace WebApplication.Controllers
                 }
                 else
                 {
-                    List<SaleReturn> listSale = SM.SelectTodayForReturnIndex(DateTime.Now.ToLocalTime().AddHours(8).ToString("yyyy-MM"));
+                    List<SaleReturn> listSale = SM.SelectTodayForReturnIndex(DateTime.Now.ToLocalTime().ToString("yyyy-MM"));
                     string count_num = "";
                     int num = listSale.Count + 1;
                     if (num < 10)
@@ -100,7 +100,7 @@ namespace WebApplication.Controllers
                     {
                         count_num = "" + num;
                     }
-                    ViewBag.return_index = SettingM.SelectConfigList(7)[0].config_list + DateTime.Now.ToLocalTime().AddHours(8).ToString("yyyy-MM").Replace("-", "") + count_num;
+                    ViewBag.return_index = SettingM.SelectConfigList(7)[0].config_list + DateTime.Now.ToLocalTime().ToString("yyyy-MM").Replace("-", "") + count_num;
                     return View();
                 }
             }
@@ -132,7 +132,7 @@ namespace WebApplication.Controllers
             SaleReturn objSaleReturn = new SaleReturn();
             objSaleReturn.return_index = return_index;
             objSaleReturn.deliver_index = deliver_index;
-            objSaleReturn.insert_time = DateTime.Now.ToLocalTime().AddHours(8);
+            objSaleReturn.insert_time = DateTime.Now.ToLocalTime();
 
             Order objOrder = new Order();
             for (int i = 0; i < inputNum; i++)
@@ -230,7 +230,6 @@ namespace WebApplication.Controllers
 
                 Order orderNew = new Order();
                 orderNew.seq_id = seq_id;
-                orderNew.remain_num = orderOld.remain_num+ saleReturn.return_num;
                 orderNew.open_num = orderOld.open_num;
                 orderNew.tui_num = orderOld.tui_num + saleReturn.return_num;
                 OM.UpdateSeqNum(orderNew);
@@ -287,13 +286,13 @@ namespace WebApplication.Controllers
 
             ViewBag.flag = 1;
 
-            DateTime dt = DateTime.Now.AddHours(8);
+            DateTime dt = DateTime.Now;
             DateTime dt2 = dt.AddMonths(1);
 
             if (day == "1")
             {
-                start_time = DateTime.Now.ToLocalTime().AddHours(8).ToString("yyyy-MM-dd");
-                end_time = DateTime.Now.ToLocalTime().AddHours(8).ToString("yyyy-MM-dd");
+                start_time = DateTime.Now.ToLocalTime().ToString("yyyy-MM-dd");
+                end_time = DateTime.Now.ToLocalTime().ToString("yyyy-MM-dd");
                 ViewBag.day = "1";
             }
             if (month == "1")
@@ -305,7 +304,7 @@ namespace WebApplication.Controllers
             if (year == "1")
             {
                 start_time = dt.AddMonths(-dt.Month + 1).AddDays(-dt.Day + 1).ToString("yyyy-MM-dd");
-                end_time = new DateTime(DateTime.Now.AddHours(8).Year, 12, 31).ToString("yyyy-MM-dd");
+                end_time = new DateTime(DateTime.Now.Year, 12, 31).ToString("yyyy-MM-dd");
                 ViewBag.year = "1";
             }
 

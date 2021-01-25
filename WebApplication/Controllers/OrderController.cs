@@ -77,13 +77,13 @@ namespace WebApplication.Controllers
                 if (id > 0)
                 {
                     
-                    ViewBag.order_time = DateTime.Now.ToLocalTime().AddHours(8).ToString("yyyy-MM-dd").Replace("-", "");
+                    ViewBag.order_time = DateTime.Now.ToLocalTime().ToString("yyyy-MM-dd").Replace("-", "");
                     var obj = OM.SelectById(id);//只允许修改order_info里面的字段
                     return View(obj);
                 }
                 else
                 {
-                    List<Order> listOrder =OM.SelectTodayForOrderIndex(DateTime.Now.ToLocalTime().AddHours(8).ToString("yyyy-MM"));
+                    List<Order> listOrder =OM.SelectTodayForOrderIndex(DateTime.Now.ToLocalTime().ToString("yyyy-MM"));
                     string count_num = "";
                     int num = listOrder.Count + 1;
                     if (num < 10)
@@ -102,8 +102,8 @@ namespace WebApplication.Controllers
                         count_num = "" + num;
                     }                   
 
-                    ViewBag.order_index = SM.SelectConfigList(3)[0].config_list + DateTime.Now.ToLocalTime().AddHours(8).ToString("yyyy-MM").Replace("-", "")+ count_num;
-                    ViewBag.order_time = DateTime.Now.ToLocalTime().AddHours(8).ToString("yyyy-MM-dd");
+                    ViewBag.order_index = SM.SelectConfigList(3)[0].config_list + DateTime.Now.ToLocalTime().ToString("yyyy-MM").Replace("-", "")+ count_num;
+                    ViewBag.order_time = DateTime.Now.ToLocalTime().ToString("yyyy-MM-dd");
                     return View();
                 }
             }
@@ -298,13 +298,13 @@ namespace WebApplication.Controllers
                 deliver_end_time = "2222-01-01";
             }
 
-            DateTime dt = DateTime.Now.AddHours(8);
+            DateTime dt = DateTime.Now;
             DateTime dt2 = dt.AddMonths(1);
 
             if (day == "1")
             {
-                start_time = DateTime.Now.ToLocalTime().AddHours(8).ToString("yyyy-MM-dd");
-                end_time = DateTime.Now.ToLocalTime().AddHours(8).ToString("yyyy-MM-dd");
+                start_time = DateTime.Now.ToLocalTime().ToString("yyyy-MM-dd");
+                end_time = DateTime.Now.ToLocalTime().ToString("yyyy-MM-dd");
                 ViewBag.day = "1";
             }
             if (month == "1")
@@ -316,7 +316,7 @@ namespace WebApplication.Controllers
             if (year == "1")
             {
                 start_time = dt.AddMonths(-dt.Month + 1).AddDays(-dt.Day + 1).ToString("yyyy-MM-dd");
-                end_time = new DateTime(DateTime.Now.AddHours(8).Year, 12, 31).ToString("yyyy-MM-dd");
+                end_time = new DateTime(DateTime.Now.Year, 12, 31).ToString("yyyy-MM-dd");
                 ViewBag.year = "1";
             }
 

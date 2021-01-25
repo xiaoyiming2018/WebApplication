@@ -37,6 +37,9 @@
                     fileName: '历史对账记录',//下载文件名称
                 },
                 columns: [{
+                checkbox:true
+                },
+                {
                     field: 'no',
                     title: '编号',
                     align: 'center',
@@ -401,6 +404,45 @@
                 + "&day=" + day + "&month=" + month + "&year=" + year + "&company_name=" + company_name + "&invoice_index=" + invoice_index;
             $("#myTable").bootstrapTable('refresh', { url: searchUrl });
         }
+
+        function ChangeInvoice(){
+            var selectResults= $("#myTable").bootstrapTable("getSelections");
+            var idList=[];
+            if(selectResults.length==0)
+            {
+                swal("请先选择要修改的数据！", "", "error");
+                return;
+             }
+            else{
+                for(var i=0;i<selectResults.length;i++){
+                    idList.push(selectResults[i].id);
+                }
+            }
+            var invoice_index = document.getElementById("invoice_index1").value;
+                 $.ajax({
+                    type: "POST",
+                    url: "/DuiZhang/ChangeInvoice",
+                    beforeSend: function (xhr) {
+                        xhr.setRequestHeader("XSRF-TOKEN",
+                            $('input:hidden[name="__RequestVerificationToken"]').val());
+                    },
+                    data: {
+                        idList:idList,
+                        invoice_index:invoice_index
+                    },
+                    success: function (msg) {
+                    if(msg=="success"){
+                    swal({ title: "修改成功!", text: msg, type: "success" },
+                                        function () { Search(); });
+                    }else{
+                    swal("修改失败！", "修改失败!", "error");
+                    }
+                    },
+                    error: function (msg) {
+                        swal("数据获取失败！", "修改失败!", "error");
+                    }
+                });
+        }
     </script>
 </head>
 <body>
@@ -518,7 +560,9 @@
                                     </div>
                                     <div class="form-group">
                                         <input type="button" value="查询" class="btn btn-primary" style="width:80px" onclick="Search()" />
-
+                                    </div>
+                                    <div class="form-group">
+                                        <input type="button" value="发票号修改" class="btn btn-primary" style="width:100px" data-toggle="modal" data-target="#changeModal" />
                                     </div>
 
                                     <input type="file" id="file" style="display:none;" accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet">
@@ -551,6 +595,40 @@
             </div>
         </div>
     </div>
+
+    <div class="modal fade" id="changeModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog modal-lg" role="document" style="width:40%">
+            <div class="modal-content">
+                <div class="modal-header">
+
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="myModalLabel">发票号绑定</h4>
+                </div>
+                <div class="form-group" style="padding:20px;">
+                    <label>发票号</label>
+                    <select class="selectpicker form-control" data-live-search="true" data-live-search-placeholder="搜索" id="invoice_index1" name="invoice_index1">
+                        <option value=""></option>
+                        @{
+                            InvoiceManager IM = new InvoiceManager();
+                            List<Invoice> invoices = IM.SelectAllInvoice();
+                            if (invoices.Count > 0)
+                            {
+                                for (int i = 0; i < invoices.Count; i++)
+                                {
+                                    <!option value="@invoices[i].invoice_index">@invoices[i].invoice_index</!option>
+                                }
+                            }
+                        }
+                    </select>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                    <button type="button" class="btn btn-primary" data-dismiss="modal" onclick="ChangeInvoice()">提交</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="card alert" id="Data1" style="margin: 30px;display: none">
 
         <div class="card-body">

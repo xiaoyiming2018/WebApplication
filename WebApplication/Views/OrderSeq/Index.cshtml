@@ -225,7 +225,7 @@
                                                 }
                                                 <td style="color:darkseagreen">@item.open_num</td>
                                                 <td style="color:red">@item.tui_num</td>
-                                                <td style="color:orange">@item.remain_num</td>
+                                                <td style="color:orange">@item.order_num-@item.open_num+@item.tui_num</td>
                                                 <td>
                                                     @if (!string.IsNullOrEmpty(item.order_picture))
                                                     {

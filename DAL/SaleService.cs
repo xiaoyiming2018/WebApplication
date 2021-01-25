@@ -78,9 +78,9 @@ namespace DAL
             {
                 List<Sale> objList = new List<Sale>();
                 string sql = null;
-                sql = "select a.deliver_index,a.deliver_company_head,a.order_id,a.seq_id,b.order_index,d.company_name,b.company_order_index," +
+                sql = "select a.id,a.deliver_index,a.deliver_company_head,a.order_id,a.seq_id,b.order_index,d.company_name,b.company_order_index," +
                         "a.real_num,a.deliver_price,a.deliver_all_price,c.order_price,c.order_all_price," +
-                        "c.order_num,c.remain_num,c.unit,c.purchase_person,c.deliver_time,c.order_name,c.order_time,a.remark " +
+                        "c.order_num,c.remain_num,c.unit,c.purchase_person,c.deliver_time,c.order_name,c.order_time,c.remark " +
                         "from jinchen.sale_info a,jinchen.order_info b, jinchen.orderseq_info c, jinchen.company_info d " +
                         "where a.order_id = b.id and b.id = c.order_id and a.seq_id = c.seq_id and b.customer_id = d.id and a.deliver_index= '{0}' and " +
                         "b.order_index ~*'{1}' and c.order_name ~*'{2}' and a.flag=0 and c.flag=0 " +
@@ -469,12 +469,12 @@ namespace DAL
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public int Del(int seq_id, string deliver_index)
+        public int Del(int id)
         {
             try
             {
-                string sql = "update jinchen.sale_info set flag=1 where seq_id={0} and deliver_index='{1}'";
-                sql = string.Format(sql, seq_id, deliver_index);
+                string sql = "update jinchen.sale_info set flag=1 where id={0}";
+                sql = string.Format(sql, id);
                 int count = PostgreHelper.ExecuteNonQuery(sql);
                 return count;
             }

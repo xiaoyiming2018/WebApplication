@@ -48,7 +48,7 @@ namespace WebApplication.Controllers
             }
             else
             {
-                store.create_time = DateTime.Now.AddHours(8);
+                store.create_time = DateTime.Now;
                 int result = storeManager.Insert(store);
                 if (result > 0)
                 {

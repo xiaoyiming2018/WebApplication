@@ -51,7 +51,8 @@
             
         });
         function Submit() {
-                var flag = 0;
+            var flag = 0;
+            var flagZero = 0;//不允许为订单数量为0
                 var deliver_index = document.getElementById('deliver_index').value;
                 var deliver_company_head = document.getElementById('deliver_company_head').value;
 
@@ -86,6 +87,10 @@
                         if (parseInt(real_numList[i].value) > parseInt(remain_numList[i].value)) {
                             flag = 1;
                         }
+
+                        if (parseInt(real_numList[i].value)==0) {
+                            flagZero = 1;
+                        }
                     }
 
                     var Order_Id = order_id.join(',');
@@ -97,6 +102,8 @@
 
                     if (flag == 1) {
                         swal("送货数量超过剩余数量！", "", "error");
+                    } else if (flagZero == 1) {
+                        swal("送货数量不能为0！", "", "error");
                     }
                     else {
                         $.ajax({
@@ -206,7 +213,7 @@
         $(".sidebar.sidebar-shrink ~ .content-wrap").css("margin-left", "250px")
     }
 
-    function deleteTiShi(deliver_index, seq_id) {
+    function deleteTiShi(deliver_index, seq_id,id) {
         swal({
         title: "确定删除 ?",
         text: "删除后将无法恢复 !",
@@ -222,7 +229,7 @@
         if (isConfirm) {
         $.ajax({
             type: "POST",
-            url: "/SaleSeq/Del?deliver_index=" + deliver_index + "&seq_id=" + seq_id + "",
+            url: "/SaleSeq/Del?deliver_index=" + deliver_index + "&seq_id=" + seq_id + "&id=" + id + "",
             beforeSend: function (xhr) {
                 xhr.setRequestHeader("XSRF-TOKEN",
                 $('input:hidden[name="__RequestVerificationToken"]').val());
@@ -490,7 +497,7 @@
                                                     @if (UserManager.Current.GetLevel >= UserLevelEnum.Boss)
                                                     {
                                                         <td>
-                                                            <input type="button" class="btn btn-primary" onclick="deleteTiShi('@ViewBag.deliver_index',@item.seq_id)" value="删除" />
+                                                            <input type="button" class="btn btn-primary" onclick="deleteTiShi('@ViewBag.deliver_index',@item.seq_id,@item.id)" value="删除" />
                                                         </td>
                                                     }
 

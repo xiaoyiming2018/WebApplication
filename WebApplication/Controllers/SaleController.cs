@@ -45,13 +45,13 @@ namespace WebApplication.Controllers
                 end_time = "2222-01-01";
             }
 
-            DateTime dt = DateTime.Now.AddHours(8);
+            DateTime dt = DateTime.Now;
             DateTime dt2 = dt.AddMonths(1);
 
             if (day == "1")
             {
-                start_time = DateTime.Now.ToLocalTime().AddHours(8).ToString("yyyy-MM-dd");
-                end_time = DateTime.Now.ToLocalTime().AddHours(8).ToString("yyyy-MM-dd");
+                start_time = DateTime.Now.ToLocalTime().ToString("yyyy-MM-dd");
+                end_time = DateTime.Now.ToLocalTime().ToString("yyyy-MM-dd");
                 ViewBag.day = "1";
             }
             if (month == "1")
@@ -63,7 +63,7 @@ namespace WebApplication.Controllers
             if (year == "1")
             {
                 start_time = dt.AddMonths(-dt.Month + 1).AddDays(-dt.Day + 1).ToString("yyyy-MM-dd");
-                end_time = new DateTime(DateTime.Now.AddHours(8).Year, 12, 31).ToString("yyyy-MM-dd");
+                end_time = new DateTime(DateTime.Now.Year, 12, 31).ToString("yyyy-MM-dd");
                 ViewBag.year = "1";
             }
 
@@ -103,7 +103,7 @@ namespace WebApplication.Controllers
                 }
                 else
                 {
-                    List<Sale> listSale = SM.SelectTodayForDeliverIndex(DateTime.Now.ToLocalTime().AddHours(8).ToString("yyyy-MM"));
+                    List<Sale> listSale = SM.SelectTodayForDeliverIndex(DateTime.Now.ToLocalTime().ToString("yyyy-MM"));
                     string count_num = "";
                     int num = listSale.Count + 1;
                     if (num < 10)
@@ -122,7 +122,7 @@ namespace WebApplication.Controllers
                     {
                         count_num = "" + num;
                     }
-                    ViewBag.deliver_index = SettingM.SelectConfigList(5)[0].config_list + DateTime.Now.ToLocalTime().AddHours(8).ToString("yyyy-MM").Replace("-", "") + count_num;
+                    ViewBag.deliver_index = SettingM.SelectConfigList(5)[0].config_list + DateTime.Now.ToLocalTime().ToString("yyyy-MM").Replace("-", "") + count_num;
 
                     return View();
                 }
@@ -156,7 +156,7 @@ namespace WebApplication.Controllers
             Sale objSale = new Sale();
             objSale.deliver_index = deliver_index;
             objSale.deliver_company_head = deliver_company_head;
-            objSale.insert_time = DateTime.Now.ToLocalTime().AddHours(8);
+            objSale.insert_time = DateTime.Now.ToLocalTime();
 
             Order objOrder = new Order();
             for (int i = 0; i < inputNum; i++)
@@ -193,16 +193,19 @@ namespace WebApplication.Controllers
                     objSale.deliver_all_price = Convert.ToDouble(deliver_all_price[i]);
                 }
                 Order order=OM.SelectByOrderSeqId(objSale.seq_id);
-                objOrder.remain_num = order.remain_num - objOrder.open_num;
                 objOrder.open_num = order.open_num + objOrder.open_num;
                 objOrder.tui_num = order.tui_num;
                 objOrder.seq_id = objSale.seq_id;
+
+                if (objOrder.open_num> order.order_num) {
+                    return Json("Fail");
+                }
                 //更新OrderSeq
                 OM.UpdateSeqNum(objOrder);
 
                 Order orderHistory = OM.SelectByOrderSeqId(Convert.ToInt32(seq_id[i]));
                 
-                if (orderHistory.remain_num == 0)
+                if (orderHistory.order_num - orderHistory.open_num + orderHistory.tui_num == 0)
                 {
                     Order res = new Order();
                     res.seq_id = Convert.ToInt32(seq_id[i]);
@@ -244,7 +247,7 @@ namespace WebApplication.Controllers
                 int id = Convert.ToInt32(Request.Query["id"]);
                 int seq_id = Convert.ToInt32(Request.Query["seq_id"]);
                 string deliver_index = Convert.ToString(Request.Query["deliver_index"]);
-                int count = SM.Del(seq_id, deliver_index);
+                int count = SM.Del(id);
                 if (count > 0)
                 {
                     return Json("Success");
@@ -269,20 +272,20 @@ namespace WebApplication.Controllers
             List<Order> order = new List<Order>();
             if (!string.IsNullOrEmpty(purchase_person) && !string.IsNullOrEmpty(company_order_index)) {
                 order = OM.SelectOrderSeqList(0, deliver_company_head)
-                    .Where(s => s.remain_num > 0 && s.purchase_person == purchase_person && s.company_order_index == company_order_index)
+                    .Where(s => s.order_num-s.open_num+s.tui_num > 0 && s.purchase_person == purchase_person && s.company_order_index == company_order_index)
                     .OrderByDescending(s => s.order_time).ToList();
             } else if (!string.IsNullOrEmpty(purchase_person) && string.IsNullOrEmpty(company_order_index)) {
                 order = OM.SelectOrderSeqList(0, deliver_company_head)
-                        .Where(s => s.remain_num > 0 && s.purchase_person == purchase_person)
+                        .Where(s => s.order_num - s.open_num + s.tui_num > 0 && s.purchase_person == purchase_person)
                         .OrderByDescending(s => s.order_time).ToList();
             } else if (string.IsNullOrEmpty(purchase_person) && !string.IsNullOrEmpty(company_order_index)) {
                 order = OM.SelectOrderSeqList(0, deliver_company_head)
-                        .Where(s => s.remain_num > 0 && s.company_order_index == company_order_index)
+                        .Where(s => s.order_num - s.open_num + s.tui_num > 0 && s.company_order_index == company_order_index)
                         .OrderByDescending(s => s.order_time).ToList();
             }
             else {
                 order = OM.SelectOrderSeqList(0, deliver_company_head)
-                            .Where(s => s.remain_num > 0 )
+                            .Where(s => s.order_num - s.open_num + s.tui_num > 0 )
                             .OrderByDescending(s => s.order_time).ToList();
             }
             
@@ -359,7 +362,7 @@ namespace WebApplication.Controllers
         {
             string count_num = "";
             int num = DZM.SelectHistory("0000-01-01", "2222-01-01", "0000-01-01", "2222-01-01")
-                .Where(s=>s.dui_time.ToLocalTime().ToString("yyyy-MM") ==DateTime.Now.ToLocalTime().AddHours(8).ToString("yyyy-MM"))
+                .Where(s=>s.dui_time.ToLocalTime().ToString("yyyy-MM") ==DateTime.Now.ToLocalTime().ToString("yyyy-MM"))
                 .GroupBy(s => s.dz_index)
                 .Select(s => s.Key).ToList().Count + 1;//从1开始
             if (num < 10)
@@ -381,7 +384,7 @@ namespace WebApplication.Controllers
             List<string> contacts = CM.SelectAllContact().GroupBy(s => s.name).Select(s => s.Key).ToList();
             ViewBag.contacts = contacts;
 
-            ViewBag.dz_index = SettingM.SelectConfigList(8)[0].config_list+ DateTime.Now.ToLocalTime().AddHours(8).ToString("yyyy-MM").Replace("-", "") + count_num;
+            ViewBag.dz_index = SettingM.SelectConfigList(8)[0].config_list+ DateTime.Now.ToLocalTime().ToString("yyyy-MM").Replace("-", "") + count_num;
             return View();
         }
         public IActionResult GetMoneyIndexData(string start_time, string end_time, string deliver_index, string deliver_company_head,string order_name,string purchase_person) 
@@ -519,7 +522,7 @@ namespace WebApplication.Controllers
                     dz.dui_all_price =Convert.ToDouble(duiprice[i]);
                     dz.deliver_time = sale.insert_time;
                     dz.dz_index = dz_index;
-                    dz.dui_time = DateTime.Now.ToLocalTime().AddHours(8);
+                    dz.dui_time = DateTime.Now.ToLocalTime();
                     count = DZM.Insert(dz);
                     if (count < 1)
                     {

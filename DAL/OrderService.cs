@@ -386,8 +386,8 @@ namespace DAL
             try
             {
                 int count = 0;
-                string sql = "update jinchen.orderseq_info set open_num={0},tui_num={1},remain_num={2} where seq_id={3}";
-                sql = string.Format(sql, obj.open_num, obj.tui_num, obj.remain_num,obj.seq_id,obj.order_id);
+                string sql = "update jinchen.orderseq_info set open_num={0},tui_num={1} where seq_id={2}";
+                sql = string.Format(sql, obj.open_num, obj.tui_num,obj.seq_id);
                 count = PostgreHelper.ExecuteNonQuery(sql);
                 return count;
 

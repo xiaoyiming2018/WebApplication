@@ -36,12 +36,12 @@ namespace WebApplication.Controllers
             {
                 end_time = "2222-01-01";
             }
-            DateTime dt = DateTime.Now.AddHours(8);
+            DateTime dt = DateTime.Now;
             DateTime dt2 = dt.AddMonths(1);
             if (day == "1")
             {
-                start_time = DateTime.Now.ToLocalTime().AddHours(8).ToString("yyyy-MM-dd");
-                end_time = DateTime.Now.ToLocalTime().AddHours(8).ToString("yyyy-MM-dd");
+                start_time = DateTime.Now.ToLocalTime().ToString("yyyy-MM-dd");
+                end_time = DateTime.Now.ToLocalTime().ToString("yyyy-MM-dd");
             }
             if (month == "1")
             {
@@ -51,7 +51,7 @@ namespace WebApplication.Controllers
             if (year == "1")
             {
                 start_time = dt.AddMonths(-dt.Month + 1).AddDays(-dt.Day + 1).ToString("yyyy-MM-dd");
-                end_time = new DateTime(DateTime.Now.AddHours(8).Year, 12, 31).ToString("yyyy-MM-dd");
+                end_time = new DateTime(DateTime.Now.Year, 12, 31).ToString("yyyy-MM-dd");
             }
 
             List<InOut> inOuts = new List<InOut>();
@@ -91,7 +91,7 @@ namespace WebApplication.Controllers
             }
             else
             {
-                inOut.create_time = DateTime.Now.AddHours(8);
+                inOut.create_time = DateTime.Now;
                 int result = inOutManager.Insert(inOut);
                 if (result > 0)
                 {

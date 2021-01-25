@@ -212,9 +212,9 @@ namespace BLL
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public int Del(int seq_id, string deliver_index)
+        public int Del(int id)
         {
-            int count = SS.Del(seq_id, deliver_index);
+            int count = SS.Del(id);
             return count;
         }
     }

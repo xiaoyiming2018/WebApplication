@@ -44,8 +44,6 @@ namespace Model
         public string unit { get; set; }
         //开单数量
         public double open_num { get; set; }
-        //剩余数量
-        public double remain_num { get; set; }
         //图纸
         public string order_picture { get; set; }
 

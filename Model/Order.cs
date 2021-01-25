@@ -41,8 +41,6 @@ namespace Model
         public double open_num { get; set; }
         //退单数量
         public double tui_num { get; set; }
-        //剩余数量
-        public double remain_num { get; set; }
         //图纸
         public string order_picture { get; set; }
         //插入时间

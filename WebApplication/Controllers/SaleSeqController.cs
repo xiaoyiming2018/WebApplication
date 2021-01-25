@@ -30,7 +30,6 @@ namespace WebApplication.Controllers
                 ViewBag.order_index = order.order_index;//订单号，名称谷歌
                 ViewBag.order_name = order.order_name;
                 ViewBag.unit = order.unit;
-                ViewBag.remain_num = order.remain_num;
                 ViewBag.order_price = order.order_price;
                 ViewBag.order_all_price = order.order_all_price;    
 
@@ -56,16 +55,19 @@ namespace WebApplication.Controllers
 
             Order orderNew = new Order();
             orderNew.seq_id = sale.seq_id;
-            orderNew.remain_num = orderOld.remain_num+ saleOld.real_num - sale.real_num;
             orderNew.open_num = orderOld.open_num- saleOld.real_num+sale.real_num;
             orderNew.tui_num = orderOld.tui_num;
+
+            if (orderNew.open_num> orderOld.order_num) {
+                return Json("Fail");
+            }
 
 
             Sale saleNew = new Sale();
             saleNew.deliver_index = sale.deliver_index;
             saleNew.seq_id= sale.seq_id;
             saleNew.deliver_company_head = saleOld.deliver_company_head;
-            saleNew.insert_time = DateTime.Now.ToLocalTime().AddHours(8);
+            saleNew.insert_time = DateTime.Now.ToLocalTime();
 
             saleNew.real_num = sale.real_num;
             saleNew.deliver_price = sale.deliver_price;
@@ -98,11 +100,11 @@ namespace WebApplication.Controllers
             {
                 string deliver_index = Convert.ToString(Request.Query["deliver_index"]);
                 int seq_id = Convert.ToInt32(Request.Query["seq_id"]);
+                int id = Convert.ToInt32(Request.Query["id"]);
                 Order orderOld = OM.SelectByOrderSeqId(seq_id);//获取原来的出货数量
                 Sale saleOld = SM.SelectSingleBySeqIndex(seq_id, deliver_index);
                 Order orderNew = new Order();
                 orderNew.seq_id = seq_id;
-                orderNew.remain_num = orderOld.remain_num + saleOld.real_num;
                 orderNew.open_num = orderOld.open_num - saleOld.real_num;
                 orderNew.tui_num = orderOld.tui_num;
 
@@ -110,7 +112,7 @@ namespace WebApplication.Controllers
 
 
                 ViewBag.deliver_index = deliver_index;
-                int count = SM.Del(seq_id,deliver_index);
+                int count = SM.Del(id);
                 if (count > 0)
                 {
                     return Json("Success");
