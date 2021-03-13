@@ -15,9 +15,9 @@
             //$(".sidebar ul li:nth-of-type(5)").addClass("active open");
             //$(".sidebar ul li:nth-of-type(5) ul li").removeClass();
             //$(".sidebar ul li:nth-of-type(5) ul li:nth-of-type(1)").addClass("active");
-
+            let month = $("#month").val();
             $("#myTable").bootstrapTable({
-                url: '/Sale/GetData',
+                url: '/Sale/GetData?month=' + month,
                 method: 'GET',
                 theadClasses: "thead-blue",
                 pagination: true,
@@ -229,7 +229,7 @@
                                     </div>
                                     <div class="form-group">
                                         <label>本月</label>
-                                        <input id="month" name="month" type="checkbox" class="form-control" onclick="CheckOrCancleAll($(this))" style="width:16px" value="0" @if (ViewBag.month == "1") { <text> checked</text> } />
+                                        <input id="month" name="month" type="checkbox" class="form-control" onclick="CheckOrCancleAll($(this))" style="width:16px" value="1" @if (ViewBag.month == "1") { <text> checked</text> } />
                                     </div>
                                     <div class="form-group">
                                         <label>本年</label>

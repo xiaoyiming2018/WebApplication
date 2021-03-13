@@ -26,6 +26,7 @@ namespace WebApplication.Controllers
         /// <returns></returns>
         public IActionResult Index()
         {
+            ViewBag.month = "1";
             return View();
         }
 

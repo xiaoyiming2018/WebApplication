@@ -2365,20 +2365,24 @@ Datamap
 Table
 -------------------------------------------------*/
 thead tr th {
-  color: #878787;
-  font-weight: normal;
-  text-transform: uppercase; }
+    /*color: #878787;*/
+    color: black;
+    font-weight: normal;
+    text-transform: uppercase;
+}
     thead tr th:last-child {
         text-align: left;
     }
 
 tbody tr th {
-  color: #878787;
-  font-family: Poppins, sans-serif;
-  font-weight: normal; }
+    color: black;
+    font-family: Poppins, sans-serif;
+    font-weight: normal;
+}
 tbody tr td {
-  font-family: Poppins, sans-serif;
-  color: #878787; }
+    font-family: Poppins, sans-serif;
+    color: black;
+}
   tbody tr td:last-child {
     text-align: left; }
 

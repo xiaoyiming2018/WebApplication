@@ -24,6 +24,7 @@
         .tdstyle {
             border: 2px solid black;
         }
+
     </style>
     <script type="text/javascript">
         var money = 0;
@@ -192,21 +193,36 @@
             }
             else {
                 $("#deliver_head").html(company_head);
+                $("#printTag").val(0);
                 window.print();
                 return false;
             }
         };
+        function tagPrint(company_order_index, order_name, order_num) {
+            $('#company_order_index_tag').html(company_order_index)
+            $('#order_name_tag').html(order_name)
+            $('#order_num_tag').html(order_num)
+            $("#printTag").val(1);
+            window.print();
+            return false;
+        }
 
     window.onbeforeprint = function () {
-
+        let printTag = $("#printTag").val();
         $(".sidebar").hide()
         $(".header").hide()
-        $("#Data1").show()
+        if (printTag == 0) {
+            $("#Data1").show()
+        } else {
+            $("#Data2").show()
+        }
+        
         $("#wrap").hide()
         $(".sidebar.sidebar-shrink ~ .content-wrap").css("margin-left", 0)
     }
     window.onafterprint = function () {
         $("#Data1").hide()
+        $("#Data2").hide()
         $("#wrap").show()
         $(".sidebar").show()
         $(".header").show()
@@ -465,7 +481,10 @@
                                             {
                                                 <th>删除</th>
                                             }
-
+                                            @if (UserManager.Current.GetLevel >= UserLevelEnum.ProductManager)
+                                            {
+                                                <th>标签打印</th>
+                                            }
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -500,6 +519,12 @@
                                                             <input type="button" class="btn btn-primary" onclick="deleteTiShi('@ViewBag.deliver_index',@item.seq_id,@item.id)" value="删除" />
                                                         </td>
                                                     }
+                                                    @if (UserManager.Current.GetLevel >= UserLevelEnum.ProductManager)
+                                                    {
+                                                        <td>
+                                                            <input type="button" class="btn btn-primary" onclick="tagPrint('@item.company_order_index','@item.order_name',@item.real_num)" value="标签打印" />
+                                                        </td>
+                                                    }
 
                                                 </tr>
                                                 index++;
@@ -527,7 +552,9 @@
 
     @if (Model != null)
     {
-        <div class="card alert" id="Data1" style="margin: 30px;display: none">
+        <input type="hidden" id="printTag" value="0" />
+
+        <div class="card alert" id="Data1" style="margin: 30px;display: none;">
 
             <div class="card-body">
                 <table class="table" border="0" cellspacing="0" cellpadding="0">
@@ -558,7 +585,7 @@
                             <td style="padding:2px;border:0;"></td>
                             <td style="padding:2px;border:0;"></td>
                             <td style="padding:2px;border:0;text-align:right">打印日期：</td>
-                            <td style="padding:2px;border:0;text-align:right">@(DateTime.Now.ToLocalTime().AddHours(8).ToString("yyyy-MM-dd HH:ss:mm"))</td>
+                            <td style="padding:2px;border:0;text-align:right">@(DateTime.Now.ToLocalTime().ToString("yyyy-MM-dd HH:ss:mm"))</td>
                         </tr>
                     </tbody>
                 </table>
@@ -616,6 +643,12 @@
                     </tbody>
                 </table>
             </div>
+        </div>
+
+        <div id="Data2">
+            <div id="company_order_index_tag"> </div>
+            <div id="order_name_tag"></div>
+            <div id="order_num_tag"></div>
         </div>
     }
 
