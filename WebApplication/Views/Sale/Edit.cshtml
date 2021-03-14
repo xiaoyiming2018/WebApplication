@@ -194,6 +194,8 @@
             else {
                 $("#deliver_head").html(company_head);
                 $("#printTag").val(0);
+                let printTime = getDateTime();
+                $("#printTime").html(printTime);
                 window.print();
                 return false;
             }
@@ -290,6 +292,23 @@
                     }
                 });
             }
+        }
+        function getDateTime() {
+            let fmt = "yyyy-MM-dd HH:mm:ss";
+            let myDate = new Date();
+            var o = {
+                "M+": myDate.getMonth() + 1, //月份 
+                "d+": myDate.getDate(), //日 
+                "H+": myDate.getHours(), //小时 
+                "m+": myDate.getMinutes(), //分 
+                "s+": myDate.getSeconds(), //秒 
+                "q+": Math.floor((myDate.getMonth() + 3) / 3), //季度 
+                "S": myDate.getMilliseconds() //毫秒 
+            };
+            if (/(y+)/.test(fmt)) fmt = fmt.replace(RegExp.$1, (myDate.getFullYear() + "").substr(4 - RegExp.$1.length));
+            for (var k in o)
+                if (new RegExp("(" + k + ")").test(fmt)) fmt = fmt.replace(RegExp.$1, (RegExp.$1.length == 1) ? (o[k]) : (("00" + o[k]).substr(("" + o[k]).length)));
+            return fmt;
         }
     </script>
 </head>
@@ -585,7 +604,7 @@
                             <td style="padding:2px;border:0;"></td>
                             <td style="padding:2px;border:0;"></td>
                             <td style="padding:2px;border:0;text-align:right">打印日期：</td>
-                            <td style="padding:2px;border:0;text-align:right">@(DateTime.Now.ToLocalTime().ToString("yyyy-MM-dd HH:ss:mm"))</td>
+                            <td id="printTime" style="padding:2px;border:0;text-align:right">@(DateTime.Now.ToLocalTime().ToString("yyyy-MM-dd HH:ss:mm"))</td>
                         </tr>
                     </tbody>
                 </table>
